@@ -110,6 +110,13 @@ class LogoSettings extends Component
             }
         }
 
+        if (!$srcImg) {
+            return;
+        }
+
+        $srcW = imagesx($srcImg);
+        $srcH = imagesy($srcImg);
+
         foreach ($sizes as $s) {
             $canvas = imagecreatetruecolor($s, $s);
             imagealphablending($canvas, false);
@@ -118,52 +125,26 @@ class LogoSettings extends Component
             $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
             imagefilledrectangle($canvas, 0, 0, $s, $s, $transparent);
 
-            if ($srcImg && imagesx($srcImg) > 0 && imagesy($srcImg) > 0) {
-                $srcW = imagesx($srcImg);
-                $srcH = imagesy($srcImg);
-                $ratio = min($s / $srcW, $s / $srcH);
-                $dstW = max(1, (int)($srcW * $ratio));
-                $dstH = max(1, (int)($srcH * $ratio));
-                $dstX = (int)(($s - $dstW) / 2);
-                $dstY = (int)(($s - $dstH) / 2);
+            $ratio = min($s / $srcW, $s / $srcH);
+            $dstW = max(1, (int)($srcW * $ratio));
+            $dstH = max(1, (int)($srcH * $ratio));
+            $dstX = (int)(($s - $dstW) / 2);
+            $dstY = (int)(($s - $dstH) / 2);
 
-                imagealphablending($canvas, true);
-                imagecopyresampled($canvas, $srcImg, $dstX, $dstY, 0, 0, $dstW, $dstH, $srcW, $srcH);
-            }
+            imagealphablending($canvas, true);
+            imagecopyresampled($canvas, $srcImg, $dstX, $dstY, 0, 0, $dstW, $dstH, $srcW, $srcH);
 
             $fileName = ($s == 180) ? 'apple-touch-icon.png' : "icon-{$s}x{$s}.png";
             imagepng($canvas, $dir . '/' . $fileName);
 
             if ($s == 192 || $s == 512) {
-                $maskCanvas = imagecreatetruecolor($s, $s);
-                imagealphablending($maskCanvas, false);
-                imagesavealpha($maskCanvas, true);
-                $bg = imagecolorallocate($maskCanvas, 81, 86, 190);
-                imagefilledrectangle($maskCanvas, 0, 0, $s, $s, $bg);
-
-                if ($srcImg && imagesx($srcImg) > 0 && imagesy($srcImg) > 0) {
-                    $srcW = imagesx($srcImg);
-                    $srcH = imagesy($srcImg);
-                    $maxDim = (int)($s * 0.75);
-                    $ratio = min($maxDim / $srcW, $maxDim / $srcH);
-                    $dstW = max(1, (int)($srcW * $ratio));
-                    $dstH = max(1, (int)($srcH * $ratio));
-                    $dstX = (int)(($s - $dstW) / 2);
-                    $dstY = (int)(($s - $dstH) / 2);
-
-                    imagealphablending($maskCanvas, true);
-                    imagecopyresampled($maskCanvas, $srcImg, $dstX, $dstY, 0, 0, $dstW, $dstH, $srcW, $srcH);
-                }
-                imagepng($maskCanvas, $dir . "/icon-maskable-{$s}x{$s}.png");
-                imagedestroy($maskCanvas);
+                imagepng($canvas, $dir . "/icon-maskable-{$s}x{$s}.png");
             }
 
             imagedestroy($canvas);
         }
 
-        if ($srcImg) {
-            imagedestroy($srcImg);
-        }
+        imagedestroy($srcImg);
     }
 
     public function render()
