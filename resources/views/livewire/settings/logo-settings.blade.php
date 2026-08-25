@@ -50,6 +50,14 @@
                         @endif
                         <input type="file" wire:model="favicon" class="form-control mt-2">
                     </div>
+
+                    <div class="col-md-4 text-center">
+                        <label class="form-label fw-bold d-block">PWA App Icon (Auto-generated)</label>
+                        @if(file_exists(public_path('assets/images/icons/icon-192x192.png')))
+                            <img src="{{ asset('assets/images/icons/icon-192x192.png') }}?v={{ time() }}" class="img-fluid rounded-3 border p-1 mb-2 shadow-sm" style="max-height: 60px;">
+                        @endif
+                        <small class="text-muted d-block font-size-12 mt-1">Synced automatically from Favicon / Logo for PWA installation.</small>
+                    </div>
                 </div>
 
                 <div class="text-end mt-4">
