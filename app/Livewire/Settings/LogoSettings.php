@@ -112,14 +112,16 @@ class LogoSettings extends Component
 
         foreach ($sizes as $s) {
             $canvas = imagecreatetruecolor($s, $s);
-            $bg = imagecolorallocate($canvas, 81, 86, 190);
-            imagefilledrectangle($canvas, 0, 0, $s, $s, $bg);
+            imagealphablending($canvas, false);
+            imagesavealpha($canvas, true);
+
+            $transparent = imagecolorallocatealpha($canvas, 0, 0, 0, 127);
+            imagefilledrectangle($canvas, 0, 0, $s, $s, $transparent);
 
             if ($srcImg && imagesx($srcImg) > 0 && imagesy($srcImg) > 0) {
                 $srcW = imagesx($srcImg);
                 $srcH = imagesy($srcImg);
-                $maxDim = (int)($s * 0.65);
-                $ratio = min($maxDim / $srcW, $maxDim / $srcH);
+                $ratio = min($s / $srcW, $s / $srcH);
                 $dstW = max(1, (int)($srcW * $ratio));
                 $dstH = max(1, (int)($srcH * $ratio));
                 $dstX = (int)(($s - $dstW) / 2);
@@ -127,28 +129,35 @@ class LogoSettings extends Component
 
                 imagealphablending($canvas, true);
                 imagecopyresampled($canvas, $srcImg, $dstX, $dstY, 0, 0, $dstW, $dstH, $srcW, $srcH);
-            } else {
-                $white = imagecolorallocate($canvas, 255, 255, 255);
-                $accent = imagecolorallocate($canvas, 43, 181, 143);
-                $pad = (int)($s * 0.22);
-                $w = $s - ($pad * 2);
-                imagefilledrectangle($canvas, $pad, (int)($s * 0.38), $s - $pad, $s - $pad, $white);
-                $points = [
-                    (int)($s * 0.5), (int)($s * 0.2),
-                    $pad - 5, (int)($s * 0.38),
-                    $s - $pad + 5, (int)($s * 0.38)
-                ];
-                imagefilledpolygon($canvas, $points, $accent);
-                $doorW = (int)($w * 0.35);
-                $doorH = (int)($w * 0.45);
-                imagefilledrectangle($canvas, (int)(($s - $doorW) / 2), $s - $pad - $doorH, (int)(($s + $doorW) / 2), $s - $pad, $bg);
             }
 
             $fileName = ($s == 180) ? 'apple-touch-icon.png' : "icon-{$s}x{$s}.png";
             imagepng($canvas, $dir . '/' . $fileName);
+
             if ($s == 192 || $s == 512) {
-                imagepng($canvas, $dir . "/icon-maskable-{$s}x{$s}.png");
+                $maskCanvas = imagecreatetruecolor($s, $s);
+                imagealphablending($maskCanvas, false);
+                imagesavealpha($maskCanvas, true);
+                $bg = imagecolorallocate($maskCanvas, 81, 86, 190);
+                imagefilledrectangle($maskCanvas, 0, 0, $s, $s, $bg);
+
+                if ($srcImg && imagesx($srcImg) > 0 && imagesy($srcImg) > 0) {
+                    $srcW = imagesx($srcImg);
+                    $srcH = imagesy($srcImg);
+                    $maxDim = (int)($s * 0.75);
+                    $ratio = min($maxDim / $srcW, $maxDim / $srcH);
+                    $dstW = max(1, (int)($srcW * $ratio));
+                    $dstH = max(1, (int)($srcH * $ratio));
+                    $dstX = (int)(($s - $dstW) / 2);
+                    $dstY = (int)(($s - $dstH) / 2);
+
+                    imagealphablending($maskCanvas, true);
+                    imagecopyresampled($maskCanvas, $srcImg, $dstX, $dstY, 0, 0, $dstW, $dstH, $srcW, $srcH);
+                }
+                imagepng($maskCanvas, $dir . "/icon-maskable-{$s}x{$s}.png");
+                imagedestroy($maskCanvas);
             }
+
             imagedestroy($canvas);
         }
 
