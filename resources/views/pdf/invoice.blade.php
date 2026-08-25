@@ -23,6 +23,11 @@
         <table>
             <tr>
                 <td style="width: 60%;">
+                    @if($company && $company->invoice_logo_src)
+                        <div style="margin-bottom: 12px;">
+                            <img src="{{ $company->invoice_logo_src }}" alt="Company Logo" style="max-height: 70px; max-width: 220px; width: auto; height: auto; object-fit: contain;">
+                        </div>
+                    @endif
                     <div class="company-name">{{ $company->company_name ?? 'Apex General Trading LLC' }}</div>
                     <div>{{ $company->address ?? '' }}</div>
                     <div>{{ $company->city ?? '' }}, {{ $company->country ?? '' }}</div>

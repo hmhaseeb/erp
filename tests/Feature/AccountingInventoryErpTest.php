@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\Account;
+use App\Models\CompanySetting;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Sale;
 use App\Models\Supplier;
+use App\Models\User;
 use App\Services\PaymentService;
 use App\Services\PurchaseService;
 use App\Services\SalesService;
@@ -228,5 +230,51 @@ class AccountingInventoryErpTest extends TestCase
         $this->assertEquals(0.00, $customer->current_balance);
         $this->assertEquals(0.00, $sale->due_amount);
         $this->assertEquals(525.00, $sale->paid_amount);
+    }
+
+    public function test_invoice_pdf_generation_displays_logo(): void
+    {
+        $user = User::first();
+        $company = CompanySetting::first();
+
+        $logoDirPath = storage_path('app/public/logos');
+        if (!file_exists($logoDirPath)) {
+            mkdir($logoDirPath, 0777, true);
+        }
+        $testImagePath = $logoDirPath . '/test_invoice_logo.png';
+        file_put_contents($testImagePath, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='));
+
+        $company->update(['invoice_logo' => 'logos/test_invoice_logo.png']);
+
+        $customer = Customer::create([
+            'customer_code' => 'CUST-PDF',
+            'name' => 'PDF Test Client',
+            'current_balance' => 0,
+        ]);
+
+        $sale = Sale::create([
+            'invoice_number' => 'INV-PDF-999',
+            'sale_date' => now()->toDateString(),
+            'customer_id' => $customer->id,
+            'payment_type' => 'Cash',
+            'subtotal' => 100.00,
+            'vat_amount' => 5.00,
+            'grand_total' => 105.00,
+            'paid_amount' => 105.00,
+            'due_amount' => 0.00,
+            'status' => 'Confirmed',
+        ]);
+
+        $this->assertNotNull($company->invoice_logo_src);
+        $this->assertStringStartsWith('data:image/', $company->invoice_logo_src);
+
+        $response = $this->actingAs($user)->get(route('sales.pdf', ['id' => $sale->id]));
+
+        $response->assertStatus(200);
+        $this->assertTrue(str_contains($response->headers->get('content-type'), 'application/pdf'));
+
+        if (file_exists($testImagePath)) {
+            unlink($testImagePath);
+        }
     }
 }
