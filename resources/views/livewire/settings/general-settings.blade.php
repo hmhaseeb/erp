@@ -1,0 +1,81 @@
+<div>
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                <h4 class="mb-sm-0 font-size-18">General System Settings</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <form wire:submit.prevent="saveSettings">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Date Format</label>
+                        <select wire:model="date_format" class="form-select">
+                            <option value="Y-m-d">YYYY-MM-DD (2026-08-22)</option>
+                            <option value="d/m/Y">DD/MM/YYYY (22/08/2026)</option>
+                            <option value="m/d/Y">MM/DD/YYYY (08/22/2026)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Timezone</label>
+                        <input type="text" wire:model="time_zone" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Decimal Places</label>
+                        <input type="number" wire:model="decimal_places" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Product SKU Prefix</label>
+                        <input type="text" wire:model="product_prefix" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Supplier Code Prefix</label>
+                        <input type="text" wire:model="supplier_prefix" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Customer Code Prefix</label>
+                        <input type="text" wire:model="customer_prefix" class="form-control">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Default Cash Account</label>
+                        <select wire:model="default_cash_account_id" class="form-select">
+                            <option value="">-- None --</option>
+                            @foreach($accounts as $acc)
+                                <option value="{{ $acc->id }}">{{ $acc->name }} ({{ $acc->type }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Default Bank Account</label>
+                        <select wire:model="default_bank_account_id" class="form-select">
+                            <option value="">-- None --</option>
+                            @foreach($accounts as $acc)
+                                <option value="{{ $acc->id }}">{{ $acc->name }} ({{ $acc->type }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" wire:model="allow_negative_stock" id="negativeStockSwitch">
+                    <label class="form-check-label" for="negativeStockSwitch">Allow Negative Inventory Stocking during Sales</label>
+                </div>
+
+                <div class="text-end mt-4">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bx bx-save me-1"></i> Save General Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,201 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Customer;
+use App\Models\CustomerTransaction;
+use App\Models\Product;
+use App\Models\Sale;
+use App\Models\SaleItem;
+use Illuminate\Support\Facades\DB;
+use Exception;
+
+class SalesService
+{
+    protected StockService $stockService;
+    protected AccountingService $accountingService;
+
+    public function __construct(StockService $stockService, AccountingService $accountingService)
+    {
+        $this->stockService = $stockService;
+        $this->accountingService = $accountingService;
+    }
+
+    /**
+     * Create and confirm a sales invoice inside DB transaction.
+     */
+    public function createSale(array $header, array $items): Sale
+    {
+        return DB::transaction(function () use ($header, $items) {
+            $cogsTotal = 0.00;
+            $processedItems = [];
+
+            foreach ($items as $item) {
+                $product = Product::findOrFail($item['product_id']);
+                $unitCost = (float) $product->weighted_cost;
+                $cogsAmount = $item['quantity'] * $unitCost;
+                $cogsTotal += $cogsAmount;
+
+                $processedItems[] = array_merge($item, [
+                    'unit_cost' => $unitCost,
+                    'cogs_amount' => $cogsAmount,
+                ]);
+            }
+
+            $sale = Sale::create([
+                'invoice_number' => $header['invoice_number'],
+                'sale_date' => $header['sale_date'],
+                'customer_id' => $header['customer_id'],
+                'payment_type' => $header['payment_type'],
+                'account_id' => $header['account_id'] ?? null,
+                'subtotal' => $header['subtotal'],
+                'discount_amount' => $header['discount_amount'] ?? 0,
+                'vat_amount' => $header['vat_amount'] ?? 0,
+                'grand_total' => $header['grand_total'],
+                'paid_amount' => $header['payment_type'] !== 'Credit' ? $header['grand_total'] : 0,
+                'due_amount' => $header['payment_type'] === 'Credit' ? $header['grand_total'] : 0,
+                'cogs_total' => $cogsTotal,
+                'status' => 'Confirmed',
+                'notes' => $header['notes'] ?? null,
+            ]);
+
+            foreach ($processedItems as $itemData) {
+                SaleItem::create([
+                    'sale_id' => $sale->id,
+                    'product_id' => $itemData['product_id'],
+                    'quantity' => $itemData['quantity'],
+                    'unit_price' => $itemData['unit_price'],
+                    'unit_cost' => $itemData['unit_cost'],
+                    'discount_amount' => $itemData['discount_amount'] ?? 0,
+                    'vat_percent' => $itemData['vat_percent'] ?? 0,
+                    'vat_amount' => $itemData['vat_amount'] ?? 0,
+                    'line_total' => $itemData['line_total'],
+                    'cogs_amount' => $itemData['cogs_amount'],
+                ]);
+
+                // Reduce stock
+                $this->stockService->recordMovement(
+                    $itemData['product_id'],
+                    $sale->sale_date,
+                    'SALE',
+                    0,
+                    $itemData['quantity'],
+                    $itemData['unit_cost'],
+                    Sale::class,
+                    $sale->id,
+                    "Sales Invoice #{$sale->invoice_number}"
+                );
+            }
+
+            $customer = Customer::findOrFail($sale->customer_id);
+
+            if ($sale->payment_type === 'Credit') {
+                // Customer Receivable increases (Debit entry on customer ledger)
+                $newCustomerBalance = $customer->current_balance + $sale->grand_total;
+                CustomerTransaction::create([
+                    'customer_id' => $customer->id,
+                    'date' => $sale->sale_date,
+                    'transaction_type' => 'SALE',
+                    'reference_type' => Sale::class,
+                    'reference_id' => $sale->id,
+                    'debit' => $sale->grand_total,
+                    'credit' => 0,
+                    'balance' => $newCustomerBalance,
+                    'description' => "Sales Invoice #{$sale->invoice_number}",
+                ]);
+                $customer->update(['current_balance' => $newCustomerBalance]);
+            } else {
+                // Immediate Cash/Bank Payment (Account Debit / Inflow)
+                if (!$sale->account_id) {
+                    throw new Exception("Account must be selected for Cash/Bank sales.");
+                }
+                $this->accountingService->recordTransaction(
+                    $sale->account_id,
+                    $sale->sale_date,
+                    'Sales Receipt',
+                    $sale->grand_total,
+                    0,
+                    Sale::class,
+                    $sale->id,
+                    "Payment received for Sales Invoice #{$sale->invoice_number}"
+                );
+
+                // Record customer ledger showing sale and immediate payment
+                CustomerTransaction::create([
+                    'customer_id' => $customer->id,
+                    'date' => $sale->sale_date,
+                    'transaction_type' => 'SALE',
+                    'reference_type' => Sale::class,
+                    'reference_id' => $sale->id,
+                    'debit' => $sale->grand_total,
+                    'credit' => $sale->grand_total,
+                    'balance' => $customer->current_balance,
+                    'description' => "Direct {$sale->payment_type} Sales Invoice #{$sale->invoice_number}",
+                ]);
+            }
+
+            return $sale;
+        });
+    }
+
+    /**
+     * Cancel sale and safely restore stock & reverse financial entries.
+     */
+    public function cancelSale(int $saleId): void
+    {
+        DB::transaction(function () use ($saleId) {
+            $sale = Sale::with('items')->findOrFail($saleId);
+
+            if ($sale->status === 'Cancelled') {
+                throw new Exception("Sale is already cancelled.");
+            }
+
+            // Restore stock
+            foreach ($sale->items as $item) {
+                $this->stockService->recordMovement(
+                    $item->product_id,
+                    now()->toDateString(),
+                    'ADJUSTMENT_IN',
+                    $item->quantity,
+                    0,
+                    $item->unit_cost,
+                    Sale::class,
+                    $sale->id,
+                    "Reversal for cancelled sale #{$sale->invoice_number}"
+                );
+            }
+
+            $customer = Customer::findOrFail($sale->customer_id);
+
+            if ($sale->payment_type === 'Credit') {
+                $newBalance = $customer->current_balance - $sale->due_amount;
+                CustomerTransaction::create([
+                    'customer_id' => $customer->id,
+                    'date' => now()->toDateString(),
+                    'transaction_type' => 'ADJUSTMENT',
+                    'reference_type' => Sale::class,
+                    'reference_id' => $sale->id,
+                    'debit' => 0,
+                    'credit' => $sale->due_amount,
+                    'balance' => $newBalance,
+                    'description' => "Cancellation of Sales Invoice #{$sale->invoice_number}",
+                ]);
+                $customer->update(['current_balance' => $newBalance]);
+            } else if ($sale->account_id) {
+                // Outflow / Refund from account
+                $this->accountingService->recordTransaction(
+                    $sale->account_id,
+                    now()->toDateString(),
+                    'Sale Reversal',
+                    0,
+                    $sale->paid_amount,
+                    Sale::class,
+                    $sale->id,
+                    "Reversal of Sales Receipt #{$sale->invoice_number}"
+                );
+            }
+
+            $sale->update(['status' => 'Cancelled']);
+        });
+    }
+}
