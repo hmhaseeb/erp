@@ -14,6 +14,15 @@
 
     <link rel="shortcut icon" href="{{ $favicon }}">
 
+    <!-- PWA Manifest & Meta Tags -->
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#5156be">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Inventory ERP">
+    <link rel="apple-touch-icon" href="{{ asset('assets/images/icons/apple-touch-icon.png') }}">
+
     <!-- preloader css -->
     <link rel="stylesheet" href="{{ asset('assets/css/preloader.min.css') }}" type="text/css" />
 
@@ -45,6 +54,19 @@
     <script src="{{ asset('assets/js/app.js') }}"></script>
 
     @livewireScripts
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('PWA ServiceWorker registered with scope:', registration.scope);
+                }, function(err) {
+                    console.log('PWA ServiceWorker registration failed:', err);
+                });
+            });
+        }
+    </script>
 </body>
 
 </html>

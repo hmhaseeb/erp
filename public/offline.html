@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline Mode | Inventory & Accounting ERP</title>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/icons.min.css">
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+        .offline-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+        }
+        .icon-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(81, 86, 190, 0.2);
+            color: #818cf8;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(129, 140, 248, 0.3);
+        }
+        .btn-primary-custom {
+            background-color: #5156be;
+            border-color: #5156be;
+            color: #ffffff;
+            font-weight: 600;
+            padding: 0.65rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn-primary-custom:hover {
+            background-color: #4348a8;
+            border-color: #4348a8;
+            color: #ffffff;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(248, 113, 113, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="offline-card">
+        <div class="status-badge">
+            <i class="bx bx-wifi-off me-1"></i> Connection Lost
+        </div>
+
+        <div class="icon-circle">
+            <i class="bx bx-cloud-off"></i>
+        </div>
+
+        <h4 class="fw-bold mb-2">You are currently offline</h4>
+        <p class="text-secondary font-size-14 mb-4" style="color: #94a3b8 !important;">
+            Inventory ERP requires an active network connection to perform financial transactions, sync inventory stock, and save sales records securely.
+        </p>
+
+        <button onclick="checkConnection()" class="btn btn-primary-custom w-100 mb-3">
+            <i class="bx bx-refresh me-1 font-size-16 align-middle"></i> Retry Connection
+        </button>
+
+        <small class="d-block text-muted" style="color: #64748b !important;">
+            Cached static pages remain accessible when browser re-connects.
+        </small>
+    </div>
+
+    <script>
+        function checkConnection() {
+            if (navigator.onLine) {
+                window.location.reload();
+            } else {
+                alert('Still offline. Please check your Wi-Fi or network cable connection.');
+            }
+        }
+
+        window.addEventListener('online', function() {
+            window.location.reload();
+        });
+    </script>
+</body>
+</html>

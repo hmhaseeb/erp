@@ -277,4 +277,25 @@ class AccountingInventoryErpTest extends TestCase
             unlink($testImagePath);
         }
     }
+
+    public function test_pwa_manifest_service_worker_and_offline_page_exist(): void
+    {
+        $this->assertFileExists(public_path('manifest.json'));
+        $this->assertFileExists(public_path('sw.js'));
+        $this->assertFileExists(public_path('offline.html'));
+        $this->assertFileExists(public_path('assets/images/icons/icon-192x192.png'));
+        $this->assertFileExists(public_path('assets/images/icons/icon-512x512.png'));
+
+        $manifestContent = file_get_contents(public_path('manifest.json'));
+        $manifest = json_decode($manifestContent, true);
+
+        $this->assertNotNull($manifest);
+        $this->assertEquals('standalone', $manifest['display']);
+        $this->assertEquals('Inventory & Accounting ERP', $manifest['name']);
+        $this->assertCount(10, $manifest['icons']);
+
+        $swContent = file_get_contents(public_path('sw.js'));
+        $this->assertStringContainsString('CACHE_NAME', $swContent);
+        $this->assertStringContainsString('offline.html', $swContent);
+    }
 }
