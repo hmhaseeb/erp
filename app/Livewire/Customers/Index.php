@@ -124,6 +124,25 @@ class Index extends Component
         $this->resetValidation();
     }
 
+    public $selectedCustomer;
+    public $isViewModalOpen = false;
+
+    public function viewCustomer($id)
+    {
+        $this->selectedCustomer = Customer::with([
+            'sales' => fn($q) => $q->latest()->take(10),
+            'payments' => fn($q) => $q->with('account')->latest()->take(10),
+            'transactions' => fn($q) => $q->latest()->take(15)
+        ])->findOrFail($id);
+        $this->isViewModalOpen = true;
+    }
+
+    public function closeViewModal()
+    {
+        $this->isViewModalOpen = false;
+        $this->selectedCustomer = null;
+    }
+
     public function saveCustomer()
     {
         $this->validate();
@@ -145,6 +164,7 @@ class Index extends Component
             ]);
 
             session()->flash('success', "Customer '{$this->name}' updated successfully.");
+            $this->dispatch('toast', message: "Customer '{$this->name}' updated successfully.", type: 'success', title: 'Customer Updated');
         } else {
             Customer::create([
                 'customer_code' => $this->customer_code,
@@ -164,6 +184,7 @@ class Index extends Component
             ]);
 
             session()->flash('success', "Customer '{$this->name}' registered successfully.");
+            $this->dispatch('toast', message: "Customer '{$this->name}' registered successfully.", type: 'success', title: 'Customer Registered');
         }
 
         $this->closeModal();
@@ -174,17 +195,20 @@ class Index extends Component
         $customer = Customer::findOrFail($id);
         if ($customer->current_balance != 0) {
             session()->flash('error', "Cannot delete customer with an outstanding balance (AED {$customer->current_balance}).");
+            $this->dispatch('toast', message: "Cannot delete customer with an outstanding balance (AED {$customer->current_balance}).", type: 'danger', title: 'Action Denied');
             return;
         }
 
         $hasSales = Sale::where('customer_id', $customer->id)->exists();
         if ($hasSales) {
             session()->flash('error', "Cannot delete customer with recorded sales invoices.");
+            $this->dispatch('toast', message: "Cannot delete customer with recorded sales invoices.", type: 'danger', title: 'Action Denied');
             return;
         }
 
         $customer->delete();
         session()->flash('success', 'Customer deleted successfully.');
+        $this->dispatch('toast', message: 'Customer deleted successfully.', type: 'success', title: 'Customer Deleted');
     }
 
     public function render()

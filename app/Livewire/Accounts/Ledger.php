@@ -5,13 +5,43 @@ namespace App\Livewire\Accounts;
 use App\Models\Account;
 use App\Models\AccountTransaction;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Ledger extends Component
 {
+    use WithPagination;
+    protected $paginationTheme = 'bootstrap';
+
     public $account_id;
     public $start_date;
     public $end_date;
     public $search = '';
+    public $perPage = 15;
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedAccountId()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedStartDate()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedEndDate()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
 
     public function mount()
     {
@@ -34,6 +64,8 @@ class Ledger extends Component
         $this->start_date = now()->startOfMonth()->toDateString();
         $this->end_date = now()->toDateString();
         $this->search = '';
+        $this->perPage = 15;
+        $this->resetPage();
     }
 
     public function render()
@@ -42,6 +74,9 @@ class Ledger extends Component
         $selectedAccount = Account::find($this->account_id);
 
         $openingBalance = 0;
+        $totalDebits = 0;
+        $totalCredits = 0;
+        $closingBalance = 0;
         $transactions = collect();
 
         if ($selectedAccount) {
@@ -53,7 +88,7 @@ class Ledger extends Component
                 ->whereDate('transaction_date', '<', $this->start_date)
                 ->sum('credit');
 
-            $openingBalance = $selectedAccount->opening_balance + $priorDebits - $priorCredits;
+            $openingBalance = (float)$selectedAccount->opening_balance + (float)$priorDebits - (float)$priorCredits;
 
             $query = AccountTransaction::where('account_id', $selectedAccount->id)
                 ->whereBetween('transaction_date', [$this->start_date, $this->end_date]);
@@ -66,14 +101,15 @@ class Ledger extends Component
                 });
             }
 
+            $metricsQuery = clone $query;
+            $totalDebits = (float) $metricsQuery->sum('debit');
+            $totalCredits = (float) $metricsQuery->sum('credit');
+            $closingBalance = $openingBalance + $totalDebits - $totalCredits;
+
             $transactions = $query->orderBy('transaction_date', 'asc')
                 ->orderBy('id', 'asc')
-                ->get();
+                ->paginate((int)$this->perPage);
         }
-
-        $totalDebits = $transactions->sum('debit');
-        $totalCredits = $transactions->sum('credit');
-        $closingBalance = $openingBalance + $totalDebits - $totalCredits;
 
         return view('livewire.accounts.ledger', [
             'accounts' => $accounts,

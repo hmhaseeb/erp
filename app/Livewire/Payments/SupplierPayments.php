@@ -105,6 +105,8 @@ class SupplierPayments extends Component
 
     public function savePayment(PaymentService $paymentService)
     {
+        $this->resetErrorBag();
+
         $this->validate([
             'supplier_id' => 'required|exists:suppliers,id',
             'account_id' => 'required|exists:accounts,id',
@@ -125,9 +127,12 @@ class SupplierPayments extends Component
             );
 
             session()->flash('success', 'Supplier payment voucher recorded successfully.');
+            $this->dispatch('toast', message: 'Supplier payment voucher recorded successfully.', type: 'success', title: 'Payment Recorded');
             $this->closeModal();
         } catch (\Exception $e) {
-            session()->flash('error', $e->getMessage());
+            $this->addError('payment_error', $e->getMessage());
+            session()->flash('modal_error', $e->getMessage());
+            $this->dispatch('toast', message: $e->getMessage(), type: 'danger', title: 'Payment Failed');
         }
     }
 

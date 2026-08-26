@@ -46,6 +46,12 @@
         .badge-soft-secondary { background-color: rgba(116, 120, 141, 0.15); color: #74788d; }
         .table-custom th { font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
 
+        /* Searchable Select Utility CSS */
+        [x-cloak] { display: none !important; }
+        .cursor-pointer { cursor: pointer; }
+        .transition-icon { transition: transform 0.2s ease; }
+        .rotate-180 { transform: rotate(180deg); }
+
         /* Sortable Table Columns */
         th.sortable {
             cursor: pointer;
@@ -496,20 +502,8 @@
             <div class="page-content">
                 <div class="container-fluid">
 
-                    <!-- Flash Notification Messages -->
-                    @if (session()->has('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <i class="mdi mdi-check-all me-2"></i> {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-
-                    @if (session()->has('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="mdi mdi-block-helper me-2"></i> {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+                    <!-- Global Toast Notifications -->
+                    <x-toast-notification />
 
                     {{ $slot }}
 
@@ -593,6 +587,104 @@
                 pwaInstallBtn.classList.remove('d-inline-flex');
                 pwaInstallBtn.classList.add('d-none');
             }
+        });
+    </script>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('searchableSelect', () => ({
+                open: false,
+                searchQuery: '',
+                options: [],
+                selectedValue: '',
+                selectedLabel: '',
+                focusedIndex: -1,
+
+                init() {
+                    this.syncFromSelect();
+                    if (this.$refs.nativeSelect) {
+                        const observer = new MutationObserver(() => this.syncFromSelect());
+                        observer.observe(this.$refs.nativeSelect, { childList: true, attributes: true, subtree: true });
+                    }
+                    this.$watch('selectedValue', (val) => {
+                        const select = this.$refs.nativeSelect;
+                        if (select && select.value !== val) {
+                            select.value = val;
+                            select.dispatchEvent(new Event('change', { bubbles: true }));
+                            select.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+                    });
+                },
+
+                syncFromSelect() {
+                    const select = this.$refs.nativeSelect;
+                    if (!select) return;
+
+                    const opts = [];
+                    for (let i = 0; i < select.options.length; i++) {
+                        const opt = select.options[i];
+                        opts.push({
+                            value: opt.value,
+                            label: opt.text.trim(),
+                            disabled: opt.disabled
+                        });
+                    }
+                    this.options = opts;
+                    this.selectedValue = select.value;
+                    const currentOpt = opts.find(o => o.value == select.value);
+                    if (currentOpt) {
+                        this.selectedLabel = currentOpt.label;
+                    } else if (select.options.length > 0 && select.selectedIndex >= 0) {
+                        this.selectedLabel = select.options[select.selectedIndex]?.text?.trim() || '';
+                    } else {
+                        this.selectedLabel = '';
+                    }
+                },
+
+                get filteredOptions() {
+                    if (!this.searchQuery) return this.options;
+                    const q = this.searchQuery.toLowerCase();
+                    return this.options.filter(o => o.label.toLowerCase().includes(q) || String(o.value).toLowerCase().includes(q));
+                },
+
+                selectOption(opt) {
+                    if (opt.disabled) return;
+                    this.selectedValue = opt.value;
+                    this.selectedLabel = opt.label;
+                    this.open = false;
+                    this.searchQuery = '';
+                    this.focusedIndex = -1;
+
+                    const select = this.$refs.nativeSelect;
+                    if (select) {
+                        select.value = opt.value;
+                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                        select.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                },
+
+                navigateOptions(step) {
+                    const total = this.filteredOptions.length;
+                    if (total === 0) return;
+                    this.focusedIndex = (this.focusedIndex + step + total) % total;
+                },
+
+                selectFocusedOption() {
+                    if (this.focusedIndex >= 0 && this.focusedIndex < this.filteredOptions.length) {
+                        this.selectOption(this.filteredOptions[this.focusedIndex]);
+                    }
+                },
+
+                toggle() {
+                    this.open = !this.open;
+                    if (this.open) {
+                        this.syncFromSelect();
+                        this.focusedIndex = -1;
+                        this.$nextTick(() => {
+                            if (this.$refs.searchInput) this.$refs.searchInput.focus();
+                        });
+                    }
+                }
+            }));
         });
     </script>
 </body>

@@ -6,12 +6,16 @@ use App\Models\Account;
 use App\Models\AccountTransaction;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class CashBook extends Component
 {
+    use WithPagination;
+
     public $start_date;
     public $end_date;
     public $search = '';
+    public $perPage = 15;
 
     public function mount()
     {
@@ -19,11 +23,33 @@ class CashBook extends Component
         $this->end_date = now()->toDateString();
     }
 
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedStartDate()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedEndDate()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
     public function resetFilters()
     {
         $this->start_date = now()->startOfMonth()->toDateString();
         $this->end_date = now()->toDateString();
         $this->search = '';
+        $this->perPage = 15;
+        $this->resetPage();
     }
 
     public function render()
@@ -56,13 +82,13 @@ class CashBook extends Component
             });
         }
 
+        $totalDebits = (float) (clone $query)->sum('debit');
+        $totalCredits = (float) (clone $query)->sum('credit');
+        $closingBalance = $openingBalance + $totalDebits - $totalCredits;
+
         $transactions = $query->orderBy('transaction_date', 'asc')
             ->orderBy('id', 'asc')
-            ->get();
-
-        $totalDebits = (float) $transactions->sum('debit');
-        $totalCredits = (float) $transactions->sum('credit');
-        $closingBalance = $openingBalance + $totalDebits - $totalCredits;
+            ->paginate($this->perPage);
 
         return view('livewire.reports.cash-book', [
             'transactions' => $transactions,

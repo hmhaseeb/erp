@@ -1,11 +1,6 @@
 <div>
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Logo Management</h4>
-            </div>
-        </div>
-    </div>
+    <!-- Page Header -->
+    <x-page-header title="Logo Management" subtitle="Manage header branding, PDF report logos, login page graphics, and browser favicons." />
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">

@@ -39,12 +39,14 @@ class Create extends Component
         $this->addItem();
     }
 
+    public function updatedPurchaseDate()
+    {
+        $this->generatePurchaseNumber();
+    }
+
     public function generatePurchaseNumber()
     {
-        $setting = \App\Models\InvoiceSetting::first();
-        $prefix = $setting ? $setting->purchase_prefix : 'PUR-';
-        $maxId = Purchase::max('id') + 1;
-        $this->purchase_number = $prefix . str_pad((string)$maxId, 6, '0', STR_PAD_LEFT);
+        $this->purchase_number = \App\Models\InvoiceSetting::getNextPurchaseNumber($this->purchase_date);
     }
 
     public function addItem()
@@ -145,17 +147,23 @@ class Create extends Component
             'notes' => $this->notes,
         ];
 
-        $purchaseService->createPurchase($header, $this->items);
+        try {
+            $purchaseService->createPurchase($header, $this->items);
 
-        session()->flash('success', "Purchase Invoice #{$this->purchase_number} created successfully.");
-        return redirect()->route('purchases.index');
+            session()->flash('success', "Purchase Invoice #{$this->purchase_number} created successfully.");
+            $this->dispatch('toast', message: "Purchase Invoice #{$this->purchase_number} created successfully.", type: 'success', title: 'Purchase Created');
+            return redirect()->route('purchases.index');
+        } catch (\Exception $e) {
+            session()->flash('error', $e->getMessage());
+            $this->dispatch('toast', message: $e->getMessage(), type: 'danger', title: 'Error');
+        }
     }
 
     public function render()
     {
         $suppliers = Supplier::select('id', 'name', 'company_name')->where('status', true)->orderBy('name')->get();
         $accounts = Account::select('id', 'name', 'type', 'current_balance')->where('status', true)->get();
-        $products = Product::select('id', 'product_code', 'name', 'sales_price', 'purchase_price', 'tax_percent')->where('status', true)->orderBy('name')->get();
+        $products = Product::with('category')->where('status', true)->orderBy('name')->get();
 
         return view('livewire.purchases.create', [
             'suppliers' => $suppliers,

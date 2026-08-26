@@ -1,64 +1,67 @@
 <div>
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Create Sales Invoice</h4>
-                <a href="{{ route('sales.index') }}" class="btn btn-secondary">
-                    <i class="bx bx-arrow-back me-1"></i> Back to Invoices
-                </a>
-            </div>
-        </div>
-    </div>
+    <!-- Page Header -->
+    <x-page-header title="Create Sales Invoice" subtitle="Generate a new tax invoice for customer sales.">
+        <a href="{{ route('sales.index') }}" class="btn btn-light">
+            <i class="bx bx-arrow-back me-1"></i> Back to Invoices
+        </a>
+    </x-page-header>
 
     <form wire:submit.prevent="saveSale">
+        <!-- Invoice Header Card -->
         <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-bottom py-3">
+                <h5 class="card-title mb-0">Invoice Header & Customer Details</h5>
+            </div>
             <div class="card-body">
-                <h5 class="card-title mb-3">Invoice Details</h5>
                 <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Invoice Number</label>
-                        <input type="text" wire:model="invoice_number" class="form-control" readonly>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Invoice Number <span class="text-danger">*</span></label>
+                        <input type="text" wire:model="invoice_number" class="form-control @error('invoice_number') is-invalid @enderror" readonly>
+                        @error('invoice_number') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Sale Date</label>
-                        <input type="date" wire:model="sale_date" class="form-control">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Sale Date <span class="text-danger">*</span></label>
+                        <input type="date" wire:model="sale_date" class="form-control @error('sale_date') is-invalid @enderror">
+                        @error('sale_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Customer</label>
-                        <select wire:model="customer_id" class="form-select">
-                            @foreach($customers as $cust)
-                                <option value="{{ $cust->id }}">{{ $cust->name }} @if($cust->company_name) ({{ $cust->company_name }}) @endif</option>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Select Customer <span class="text-danger">*</span></label>
+                        <x-searchable-select wire:model="customer_id" class="form-select {{ $errors->has('customer_id') ? 'is-invalid' : '' }}" placeholder="Select Customer...">
+                            @foreach($customers as $c)
+                                <option value="{{ $c->id }}">{{ $c->name }} ({{ $c->company_name ?? 'Individual' }})</option>
                             @endforeach
-                        </select>
+                        </x-searchable-select>
+                        @error('customer_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Payment Type <span class="text-danger">*</span></label>
+                        <x-searchable-select wire:model.live="payment_type" class="form-select">
+                            <option value="Cash">Cash Sale</option>
+                            <option value="Bank">Bank / Online</option>
+                            <option value="Credit">Credit (Receivable)</option>
+                        </x-searchable-select>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Payment Terms / Type</label>
-                        <select wire:model.live="payment_type" class="form-select">
-                            <option value="Cash">Cash (Immediate Receipt)</option>
-                            <option value="Bank">Bank Deposit / Card</option>
-                            <option value="Credit">Credit (Customer Account Receivable)</option>
-                        </select>
-                    </div>
-                    @if(in_array($payment_type, ['Cash', 'Bank']))
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">Receiving Account</label>
-                            <select wire:model="account_id" class="form-select">
+                @if($payment_type !== 'Credit')
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Deposit Account <span class="text-danger">*</span></label>
+                            <x-searchable-select wire:model="account_id" class="form-select {{ $errors->has('account_id') ? 'is-invalid' : '' }}" placeholder="Select Account...">
                                 @foreach($accounts as $acc)
-                                    <option value="{{ $acc->id }}">{{ $acc->name }} (AED {{ number_format($acc->current_balance, 2) }})</option>
+                                    <option value="{{ $acc->id }}">{{ $acc->name }} ({{ $acc->type }}) - AED {{ number_format($acc->current_balance, 2) }}</option>
                                 @endforeach
-                            </select>
+                            </x-searchable-select>
+                            @error('account_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
-                    @endif
-                </div>
+                    </div>
+                @endif
             </div>
         </div>
 
         <!-- Invoice Items Table -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
+        <div class="card border-0 shadow-sm mb-4" style="overflow: visible;">
+            <div class="card-body" style="overflow: visible;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="card-title mb-0">Invoice Line Items</h5>
                     <button type="button" wire:click="addItem" class="btn btn-sm btn-outline-primary">
@@ -66,30 +69,49 @@
                     </button>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table align-middle table-nowrap mb-0 font-size-13">
+                @if($products->isEmpty())
+                    <div class="alert alert-warning font-size-13 py-2 px-3 mb-3" role="alert">
+                        <i class="bx bx-error-circle me-1"></i> <strong>No in-stock products available:</strong> All products are currently out of stock (Stock: 0). Please record a purchase invoice or stock adjustment before selling.
+                    </div>
+                @endif
+
+                <div class="table-responsive" style="overflow: visible;">
+                    <table class="table align-middle mb-0 font-size-13">
                         <thead class="table-light">
                             <tr>
-                                <th style="width: 35%;">Product</th>
+                                <th style="width: 40%;">Product</th>
                                 <th style="width: 12%;">Qty</th>
                                 <th style="width: 15%;">Unit Selling Price (AED)</th>
                                 <th style="width: 10%;">VAT %</th>
                                 <th style="width: 15%;" class="text-end">Line Total</th>
-                                <th style="width: 5%;">Action</th>
+                                <th style="width: 8%;" class="text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($items as $index => $item)
-                                <tr>
-                                    <td>
-                                        <select wire:model.live="items.{{ $index }}.product_id" class="form-select">
+                                <tr wire:key="sale-item-{{ $index }}">
+                                    <td style="min-width: 280px; position: relative;">
+                                        <x-searchable-select wire:model.live="items.{{ $index }}.product_id" class="form-select {{ $errors->has('items.'.$index.'.product_id') ? 'is-invalid' : '' }}" placeholder="Select In-Stock Product...">
                                             @foreach($products as $p)
-                                                <option value="{{ $p->id }}">{{ $p->name }} (Stock: {{ number_format($p->current_stock, 2) }})</option>
+                                                @php
+                                                    $catName = $p->category ? $p->category->name : 'General';
+                                                    $stock = (float)$p->current_stock;
+                                                    $stockLabel = "Stock: " . number_format($stock, $stock == (int)$stock ? 0 : 2);
+                                                @endphp
+                                                <option value="{{ $p->id }}">
+                                                    {{ $p->name }} - {{ $catName }} [{{ $p->product_code }}] — {{ $stockLabel }}
+                                                </option>
                                             @endforeach
-                                        </select>
+                                        </x-searchable-select>
+                                        @if($errors->has('items.'.$index.'.product_id'))
+                                            <div class="invalid-feedback d-block font-size-11">{{ $errors->first('items.'.$index.'.product_id') }}</div>
+                                        @endif
                                     </td>
                                     <td>
-                                        <input type="number" step="0.01" wire:model.live.debounce.300ms="items.{{ $index }}.quantity" class="form-control">
+                                        <input type="number" step="0.01" wire:model.live.debounce.300ms="items.{{ $index }}.quantity" class="form-control {{ $errors->has('items.'.$index.'.quantity') ? 'is-invalid' : '' }}">
+                                        @if($errors->has('items.'.$index.'.quantity'))
+                                            <div class="invalid-feedback d-block font-size-11">{{ $errors->first('items.'.$index.'.quantity') }}</div>
+                                        @endif
                                     </td>
                                     <td>
                                         <input type="number" step="0.01" wire:model.live.debounce.300ms="items.{{ $index }}.unit_price" class="form-control">
@@ -97,11 +119,11 @@
                                     <td>
                                         <input type="number" step="0.01" wire:model.live.debounce.300ms="items.{{ $index }}.vat_percent" class="form-control">
                                     </td>
-                                    <td class="text-end fw-bold">
+                                    <td class="text-end fw-bold font-monospace">
                                         AED {{ number_format($item['line_total'], 2) }}
                                     </td>
-                                    <td>
-                                        <button type="button" wire:click="removeItem({{ $index }})" class="btn btn-sm btn-outline-danger">
+                                    <td class="text-center">
+                                        <button type="button" wire:click="removeItem({{ $index }})" class="btn btn-sm btn-outline-danger" title="Remove Item">
                                             <i class="bx bx-trash"></i>
                                         </button>
                                     </td>
@@ -120,30 +142,35 @@
                         <div class="bg-light p-3 rounded">
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Subtotal:</span>
-                                <span class="fw-bold">AED {{ number_format($subtotal, 2) }}</span>
+                                <span class="fw-bold font-monospace">AED {{ number_format($subtotal, 2) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span>Discount (AED):</span>
+                                <input type="number" step="0.01" wire:model.live.debounce.300ms="discount_amount" class="form-control form-control-sm text-end font-monospace" style="width: 120px;" placeholder="0.00">
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>VAT Total:</span>
-                                <span class="fw-bold text-info">AED {{ number_format($vat_amount, 2) }}</span>
+                                <span class="fw-bold font-monospace">AED {{ number_format($vat_amount, 2) }}</span>
                             </div>
-                            <div class="d-flex justify-content-between mb-2 align-items-center">
-                                <span>Discount Amount:</span>
-                                <input type="number" step="0.01" wire:model.live.debounce.300ms="discount_amount" class="form-control form-control-sm w-50 text-end">
-                            </div>
-                            <hr>
-                            <div class="d-flex justify-content-between font-size-18">
+                            <hr class="my-2">
+                            <div class="d-flex justify-content-between font-size-16">
                                 <span class="fw-bold">Grand Total:</span>
-                                <span class="fw-bold text-success">AED {{ number_format($grand_total, 2) }}</span>
+                                <span class="fw-bold text-primary font-monospace">AED {{ number_format($grand_total, 2) }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="text-end mt-4">
-                    <button type="submit" class="btn btn-success btn-lg px-5">
-                        <i class="bx bx-check-circle me-1"></i> Confirm & Issue Invoice
-                    </button>
-                </div>
+            </div>
+            <div class="card-footer bg-white border-top py-3 d-flex justify-content-between align-items-center">
+                <a href="{{ route('sales.index') }}" class="btn btn-light">Cancel</a>
+                <button type="submit" class="btn btn-success px-4" {{ $products->isEmpty() ? 'disabled' : '' }}>
+                    <span wire:loading.remove wire:target="saveSale">
+                        <i class="bx bx-check me-1"></i> Generate & Issue Invoice
+                    </span>
+                    <span wire:loading wire:target="saveSale">
+                        <i class="bx bx-loader-alt bx-spin me-1"></i> Processing...
+                    </span>
+                </button>
             </div>
         </div>
     </form>

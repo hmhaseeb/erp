@@ -102,10 +102,11 @@ class ReportService
     }
 
     /**
-     * Profit and Loss statement calculation for a date range.
+     * Profit and Loss statement calculation for a date range with detailed breakdowns.
      */
-    public function getProfitAndLoss(string $startDate, string $endDate): array
+    public function getProfitLossReport(string $startDate, string $endDate): array
     {
+        // 1. Operating Revenue
         $salesAgg = DB::table('sales')
             ->whereBetween('sale_date', [$startDate, $endDate])
             ->where('status', 'Confirmed')
@@ -118,45 +119,100 @@ class ReportService
                 COALESCE(SUM(cogs_total), 0) as cogs_total
             ')->first();
 
-        $returnsAgg = DB::table('sales_returns')
+        $salesReturnsAgg = DB::table('sales_returns')
             ->whereBetween('return_date', [$startDate, $endDate])
             ->where('status', 'Confirmed')
             ->whereNull('deleted_at')
             ->selectRaw('
+                COALESCE(SUM(grand_total), 0) as returns_grand_total,
                 COALESCE(SUM(subtotal), 0) as returns_subtotal,
                 COALESCE(SUM(cogs_total), 0) as returns_cogs
             ')->first();
 
-        $salesSubtotal = (float) ($salesAgg->subtotal ?? 0);
-        $salesReturnsSubtotal = (float) ($returnsAgg->returns_subtotal ?? 0);
-        $netSalesRevenue = max(0, $salesSubtotal - $salesReturnsSubtotal);
+        $grossSales = (float) ($salesAgg->gross_sales ?? 0);
+        $salesReturns = (float) ($salesReturnsAgg->returns_grand_total ?? 0);
+        $netSales = max(0, $grossSales - $salesReturns);
 
-        // COGS calculation
+        // 2. Cost of Goods Sold / Purchases
+        $purchasesAgg = DB::table('purchases')
+            ->whereBetween('purchase_date', [$startDate, $endDate])
+            ->where('status', 'Confirmed')
+            ->whereNull('deleted_at')
+            ->selectRaw('COALESCE(SUM(grand_total), 0) as total_purchases')->first();
+
+        $purchaseReturnsAgg = DB::table('purchase_returns')
+            ->whereBetween('return_date', [$startDate, $endDate])
+            ->where('status', 'Confirmed')
+            ->whereNull('deleted_at')
+            ->selectRaw('COALESCE(SUM(grand_total), 0) as total_returns')->first();
+
+        $totalPurchases = (float) ($purchasesAgg->total_purchases ?? 0);
+        $totalPurchaseReturns = (float) ($purchaseReturnsAgg->total_returns ?? 0);
+        $netPurchases = max(0, $totalPurchases - $totalPurchaseReturns);
+
+        // COGS from weighted inventory cost
         $salesCogs = (float) ($salesAgg->cogs_total ?? 0);
-        $returnsCogs = (float) ($returnsAgg->returns_cogs ?? 0);
+        $returnsCogs = (float) ($salesReturnsAgg->returns_cogs ?? 0);
         $cogs = max(0, $salesCogs - $returnsCogs);
 
-        $grossProfit = $netSalesRevenue - $cogs;
+        // Gross profit based on Net Sales and COGS / Net Purchases
+        $grossProfit = $netPurchases > 0 ? ($netSales - $netPurchases) : ($netSales - $cogs);
 
-        // Other Income & Expenses
-        $otherIncome = (float) DB::table('incomes')->whereBetween('date', [$startDate, $endDate])->whereNull('deleted_at')->sum('amount');
-        $operatingExpenses = (float) DB::table('expenses')->whereBetween('date', [$startDate, $endDate])->whereNull('deleted_at')->sum('amount');
+        // 3. Other Operating Income & Breakdown
+        $incomeBreakdown = DB::table('incomes')
+            ->leftJoin('income_categories', 'incomes.income_category_id', '=', 'income_categories.id')
+            ->whereBetween('incomes.date', [$startDate, $endDate])
+            ->whereNull('incomes.deleted_at')
+            ->selectRaw('COALESCE(income_categories.name, "General Income") as cat_name, SUM(incomes.amount) as total_amt')
+            ->groupBy('cat_name')
+            ->pluck('total_amt', 'cat_name')
+            ->toArray();
+
+        $otherIncome = (float) array_sum($incomeBreakdown);
+
+        // 4. Operating Expenses & Breakdown
+        $expensesBreakdown = DB::table('expenses')
+            ->leftJoin('expense_categories', 'expenses.expense_category_id', '=', 'expense_categories.id')
+            ->whereBetween('expenses.date', [$startDate, $endDate])
+            ->whereNull('expenses.deleted_at')
+            ->selectRaw('COALESCE(expense_categories.name, "General Expense") as cat_name, SUM(expenses.amount) as total_amt')
+            ->groupBy('cat_name')
+            ->pluck('total_amt', 'cat_name')
+            ->toArray();
+
+        $operatingExpenses = (float) array_sum($expensesBreakdown);
 
         $netProfit = $grossProfit + $otherIncome - $operatingExpenses;
 
         return [
             'start_date' => $startDate,
             'end_date' => $endDate,
-            'gross_sales' => (float) ($salesAgg->gross_sales ?? 0),
-            'sales_subtotal' => $salesSubtotal,
-            'sales_returns' => $salesReturnsSubtotal,
-            'net_sales_revenue' => $netSalesRevenue,
-            'cogs' => $cogs,
+            'revenue' => [
+                'gross_sales' => $grossSales,
+                'sales_returns' => $salesReturns,
+                'net_sales' => $netSales,
+            ],
+            'cogs' => [
+                'purchases' => $totalPurchases,
+                'purchase_returns' => $totalPurchaseReturns,
+                'net_purchases' => $netPurchases,
+                'inventory_cogs' => $cogs,
+            ],
             'gross_profit' => $grossProfit,
             'other_income' => $otherIncome,
-            'operating_expenses' => $operatingExpenses,
+            'other_income_breakdown' => $incomeBreakdown,
+            'expenses' => $operatingExpenses,
+            'expenses_breakdown' => $expensesBreakdown,
             'net_profit' => $netProfit,
         ];
+    }
+
+    /**
+     * Alias for backward compatibility.
+     */
+    public function getProfitAndLoss(string $startDate, string $endDate): array
+    {
+        return $this->getProfitLossReport($startDate, $endDate);
     }
 
     /**

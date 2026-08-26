@@ -1,11 +1,6 @@
 <div>
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">General System Settings</h4>
-            </div>
-        </div>
-    </div>
+    <!-- Page Header -->
+    <x-page-header title="General System Settings" subtitle="Configure numbering prefixes, timezones, date formatting, and inventory rules." />
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
@@ -13,11 +8,11 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Date Format</label>
-                        <select wire:model="date_format" class="form-select">
+                        <x-searchable-select wire:model="date_format" class="form-select">
                             <option value="Y-m-d">YYYY-MM-DD (2026-08-22)</option>
                             <option value="d/m/Y">DD/MM/YYYY (22/08/2026)</option>
                             <option value="m/d/Y">MM/DD/YYYY (08/22/2026)</option>
-                        </select>
+                        </x-searchable-select>
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Timezone</label>
@@ -47,21 +42,21 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Default Cash Account</label>
-                        <select wire:model="default_cash_account_id" class="form-select">
+                        <x-searchable-select wire:model="default_cash_account_id" class="form-select">
                             <option value="">-- None --</option>
                             @foreach($accounts as $acc)
                                 <option value="{{ $acc->id }}">{{ $acc->name }} ({{ $acc->type }})</option>
                             @endforeach
-                        </select>
+                        </x-searchable-select>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Default Bank Account</label>
-                        <select wire:model="default_bank_account_id" class="form-select">
+                        <x-searchable-select wire:model="default_bank_account_id" class="form-select">
                             <option value="">-- None --</option>
                             @foreach($accounts as $acc)
                                 <option value="{{ $acc->id }}">{{ $acc->name }} ({{ $acc->type }})</option>
                             @endforeach
-                        </select>
+                        </x-searchable-select>
                     </div>
                 </div>
 

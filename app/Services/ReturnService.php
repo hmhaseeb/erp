@@ -48,8 +48,13 @@ class ReturnService
                 ]);
             }
 
+            $returnNum = $header['return_number'] ?? null;
+            if (empty($returnNum) || SalesReturn::where('return_number', $returnNum)->exists()) {
+                $returnNum = \App\Models\InvoiceSetting::getNextSalesReturnNumber($header['return_date'] ?? null);
+            }
+
             $salesReturn = SalesReturn::create([
-                'return_number' => $header['return_number'],
+                'return_number' => $returnNum,
                 'return_date' => $header['return_date'],
                 'customer_id' => $header['customer_id'],
                 'sale_id' => $header['sale_id'] ?? null,
@@ -143,8 +148,13 @@ class ReturnService
     public function processPurchaseReturn(array $header, array $items): PurchaseReturn
     {
         return DB::transaction(function () use ($header, $items) {
+            $returnNum = $header['return_number'] ?? null;
+            if (empty($returnNum) || PurchaseReturn::where('return_number', $returnNum)->exists()) {
+                $returnNum = \App\Models\InvoiceSetting::getNextPurchaseReturnNumber($header['return_date'] ?? null);
+            }
+
             $purchaseReturn = PurchaseReturn::create([
-                'return_number' => $header['return_number'],
+                'return_number' => $returnNum,
                 'return_date' => $header['return_date'],
                 'supplier_id' => $header['supplier_id'],
                 'purchase_id' => $header['purchase_id'] ?? null,

@@ -196,6 +196,7 @@ class Index extends Component
             ]);
 
             session()->flash('success', "Product '{$this->name}' updated successfully.");
+            $this->dispatch('toast', message: "Product '{$this->name}' updated successfully.", type: 'success', title: 'Product Updated');
         } else {
             $product = Product::create([
                 'product_code' => $this->product_code,
@@ -232,6 +233,7 @@ class Index extends Component
             }
 
             session()->flash('success', "Product '{$this->name}' registered successfully.");
+            $this->dispatch('toast', message: "Product '{$this->name}' registered successfully.", type: 'success', title: 'Product Registered');
         }
 
         $this->closeModal();
@@ -242,11 +244,13 @@ class Index extends Component
         $product = Product::findOrFail($id);
         if ($product->current_stock > 0) {
             session()->flash('error', "Cannot delete product with existing stock balance ({$product->current_stock}).");
+            $this->dispatch('toast', message: "Cannot delete product with existing stock balance ({$product->current_stock}).", type: 'danger', title: 'Action Denied');
             return;
         }
 
         $product->delete();
         session()->flash('success', 'Product deleted successfully.');
+        $this->dispatch('toast', message: 'Product deleted successfully.', type: 'success', title: 'Product Deleted');
     }
 
     public function render()

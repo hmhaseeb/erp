@@ -1,14 +1,10 @@
 <div>
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Create Purchase Invoice</h4>
-                <a href="{{ route('purchases.index') }}" class="btn btn-secondary">
-                    <i class="bx bx-arrow-back me-1"></i> Back to Invoices
-                </a>
-            </div>
-        </div>
-    </div>
+    <!-- Page Header -->
+    <x-page-header title="Create Purchase Invoice" subtitle="Record new vendor purchase bills, stock receiving, and payment terms.">
+        <a href="{{ route('purchases.index') }}" class="btn btn-secondary">
+            <i class="bx bx-arrow-back me-1"></i> Back to Invoices
+        </a>
+    </x-page-header>
 
     <form wire:submit.prevent="savePurchase">
         <div class="card border-0 shadow-sm mb-4">
@@ -25,11 +21,11 @@
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Supplier</label>
-                        <select wire:model="supplier_id" class="form-select">
+                        <x-searchable-select wire:model="supplier_id" class="form-select" placeholder="Select Supplier...">
                             @foreach($suppliers as $sup)
                                 <option value="{{ $sup->id }}">{{ $sup->name }} @if($sup->company_name) ({{ $sup->company_name }}) @endif</option>
                             @endforeach
-                        </select>
+                        </x-searchable-select>
                     </div>
                     <div class="col-md-3 mb-3">
                         <label class="form-label">Supplier Ref # / Bill No</label>
@@ -40,20 +36,20 @@
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Payment Terms / Type</label>
-                        <select wire:model.live="payment_type" class="form-select">
+                        <x-searchable-select wire:model.live="payment_type" class="form-select">
                             <option value="Credit">Credit (Supplier Account Payable)</option>
                             <option value="Cash">Cash (Immediate Outflow)</option>
                             <option value="Bank">Bank Transfer / Card</option>
-                        </select>
+                        </x-searchable-select>
                     </div>
                     @if(in_array($payment_type, ['Cash', 'Bank']))
                         <div class="col-md-4 mb-3">
                             <label class="form-label">Payment Account</label>
-                            <select wire:model="account_id" class="form-select">
+                            <x-searchable-select wire:model="account_id" class="form-select">
                                 @foreach($accounts as $acc)
                                     <option value="{{ $acc->id }}">{{ $acc->name }} (AED {{ number_format($acc->current_balance, 2) }})</option>
                                 @endforeach
-                            </select>
+                            </x-searchable-select>
                         </div>
                     @endif
                 </div>
@@ -61,8 +57,8 @@
         </div>
 
         <!-- Invoice Items Table -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
+        <div class="card border-0 shadow-sm mb-4" style="overflow: visible;">
+            <div class="card-body" style="overflow: visible;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="card-title mb-0">Purchase Items</h5>
                     <button type="button" wire:click="addItem" class="btn btn-sm btn-outline-primary">
@@ -70,8 +66,8 @@
                     </button>
                 </div>
 
-                <div class="table-responsive">
-                    <table class="table align-middle table-nowrap mb-0 font-size-13">
+                <div class="table-responsive" style="overflow: visible;">
+                    <table class="table align-middle mb-0 font-size-13">
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 35%;">Product</th>
@@ -84,13 +80,20 @@
                         </thead>
                         <tbody>
                             @foreach($items as $index => $item)
-                                <tr>
+                                <tr wire:key="item-row-{{ $index }}">
                                     <td>
-                                        <select wire:model.live="items.{{ $index }}.product_id" class="form-select">
+                                        <x-searchable-select wire:model.live="items.{{ $index }}.product_id" class="form-select" placeholder="Select Product...">
                                             @foreach($products as $p)
-                                                <option value="{{ $p->id }}">{{ $p->name }} ({{ $p->product_code }})</option>
+                                                @php
+                                                    $catName = $p->category ? $p->category->name : 'General';
+                                                    $stock = (float)$p->current_stock;
+                                                    $stockLabel = $stock > 0 ? "Stock: " . number_format($stock, $stock == (int)$stock ? 0 : 2) : "Out of Stock: 0";
+                                                @endphp
+                                                <option value="{{ $p->id }}">
+                                                    {{ $p->name }} - {{ $catName }} [{{ $p->product_code }}] — {{ $stockLabel }}
+                                                </option>
                                             @endforeach
-                                        </select>
+                                        </x-searchable-select>
                                     </td>
                                     <td>
                                         <input type="number" step="0.01" wire:model.live.debounce.300ms="items.{{ $index }}.quantity" class="form-control">

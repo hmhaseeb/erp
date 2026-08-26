@@ -99,12 +99,14 @@ class Returns extends Component
         }
     }
 
+    public function updatedReturnDate()
+    {
+        $this->generateReturnNumber();
+    }
+
     public function generateReturnNumber()
     {
-        $setting = \App\Models\InvoiceSetting::first();
-        $prefix = $setting ? $setting->sales_return_prefix : 'SR-';
-        $maxId = SalesReturn::max('id') + 1;
-        $this->return_number = $prefix . str_pad((string)$maxId, 6, '0', STR_PAD_LEFT);
+        $this->return_number = \App\Models\InvoiceSetting::getNextSalesReturnNumber($this->return_date);
     }
 
     public function openModal()

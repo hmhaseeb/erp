@@ -38,17 +38,19 @@ class Create extends Component
         $this->addItem();
     }
 
+    public function updatedSaleDate()
+    {
+        $this->generateInvoiceNumber();
+    }
+
     public function generateInvoiceNumber()
     {
-        $setting = \App\Models\InvoiceSetting::first();
-        $prefix = $setting ? $setting->invoice_prefix : 'INV-';
-        $maxId = Sale::max('id') + 1;
-        $this->invoice_number = $prefix . str_pad((string)$maxId, 6, '0', STR_PAD_LEFT);
+        $this->invoice_number = \App\Models\InvoiceSetting::getNextSalesInvoiceNumber($this->sale_date);
     }
 
     public function addItem()
     {
-        $firstProd = Product::first();
+        $firstProd = Product::where('status', true)->where('current_stock', '>', 0)->orderBy('name')->first();
         $this->items[] = [
             'product_id' => $firstProd ? $firstProd->id : '',
             'quantity' => 1,
@@ -80,8 +82,15 @@ class Create extends Component
             if ($field === 'product_id') {
                 $prod = Product::find($value);
                 if ($prod) {
-                    $this->items[$index]['unit_price'] = $prod->sales_price;
-                    $this->items[$index]['vat_percent'] = $prod->tax_percent;
+                    if ((float)$prod->current_stock <= 0) {
+                        $this->items[$index]['product_id'] = '';
+                        $msg = "'{$prod->name}' is out of stock and cannot be selected for sales.";
+                        $this->addError("items.{$index}.product_id", $msg);
+                        $this->dispatch('toast', message: $msg, type: 'danger', title: 'Out of Stock');
+                    } else {
+                        $this->items[$index]['unit_price'] = $prod->sales_price;
+                        $this->items[$index]['vat_percent'] = $prod->tax_percent;
+                    }
                 }
             }
         }
@@ -118,6 +127,8 @@ class Create extends Component
 
     public function saveSale(SalesService $salesService)
     {
+        $this->resetErrorBag();
+
         $this->validate([
             'invoice_number' => 'required|unique:sales,invoice_number',
             'customer_id' => 'required|exists:customers,id',
@@ -129,6 +140,31 @@ class Create extends Component
             'items.*.quantity' => 'required|numeric|gt:0',
             'items.*.unit_price' => 'required|numeric|min:0',
         ]);
+
+        $generalSetting = \App\Models\GeneralSetting::first();
+        $allowNegativeStock = $generalSetting ? (bool)$generalSetting->allow_negative_stock : false;
+
+        foreach ($this->items as $idx => $item) {
+            $prod = Product::find($item['product_id']);
+            if (!$prod || (float)$prod->current_stock <= 0) {
+                $prodName = $prod ? $prod->name : 'Selected product';
+                $msg = "'{$prodName}' is out of stock and cannot be sold.";
+                $this->addError("items.{$idx}.product_id", $msg);
+                session()->flash('error', $msg);
+                $this->dispatch('toast', message: $msg, type: 'danger', title: 'Out of Stock');
+                return;
+            }
+
+            $qty = (float)($item['quantity'] ?? 0);
+            $avail = (float)$prod->current_stock;
+            if (!$allowNegativeStock && $qty > $avail) {
+                $msg = "Insufficient stock for '{$prod->name}'. Available stock is {$avail}, requested {$qty}.";
+                $this->addError("items.{$idx}.quantity", $msg);
+                session()->flash('error', $msg);
+                $this->dispatch('toast', message: $msg, type: 'danger', title: 'Stock Insufficient');
+                return;
+            }
+        }
 
         $header = [
             'invoice_number' => $this->invoice_number,
@@ -146,22 +182,32 @@ class Create extends Component
         try {
             $sale = $salesService->createSale($header, $this->items);
             session()->flash('success', "Sales Invoice #{$this->invoice_number} generated successfully.");
+            $this->dispatch('toast', message: "Sales Invoice #{$this->invoice_number} generated successfully.", type: 'success', title: 'Invoice Issued');
             return redirect()->route('sales.index');
         } catch (\Exception $e) {
             session()->flash('error', $e->getMessage());
+            $this->dispatch('toast', message: $e->getMessage(), type: 'danger', title: 'Sale Failed');
         }
     }
 
     public function render()
     {
+        $generalSetting = \App\Models\GeneralSetting::first();
+        $allowNegativeStock = $generalSetting ? (bool)$generalSetting->allow_negative_stock : false;
+
         $customers = Customer::select('id', 'name', 'company_name')->where('status', true)->orderBy('name')->get();
         $accounts = Account::select('id', 'name', 'type', 'current_balance')->where('status', true)->get();
-        $products = Product::select('id', 'product_code', 'name', 'sales_price', 'purchase_price', 'tax_percent')->where('status', true)->orderBy('name')->get();
+        $products = Product::with('category')
+            ->where('status', true)
+            ->where('current_stock', '>', 0)
+            ->orderBy('name')
+            ->get();
 
         return view('livewire.sales.create', [
             'customers' => $customers,
             'accounts' => $accounts,
             'products' => $products,
+            'allowNegativeStock' => $allowNegativeStock,
         ])->layout('layouts.app', ['title' => 'Create Sales Invoice']);
     }
 }

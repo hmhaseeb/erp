@@ -6,13 +6,17 @@ use App\Models\Account;
 use App\Models\AccountTransaction;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class BankBook extends Component
 {
+    use WithPagination;
+
     public $account_id;
     public $start_date;
     public $end_date;
     public $search = '';
+    public $perPage = 15;
 
     public function mount()
     {
@@ -30,11 +34,38 @@ class BankBook extends Component
         }
     }
 
+    public function updatedAccountId()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedStartDate()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedEndDate()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
+    }
+
     public function resetFilters()
     {
         $this->start_date = now()->startOfMonth()->toDateString();
         $this->end_date = now()->toDateString();
         $this->search = '';
+        $this->perPage = 15;
+        $this->resetPage();
     }
 
     public function render()
@@ -47,7 +78,10 @@ class BankBook extends Component
         $selectedAccount = Account::find($this->account_id);
 
         $openingBalance = 0;
-        $transactions = collect();
+        $totalDebits = 0;
+        $totalCredits = 0;
+        $closingBalance = 0;
+        $transactions = null;
 
         if ($selectedAccount) {
             $priorStats = DB::table('account_transactions')
@@ -69,14 +103,14 @@ class BankBook extends Component
                 });
             }
 
+            $totalDebits = (float) (clone $query)->sum('debit');
+            $totalCredits = (float) (clone $query)->sum('credit');
+            $closingBalance = $openingBalance + $totalDebits - $totalCredits;
+
             $transactions = $query->orderBy('transaction_date', 'asc')
                 ->orderBy('id', 'asc')
-                ->get();
+                ->paginate($this->perPage);
         }
-
-        $totalDebits = (float) $transactions->sum('debit');
-        $totalCredits = (float) $transactions->sum('credit');
-        $closingBalance = $openingBalance + $totalDebits - $totalCredits;
 
         return view('livewire.reports.bank-book', [
             'bankAccounts' => $bankAccounts,

@@ -46,10 +46,8 @@ class PaymentService
         ) {
             $customer = Customer::findOrFail($customerId);
 
-            if (!$paymentNumber) {
-                $setting = \App\Models\InvoiceSetting::first();
-                $prefix = $setting ? $setting->customer_payment_prefix : 'REC-';
-                $paymentNumber = $prefix . str_pad((string)(CustomerPayment::max('id') + 1), 6, '0', STR_PAD_LEFT);
+            if (!$paymentNumber || CustomerPayment::where('payment_number', $paymentNumber)->exists()) {
+                $paymentNumber = \App\Models\InvoiceSetting::getNextCustomerPaymentNumber($date);
             }
 
             $payment = CustomerPayment::create([
@@ -66,12 +64,12 @@ class PaymentService
             $this->accountingService->recordTransaction(
                 $accountId,
                 $date,
-                'Customer Payment',
+                'Customer Receipt',
                 $amount,
                 0,
                 CustomerPayment::class,
                 $payment->id,
-                "Customer Payment #{$payment->payment_number} from {$customer->name}"
+                "Customer Payment Receipt #{$payment->payment_number} from {$customer->name}"
             );
 
             // Customer Receivable decreases (Credit entry)
@@ -79,32 +77,36 @@ class PaymentService
             CustomerTransaction::create([
                 'customer_id' => $customer->id,
                 'date' => $date,
-                'transaction_type' => 'PAYMENT',
-                'reference_type' => CustomerPayment::class,
-                'reference_id' => $payment->id,
+                'transaction_type' => 'RECEIPT',
+                'description' => "Customer Receipt #{$payment->payment_number}",
                 'debit' => 0,
                 'credit' => $amount,
                 'balance' => $newBalance,
-                'description' => "Payment Receipt #{$payment->payment_number}",
+                'reference_id' => $payment->id,
             ]);
             $customer->update(['current_balance' => $newBalance]);
 
-            // Process allocations
-            foreach ($allocations as $saleId => $allocatedAmt) {
-                if ($allocatedAmt > 0) {
-                    CustomerPaymentAllocation::create([
-                        'customer_payment_id' => $payment->id,
-                        'sale_id' => $saleId,
-                        'allocated_amount' => $allocatedAmt,
-                    ]);
+            // If allocations were provided, apply to specific invoices
+            if (!empty($allocations)) {
+                foreach ($allocations as $saleId => $allocAmount) {
+                    $allocAmount = (float) $allocAmount;
+                    if ($allocAmount > 0) {
+                        $sale = Sale::find($saleId);
+                        if ($sale && $sale->customer_id === $customer->id) {
+                            $newPaid = min($sale->grand_total, $sale->paid_amount + $allocAmount);
+                            $newDue = max(0, $sale->grand_total - $newPaid);
+                            $sale->update([
+                                'paid_amount' => $newPaid,
+                                'due_amount' => $newDue,
+                            ]);
 
-                    $sale = Sale::findOrFail($saleId);
-                    $newPaid = $sale->paid_amount + $allocatedAmt;
-                    $newDue = max(0, $sale->grand_total - $newPaid);
-                    $sale->update([
-                        'paid_amount' => $newPaid,
-                        'due_amount' => $newDue,
-                    ]);
+                            CustomerPaymentAllocation::create([
+                                'customer_payment_id' => $payment->id,
+                                'sale_id' => $sale->id,
+                                'allocated_amount' => $allocAmount,
+                            ]);
+                        }
+                    }
                 }
             }
 
@@ -113,7 +115,7 @@ class PaymentService
     }
 
     /**
-     * Record supplier payment and allocate to purchase invoices.
+     * Record supplier payment voucher and allocate to purchase invoices.
      */
     public function recordSupplierPayment(
         int $supplierId,
@@ -134,10 +136,8 @@ class PaymentService
         ) {
             $supplier = Supplier::findOrFail($supplierId);
 
-            if (!$paymentNumber) {
-                $setting = \App\Models\InvoiceSetting::first();
-                $prefix = $setting ? $setting->supplier_payment_prefix : 'PAY-';
-                $paymentNumber = $prefix . str_pad((string)(SupplierPayment::max('id') + 1), 6, '0', STR_PAD_LEFT);
+            if (!$paymentNumber || SupplierPayment::where('payment_number', $paymentNumber)->exists()) {
+                $paymentNumber = \App\Models\InvoiceSetting::getNextSupplierPaymentNumber($date);
             }
 
             $payment = SupplierPayment::create([

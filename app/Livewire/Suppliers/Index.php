@@ -122,6 +122,25 @@ class Index extends Component
         $this->resetValidation();
     }
 
+    public $selectedSupplier;
+    public $isViewModalOpen = false;
+
+    public function viewSupplier($id)
+    {
+        $this->selectedSupplier = Supplier::with([
+            'purchases' => fn($q) => $q->latest()->take(10),
+            'payments' => fn($q) => $q->with('account')->latest()->take(10),
+            'transactions' => fn($q) => $q->latest()->take(15)
+        ])->findOrFail($id);
+        $this->isViewModalOpen = true;
+    }
+
+    public function closeViewModal()
+    {
+        $this->isViewModalOpen = false;
+        $this->selectedSupplier = null;
+    }
+
     public function saveSupplier()
     {
         $this->validate();
@@ -142,6 +161,7 @@ class Index extends Component
             ]);
 
             session()->flash('success', "Supplier '{$this->name}' updated successfully.");
+            $this->dispatch('toast', message: "Supplier '{$this->name}' updated successfully.", type: 'success', title: 'Supplier Updated');
         } else {
             Supplier::create([
                 'supplier_code' => $this->supplier_code,
@@ -160,6 +180,7 @@ class Index extends Component
             ]);
 
             session()->flash('success', "Supplier '{$this->name}' registered successfully.");
+            $this->dispatch('toast', message: "Supplier '{$this->name}' registered successfully.", type: 'success', title: 'Supplier Registered');
         }
 
         $this->closeModal();
@@ -170,17 +191,20 @@ class Index extends Component
         $supplier = Supplier::findOrFail($id);
         if ($supplier->current_balance != 0) {
             session()->flash('error', "Cannot delete supplier with an outstanding balance (AED {$supplier->current_balance}).");
+            $this->dispatch('toast', message: "Cannot delete supplier with an outstanding balance (AED {$supplier->current_balance}).", type: 'danger', title: 'Action Denied');
             return;
         }
 
         $hasPurchases = Purchase::where('supplier_id', $supplier->id)->exists();
         if ($hasPurchases) {
             session()->flash('error', "Cannot delete supplier with recorded purchase invoices.");
+            $this->dispatch('toast', message: "Cannot delete supplier with recorded purchase invoices.", type: 'danger', title: 'Action Denied');
             return;
         }
 
         $supplier->delete();
         session()->flash('success', 'Supplier deleted successfully.');
+        $this->dispatch('toast', message: 'Supplier deleted successfully.', type: 'success', title: 'Supplier Deleted');
     }
 
     public function render()

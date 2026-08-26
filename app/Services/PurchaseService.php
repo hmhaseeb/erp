@@ -26,8 +26,13 @@ class PurchaseService
     public function createPurchase(array $header, array $items): Purchase
     {
         return DB::transaction(function () use ($header, $items) {
+            $purchaseNum = $header['purchase_number'] ?? null;
+            if (empty($purchaseNum) || Purchase::where('purchase_number', $purchaseNum)->exists()) {
+                $purchaseNum = \App\Models\InvoiceSetting::getNextPurchaseNumber($header['purchase_date'] ?? null);
+            }
+
             $purchase = Purchase::create([
-                'purchase_number' => $header['purchase_number'],
+                'purchase_number' => $purchaseNum,
                 'purchase_date' => $header['purchase_date'],
                 'supplier_id' => $header['supplier_id'],
                 'reference_number' => $header['reference_number'] ?? null,

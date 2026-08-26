@@ -105,6 +105,8 @@ class CustomerPayments extends Component
 
     public function savePayment(PaymentService $paymentService)
     {
+        $this->resetErrorBag();
+
         $this->validate([
             'customer_id' => 'required|exists:customers,id',
             'account_id' => 'required|exists:accounts,id',
@@ -125,9 +127,12 @@ class CustomerPayments extends Component
             );
 
             session()->flash('success', 'Customer receipt payment voucher recorded successfully.');
+            $this->dispatch('toast', message: 'Customer receipt payment voucher recorded successfully.', type: 'success', title: 'Payment Recorded');
             $this->closeModal();
         } catch (\Exception $e) {
-            session()->flash('error', $e->getMessage());
+            $this->addError('payment_error', $e->getMessage());
+            session()->flash('modal_error', $e->getMessage());
+            $this->dispatch('toast', message: $e->getMessage(), type: 'danger', title: 'Payment Failed');
         }
     }
 

@@ -42,8 +42,13 @@ class SalesService
                 ]);
             }
 
+            $invNum = $header['invoice_number'];
+            if (Sale::where('invoice_number', $invNum)->exists()) {
+                $invNum = \App\Models\InvoiceSetting::getNextSalesInvoiceNumber($header['sale_date'] ?? null);
+            }
+
             $sale = Sale::create([
-                'invoice_number' => $header['invoice_number'],
+                'invoice_number' => $invNum,
                 'sale_date' => $header['sale_date'],
                 'customer_id' => $header['customer_id'],
                 'payment_type' => $header['payment_type'],

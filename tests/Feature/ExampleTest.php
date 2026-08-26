@@ -22,4 +22,52 @@ class ExampleTest extends TestCase
         $response = $this->actingAs($user)->get('/');
         $response->assertStatus(200);
     }
+
+    public function test_all_erp_routes_render_successfully(): void
+    {
+        $user = User::factory()->create();
+
+        $routes = [
+            'dashboard',
+            'accounts.index',
+            'accounts.transactions',
+            'accounts.ledger',
+            'products.index',
+            'products.categories',
+            'products.units',
+            'products.stock',
+            'suppliers.index',
+            'customers.index',
+            'purchases.index',
+            'purchases.create',
+            'purchases.returns',
+            'sales.index',
+            'sales.create',
+            'sales.returns',
+            'payments.customer',
+            'payments.supplier',
+            'income.categories',
+            'income.index',
+            'expenses.categories',
+            'expenses.index',
+            'reports.daily',
+            'reports.sales',
+            'reports.purchases',
+            'reports.stock',
+            'reports.cashbook',
+            'reports.bankbook',
+            'reports.receivables',
+            'reports.payables',
+            'reports.profit-loss',
+            'settings.company',
+            'settings.invoice',
+            'settings.logos',
+            'settings.general',
+        ];
+
+        foreach ($routes as $route) {
+            $response = $this->actingAs($user)->get(route($route));
+            $response->assertStatus(200);
+        }
+    }
 }

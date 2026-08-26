@@ -99,12 +99,14 @@ class Returns extends Component
         }
     }
 
+    public function updatedReturnDate()
+    {
+        $this->generateReturnNumber();
+    }
+
     public function generateReturnNumber()
     {
-        $setting = \App\Models\InvoiceSetting::first();
-        $prefix = $setting ? $setting->purchase_return_prefix : 'PR-';
-        $maxId = PurchaseReturn::max('id') + 1;
-        $this->return_number = $prefix . str_pad((string)$maxId, 6, '0', STR_PAD_LEFT);
+        $this->return_number = \App\Models\InvoiceSetting::getNextPurchaseReturnNumber($this->return_date);
     }
 
     public function openModal()

@@ -1,44 +1,30 @@
 <div>
     <!-- Page Header -->
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <div>
-                    <h4 class="mb-sm-0 font-size-18">Profit & Loss Statement (Income Statement)</h4>
-                    <p class="text-muted font-size-13 mb-0">Financial performance summary calculating Revenue, Cost of Goods Sold, Gross Profit, and Net Profit.</p>
-                </div>
-                <div class="page-title-right">
-                    <button onclick="window.print()" class="btn btn-secondary waves-effect waves-light">
-                        <i class="bx bx-printer me-1"></i> Print P&L Statement
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <x-page-header title="Profit & Loss Statement (Income Statement)" subtitle="Financial performance summary calculating Revenue, Cost of Goods Sold, Gross Profit, and Net Profit.">
+        <button onclick="window.print()" class="btn btn-secondary waves-effect waves-light">
+            <i class="bx bx-printer me-1"></i> Print P&L Statement
+        </button>
+    </x-page-header>
 
     <!-- Period Filter Card -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <div class="row g-3 align-items-end">
-                <div class="col-lg-3 col-md-3">
-                    <label class="form-label font-size-12 text-muted mb-1">From Date</label>
-                    <input type="date" wire:model.live="start_date" class="form-control">
-                </div>
-                <div class="col-lg-3 col-md-3">
-                    <label class="form-label font-size-12 text-muted mb-1">To Date</label>
-                    <input type="date" wire:model.live="end_date" class="form-control">
-                </div>
-                <div class="col-lg-6 col-md-6 text-md-end">
-                    <div class="btn-group" role="group">
-                        <button type="button" wire:click="setPeriod('today')" class="btn btn-sm btn-outline-primary">Today</button>
-                        <button type="button" wire:click="setPeriod('this_month')" class="btn btn-sm btn-outline-primary">This Month</button>
-                        <button type="button" wire:click="setPeriod('last_month')" class="btn btn-sm btn-outline-primary">Last Month</button>
-                        <button type="button" wire:click="setPeriod('this_year')" class="btn btn-sm btn-outline-primary">This Year</button>
-                    </div>
-                </div>
+    <x-filter-card>
+        <div class="col-lg-3 col-md-3">
+            <label class="form-label font-size-12 text-muted mb-1">From Date</label>
+            <input type="date" wire:model.live="start_date" class="form-control">
+        </div>
+        <div class="col-lg-3 col-md-3">
+            <label class="form-label font-size-12 text-muted mb-1">To Date</label>
+            <input type="date" wire:model.live="end_date" class="form-control">
+        </div>
+        <div class="col-lg-6 col-md-6 text-md-end">
+            <div class="btn-group" role="group">
+                <button type="button" wire:click="setPeriod('today')" class="btn btn-sm btn-outline-primary">Today</button>
+                <button type="button" wire:click="setPeriod('this_month')" class="btn btn-sm btn-outline-primary">This Month</button>
+                <button type="button" wire:click="setPeriod('last_month')" class="btn btn-sm btn-outline-primary">Last Month</button>
+                <button type="button" wire:click="setPeriod('this_year')" class="btn btn-sm btn-outline-primary">This Year</button>
             </div>
         </div>
-    </div>
+    </x-filter-card>
 
     <!-- Profit & Loss Statement Card -->
     <div class="card border-0 shadow-sm">

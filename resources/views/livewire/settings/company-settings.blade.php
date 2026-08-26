@@ -1,11 +1,6 @@
 <div>
-    <div class="row">
-        <div class="col-12">
-            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                <h4 class="mb-sm-0 font-size-18">Company Settings</h4>
-            </div>
-        </div>
-    </div>
+    <!-- Page Header -->
+    <x-page-header title="Company Settings" subtitle="Configure business legal name, TRN tax number, contacts, and currency." />
 
     <div class="card border-0 shadow-sm">
         <div class="card-body">
