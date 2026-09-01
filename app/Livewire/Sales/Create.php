@@ -4,6 +4,7 @@ namespace App\Livewire\Sales;
 
 use App\Models\Account;
 use App\Models\Customer;
+use App\Models\GeneralSetting;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Services\SalesService;
@@ -31,12 +32,12 @@ class Create extends Component
         $this->sale_date = now()->toDateString();
         $this->generateInvoiceNumber();
 
-        $firstCustomer = Customer::first();
+        $firstCustomer = Customer::where('status', true)->first();
         if ($firstCustomer) {
             $this->customer_id = $firstCustomer->id;
         }
 
-        $firstAccount = Account::first();
+        $firstAccount = Account::where('status', true)->first();
         if ($firstAccount) {
             $this->account_id = $firstAccount->id;
         }
@@ -57,23 +58,36 @@ class Create extends Component
     public function addItem()
     {
         $selectedIds = array_filter(array_column($this->items, 'product_id'));
-        $firstProd = Product::where('status', true)
-            ->where('current_stock', '>', 0)
+        $generalSetting = GeneralSetting::first();
+        $allowNegativeStock = $generalSetting ? (bool)$generalSetting->allow_negative_stock : false;
+
+        $firstProdQuery = Product::where('status', true)
             ->whereNotIn('id', $selectedIds)
-            ->orderBy('name')
-            ->first();
+            ->orderBy('name');
+
+        if (!$allowNegativeStock) {
+            $firstProdQuery->where('current_stock', '>', 0);
+        }
+
+        $firstProd = $firstProdQuery->first();
 
         if (!$firstProd && count($selectedIds) > 0) {
             $this->dispatch('toast', message: 'All available in-stock products have already been added to this sales invoice.', type: 'warning', title: 'Cannot Add More Products');
             return;
         }
 
+        $availStock = $firstProd ? (float)$firstProd->current_stock : 0;
+        $initialQty = 1;
+        if ($availStock > 0 && $availStock < 1) {
+            $initialQty = $availStock;
+        }
+
         $this->items[] = [
             'product_id' => $firstProd ? $firstProd->id : '',
-            'quantity' => 1,
-            'unit_price' => $firstProd ? $firstProd->sales_price : 0,
+            'quantity' => $initialQty,
+            'unit_price' => $firstProd ? (float)$firstProd->sales_price : 0,
             'discount_amount' => 0,
-            'vat_percent' => $firstProd ? $firstProd->tax_percent : 5,
+            'vat_percent' => $firstProd ? (float)($firstProd->tax_percent ?? 5) : 5,
             'vat_amount' => 0,
             'line_total' => 0,
         ];
@@ -90,13 +104,13 @@ class Create extends Component
     public function updatedItems($value, $key)
     {
         $parts = explode('.', $key);
-        $index = $parts[0];
+        $index = (int)$parts[0];
         $field = $parts[1] ?? null;
 
         if ($field === 'product_id') {
             $duplicate = false;
             foreach ($this->items as $i => $item) {
-                if ($i != $index && !empty($item['product_id']) && $item['product_id'] == $value) {
+                if ($i !== $index && !empty($item['product_id']) && (string)$item['product_id'] === (string)$value) {
                     $duplicate = true;
                     break;
                 }
@@ -116,8 +130,80 @@ class Create extends Component
 
             $prod = Product::find($value);
             if ($prod) {
-                $this->items[$index]['unit_price'] = $prod->sales_price;
-                $this->items[$index]['vat_percent'] = $prod->tax_percent ?? 5;
+                $generalSetting = GeneralSetting::first();
+                $allowNegativeStock = $generalSetting ? (bool)$generalSetting->allow_negative_stock : false;
+                $availStock = (float)$prod->current_stock;
+
+                if (!$allowNegativeStock && $availStock <= 0) {
+                    $this->items[$index]['product_id'] = '';
+                    $this->items[$index]['unit_price'] = 0;
+                    $this->items[$index]['vat_percent'] = 5;
+                    $this->calculateTotals();
+                    $this->dispatch('toast', message: "'{$prod->name}' is out of stock (0 available) and cannot be added to a sales invoice.", type: 'danger', title: 'Out of Stock');
+                    return;
+                }
+
+                $this->items[$index]['unit_price'] = (float)$prod->sales_price;
+                $this->items[$index]['vat_percent'] = (float)($prod->tax_percent ?? 5);
+
+                // Auto adjust row quantity if existing quantity exceeds available stock
+                $currentQty = (float)($this->items[$index]['quantity'] ?? 1);
+                if ($currentQty <= 0) {
+                    $currentQty = $availStock > 0 && $availStock < 1 ? $availStock : 1;
+                    $this->items[$index]['quantity'] = $currentQty;
+                }
+
+                if (!$allowNegativeStock && $currentQty > $availStock) {
+                    $this->items[$index]['quantity'] = $availStock;
+                    $this->dispatch('toast', message: "Quantity adjusted to {$availStock} based on available stock for '{$prod->name}'.", type: 'info', title: 'Quantity Adjusted');
+                }
+
+                $this->resetErrorBag("items.{$index}.quantity");
+                $this->resetErrorBag("items.{$index}.product_id");
+            }
+        }
+
+        if ($field === 'quantity') {
+            $qty = (float)$value;
+            $prodId = $this->items[$index]['product_id'] ?? null;
+
+            if ($value === '' || $value === null || $qty <= 0) {
+                $msg = "Quantity must be a positive number greater than 0.";
+                $this->addError("items.{$index}.quantity", $msg);
+                $this->dispatch('toast', message: $msg, type: 'warning', title: 'Invalid Quantity');
+                $this->items[$index]['quantity'] = 1;
+            } elseif ($prodId) {
+                $generalSetting = GeneralSetting::first();
+                $allowNegativeStock = $generalSetting ? (bool)$generalSetting->allow_negative_stock : false;
+
+                if (!$allowNegativeStock) {
+                    $prod = Product::find($prodId);
+                    if ($prod) {
+                        $availStock = (float)$prod->current_stock;
+
+                        // Calculate total requested quantity of this product across all lines
+                        $totalReq = 0;
+                        foreach ($this->items as $i => $it) {
+                            if (($it['product_id'] ?? null) == $prodId) {
+                                $totalReq += ($i === $index ? $qty : (float)($it['quantity'] ?? 0));
+                            }
+                        }
+
+                        if ($totalReq > $availStock) {
+                            $otherItemsQty = $totalReq - $qty;
+                            $maxAllowedForThisRow = max(0, $availStock - $otherItemsQty);
+                            $this->items[$index]['quantity'] = $maxAllowedForThisRow;
+
+                            $msg = "Cannot sell {$qty}. Only {$availStock} available in stock for '{$prod->name}'. Quantity clamped to {$maxAllowedForThisRow}.";
+                            $this->addError("items.{$index}.quantity", $msg);
+                            $this->dispatch('toast', message: $msg, type: 'warning', title: 'Stock Limit Exceeded');
+                        } else {
+                            $this->resetErrorBag("items.{$index}.quantity");
+                        }
+                    }
+                } else {
+                    $this->resetErrorBag("items.{$index}.quantity");
+                }
             }
         }
 
@@ -159,14 +245,14 @@ class Create extends Component
     public function saveSale(SalesService $salesService)
     {
         $this->validate([
-            'invoice_number' => 'required|string|unique:sales,invoice_number',
+            'invoice_number' => 'required|string',
             'sale_date' => 'required|date',
             'customer_id' => 'required|exists:customers,id',
             'payment_type' => 'required|in:Cash,Bank,Credit',
             'account_id' => 'required_if:payment_type,Cash,Bank|nullable|exists:accounts,id',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|numeric|min:0.01',
+            'items.*.quantity' => 'required|numeric|gt:0',
             'items.*.unit_price' => 'required|numeric|min:0',
             'discount_amount' => 'numeric|min:0',
         ]);
@@ -179,28 +265,50 @@ class Create extends Component
             return;
         }
 
-        $generalSetting = \App\Models\GeneralSetting::first();
+        $generalSetting = GeneralSetting::first();
         $allowNegativeStock = $generalSetting ? (bool)$generalSetting->allow_negative_stock : false;
 
+        // Aggregate quantities per product for strict stock check
+        $productQuantities = [];
         foreach ($this->items as $idx => $item) {
-            $prod = Product::find($item['product_id']);
-            if (!$prod || (float)$prod->current_stock <= 0) {
-                $prodName = $prod ? $prod->name : 'Selected product';
-                $msg = "'{$prodName}' is out of stock and cannot be sold.";
-                $this->addError("items.{$idx}.product_id", $msg);
-                session()->flash('error', $msg);
-                $this->dispatch('toast', message: $msg, type: 'danger', title: 'Out of Stock');
+            $pid = $item['product_id'];
+            $qty = (float)($item['quantity'] ?? 0);
+            if ($qty <= 0) {
+                $msg = "Quantity for item #" . ($idx + 1) . " must be a positive number greater than 0.";
+                $this->addError("items.{$idx}.quantity", $msg);
+                $this->dispatch('toast', message: $msg, type: 'danger', title: 'Invalid Quantity');
                 return;
             }
+            $productQuantities[$pid] = ($productQuantities[$pid] ?? 0) + $qty;
+        }
 
-            $qty = (float)($item['quantity'] ?? 0);
-            $avail = (float)$prod->current_stock;
-            if (!$allowNegativeStock && $qty > $avail) {
-                $msg = "Insufficient stock for '{$prod->name}'. Available stock is {$avail}, requested {$qty}.";
-                $this->addError("items.{$idx}.quantity", $msg);
-                session()->flash('error', $msg);
-                $this->dispatch('toast', message: $msg, type: 'danger', title: 'Stock Insufficient');
-                return;
+        if (!$allowNegativeStock) {
+            $products = Product::whereIn('id', array_keys($productQuantities))->get()->keyBy('id');
+            foreach ($this->items as $idx => $item) {
+                $pid = $item['product_id'];
+                $prod = $products[$pid] ?? null;
+                if (!$prod) {
+                    $msg = "Selected product is invalid or no longer exists.";
+                    $this->addError("items.{$idx}.product_id", $msg);
+                    $this->dispatch('toast', message: $msg, type: 'danger', title: 'Invalid Product');
+                    return;
+                }
+
+                $avail = (float)$prod->current_stock;
+                if ($avail <= 0) {
+                    $msg = "'{$prod->name}' is out of stock (0 available) and cannot be sold.";
+                    $this->addError("items.{$idx}.product_id", $msg);
+                    $this->dispatch('toast', message: $msg, type: 'danger', title: 'Out of Stock');
+                    return;
+                }
+
+                $totalReq = $productQuantities[$pid];
+                if ($totalReq > $avail) {
+                    $msg = "Insufficient stock for '{$prod->name}'. Available stock is {$avail}, requested {$totalReq}.";
+                    $this->addError("items.{$idx}.quantity", $msg);
+                    $this->dispatch('toast', message: $msg, type: 'danger', title: 'Stock Insufficient');
+                    return;
+                }
             }
         }
 
@@ -219,8 +327,8 @@ class Create extends Component
 
         try {
             $sale = $salesService->createSale($header, $this->items);
-            session()->flash('success', "Sales Invoice #{$this->invoice_number} generated successfully.");
-            $this->dispatch('toast', message: "Sales Invoice #{$this->invoice_number} generated successfully.", type: 'success', title: 'Invoice Issued');
+            session()->flash('success', "Sales Invoice #{$sale->invoice_number} generated successfully.");
+            $this->dispatch('toast', message: "Sales Invoice #{$sale->invoice_number} generated successfully.", type: 'success', title: 'Invoice Issued');
             return redirect()->route('sales.index');
         } catch (\Exception $e) {
             session()->flash('error', $e->getMessage());
@@ -239,7 +347,7 @@ class Create extends Component
             'cust_mobile', 'cust_email', 'cust_address', 'cust_trn_number',
             'cust_opening_balance', 'cust_credit_limit', 'cust_payment_terms', 'cust_notes'
         ]);
-        $setting = \App\Models\GeneralSetting::first();
+        $setting = GeneralSetting::first();
         $prefix = $setting ? $setting->customer_prefix : 'CUST-';
         $maxId = Customer::max('id') + 1;
         $this->cust_code = $prefix . str_pad((string)$maxId, 5, '0', STR_PAD_LEFT);
@@ -288,7 +396,7 @@ class Create extends Component
 
     public function render()
     {
-        $generalSetting = \App\Models\GeneralSetting::first();
+        $generalSetting = GeneralSetting::first();
         $allowNegativeStock = $generalSetting ? (bool)$generalSetting->allow_negative_stock : false;
 
         $customers = Customer::select('id', 'name', 'company_name', 'current_balance')

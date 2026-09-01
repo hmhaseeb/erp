@@ -22,18 +22,62 @@ class SalesService
     }
 
     /**
-     * Create and confirm a sales invoice inside DB transaction.
+     * Create and confirm a sales invoice inside DB transaction with pessimistic locking.
      */
     public function createSale(array $header, array $items): Sale
     {
         return DB::transaction(function () use ($header, $items) {
+            $generalSetting = \App\Models\GeneralSetting::first();
+            $allowNegativeStock = $generalSetting ? (bool)$generalSetting->allow_negative_stock : false;
+
+            // 1. Aggregate requested quantities per product
+            $productQuantities = [];
+            foreach ($items as $item) {
+                $pid = $item['product_id'];
+                $qty = (float)($item['quantity'] ?? 0);
+                if ($qty <= 0) {
+                    throw new Exception("Invalid quantity for product ID #{$pid}. Quantity must be greater than zero.");
+                }
+                $productQuantities[$pid] = ($productQuantities[$pid] ?? 0) + $qty;
+            }
+
+            // 2. Lock products for update to prevent concurrent race conditions
+            $products = Product::whereIn('id', array_keys($productQuantities))
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            // 3. Strict stock validation against real-time database state
+            foreach ($productQuantities as $pid => $totalRequestedQty) {
+                if (!isset($products[$pid])) {
+                    throw new Exception("Selected product (ID: {$pid}) does not exist in catalog.");
+                }
+
+                $prod = $products[$pid];
+                if (!$prod->status) {
+                    throw new Exception("Product '{$prod->name}' is marked inactive and cannot be sold.");
+                }
+
+                $availStock = (float)$prod->current_stock;
+                if (!$allowNegativeStock) {
+                    if ($availStock <= 0) {
+                        throw new Exception("Product '{$prod->name}' is currently out of stock (0 available).");
+                    }
+                    if ($totalRequestedQty > $availStock) {
+                        throw new Exception("Insufficient stock for '{$prod->name}'. Available stock is {$availStock}, requested {$totalRequestedQty}.");
+                    }
+                }
+            }
+
+            // 4. Calculate COGS & prepare item data
             $cogsTotal = 0.00;
             $processedItems = [];
 
             foreach ($items as $item) {
-                $product = Product::findOrFail($item['product_id']);
+                $product = $products[$item['product_id']];
                 $unitCost = (float) $product->weighted_cost;
-                $cogsAmount = $item['quantity'] * $unitCost;
+                $qty = (float) $item['quantity'];
+                $cogsAmount = $qty * $unitCost;
                 $cogsTotal += $cogsAmount;
 
                 $processedItems[] = array_merge($item, [
@@ -42,11 +86,13 @@ class SalesService
                 ]);
             }
 
+            // 5. Unique invoice number check
             $invNum = $header['invoice_number'];
             if (Sale::where('invoice_number', $invNum)->exists()) {
                 $invNum = \App\Models\InvoiceSetting::getNextSalesInvoiceNumber($header['sale_date'] ?? null);
             }
 
+            // 6. Create Sale record
             $sale = Sale::create([
                 'invoice_number' => $invNum,
                 'sale_date' => $header['sale_date'],
@@ -64,6 +110,7 @@ class SalesService
                 'notes' => $header['notes'] ?? null,
             ]);
 
+            // 7. Create Sale Items and deduct stock
             foreach ($processedItems as $itemData) {
                 SaleItem::create([
                     'sale_id' => $sale->id,
@@ -78,7 +125,7 @@ class SalesService
                     'cogs_amount' => $itemData['cogs_amount'],
                 ]);
 
-                // Reduce stock
+                // Reduce stock via StockService
                 $this->stockService->recordMovement(
                     $itemData['product_id'],
                     $sale->sale_date,
@@ -92,6 +139,7 @@ class SalesService
                 );
             }
 
+            // 8. Financial ledger & payment accounting
             $customer = Customer::findOrFail($sale->customer_id);
 
             if ($sale->payment_type === 'Credit') {

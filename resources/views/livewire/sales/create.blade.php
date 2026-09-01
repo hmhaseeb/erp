@@ -106,6 +106,9 @@
                                                     $otherSelectedProductIds[] = (string)$otherItem['product_id'];
                                                 }
                                             }
+                                            $selectedProdId = $item['product_id'] ?? null;
+                                            $selectedProduct = $selectedProdId ? $products->firstWhere('id', $selectedProdId) : null;
+                                            $availStock = $selectedProduct ? (float)$selectedProduct->current_stock : 0;
                                         @endphp
                                         <label class="form-label font-size-11 text-muted d-md-none mb-1">Product <span class="text-danger">*</span></label>
                                         <x-searchable-select wire:model.live="items.{{ $index }}.product_id" class="form-select {{ $errors->has('items.'.$index.'.product_id') ? 'is-invalid' : '' }}" placeholder="Select In-Stock Product...">
@@ -122,13 +125,24 @@
                                                 @endif
                                             @endforeach
                                         </x-searchable-select>
+                                        @if($selectedProduct)
+                                            <div class="mt-1 font-size-11 d-flex align-items-center gap-1">
+                                                <span class="text-muted">Available Stock:</span>
+                                                <span class="badge {{ $availStock > 0 ? 'badge-soft-success' : 'badge-soft-danger' }} font-monospace fw-semibold">
+                                                    {{ number_format($availStock, $availStock == (int)$availStock ? 0 : 2) }}
+                                                </span>
+                                            </div>
+                                        @endif
                                         @if($errors->has('items.'.$index.'.product_id'))
                                             <div class="invalid-feedback d-block font-size-11">{{ $errors->first('items.'.$index.'.product_id') }}</div>
                                         @endif
                                     </td>
                                     <td class="col-qty">
                                         <label class="form-label font-size-11 text-muted d-md-none mb-1">Qty <span class="text-danger">*</span></label>
-                                        <input type="number" step="0.01" wire:model.live.debounce.300ms="items.{{ $index }}.quantity" class="form-control text-center {{ $errors->has('items.'.$index.'.quantity') ? 'is-invalid' : '' }}" placeholder="Qty">
+                                        <input type="number" step="any" min="0.01" max="{{ $availStock > 0 ? $availStock : '' }}" wire:model.live.debounce.300ms="items.{{ $index }}.quantity" class="form-control text-center font-monospace {{ $errors->has('items.'.$index.'.quantity') ? 'is-invalid' : '' }}" placeholder="Qty">
+                                        @if($selectedProduct && $availStock > 0)
+                                            <small class="text-muted font-size-11 d-block text-center mt-1">Max: {{ number_format($availStock, $availStock == (int)$availStock ? 0 : 2) }}</small>
+                                        @endif
                                         @if($errors->has('items.'.$index.'.quantity'))
                                             <div class="invalid-feedback d-block font-size-11">{{ $errors->first('items.'.$index.'.quantity') }}</div>
                                         @endif
