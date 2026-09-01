@@ -24,11 +24,11 @@
 
     @if($type === 'Bank')
         <div class="row">
-            <div class="col-md-6 mb-3">
+            <div class="col-12 col-sm-6 mb-3">
                 <label class="form-label">Bank Name</label>
                 <input type="text" wire:model="bank_name" class="form-control" placeholder="e.g. Emirates NBD, ADCB">
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-12 col-sm-6 mb-3">
                 <label class="form-label">Account / IBAN Number</label>
                 <input type="text" wire:model="account_number" class="form-control" placeholder="Account # or IBAN">
             </div>
@@ -37,11 +37,11 @@
 
     @if(!$isEditMode)
         <div class="row">
-            <div class="col-md-6 mb-3">
+            <div class="col-12 col-sm-6 mb-3">
                 <label class="form-label">Opening Balance (AED)</label>
                 <input type="number" step="0.01" wire:model="opening_balance" class="form-control" placeholder="0.00">
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-12 col-sm-6 mb-3">
                 <label class="form-label">Opening Balance Date <span class="text-danger">*</span></label>
                 <input type="date" wire:model="opening_balance_date" class="form-control">
             </div>

@@ -1,21 +1,21 @@
 <div>
     <!-- Page Header -->
     <x-page-header title="Product Categories" subtitle="Organize products into classification groups and categories.">
-        <button wire:click="openModal" class="btn btn-primary waves-effect waves-light">
+        <button wire:click="openModal" class="btn btn-primary waves-effect waves-light w-100 w-sm-auto mt-2 mt-sm-0">
             <i class="bx bx-plus me-1"></i> Add Category
         </button>
     </x-page-header>
 
     <!-- Search & Filter Card -->
     <x-filter-card>
-        <div class="col-lg-6 col-md-6">
+        <div class="col-12 col-md-8 col-lg-6">
             <label class="form-label font-size-12 text-muted mb-1">Search Categories</label>
             <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bx bx-search text-muted"></i></span>
                 <input type="text" wire:model.live.debounce.300ms="search" class="form-control border-start-0" placeholder="Search by category name, code, description...">
             </div>
         </div>
-        <div class="col-lg-3 col-md-3">
+        <div class="col-6 col-md-4 col-lg-3">
             <label class="form-label font-size-12 text-muted mb-1">Per Page</label>
             <x-searchable-select wire:model.live="perPage" class="form-select">
                 <option value="10">10</option>
@@ -23,11 +23,13 @@
                 <option value="50">50</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-3 col-md-3">
-            <button type="button" wire:click="resetFilters" class="btn btn-light w-100">
-                <i class="bx bx-reset me-1"></i> Reset
-            </button>
-        </div>
+        <x-slot:extra>
+            <div class="col-12 text-sm-end text-center mt-1">
+                <button type="button" wire:click="resetFilters" class="btn btn-sm btn-light">
+                    <i class="bx bx-reset me-1"></i> Reset Filters
+                </button>
+            </div>
+        </x-slot:extra>
     </x-filter-card>
 
     <!-- Categories Data Table Card -->
@@ -36,10 +38,10 @@
             <thead class="table-light">
                 <tr>
                     <x-th-sort field="code" :sortField="$sortField" :sortDirection="$sortDirection" width="120px">Code</x-th-sort>
-                    <x-th-sort field="name" :sortField="$sortField" :sortDirection="$sortDirection">Category Name</x-th-sort>
-                    <th>Description</th>
+                    <x-th-sort field="name" :sortField="$sortField" :sortDirection="$sortDirection" style="min-width: 140px;">Category Name</x-th-sort>
+                    <th style="min-width: 140px;">Description</th>
                     <th class="text-center" style="width: 140px;">Assigned Products</th>
-                    <th class="text-center" style="width: 100px;">Actions</th>
+                    <th class="text-center text-nowrap" style="min-width: 90px;">Actions</th>
                 </tr>
             </thead>
             <tbody>

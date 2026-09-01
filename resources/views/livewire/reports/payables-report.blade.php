@@ -1,14 +1,14 @@
 <div>
     <!-- Page Header -->
     <x-page-header title="Accounts Payable Aging & Report" subtitle="Track outstanding vendor bills and liabilities due for supplier payments.">
-        <button onclick="window.print()" class="btn btn-secondary waves-effect waves-light">
+        <button onclick="window.print()" class="btn btn-secondary waves-effect waves-light w-100 w-sm-auto mt-2 mt-sm-0">
             <i class="bx bx-printer me-1"></i> Print Payables
         </button>
     </x-page-header>
 
     <!-- Summary KPI Cards -->
-    <div class="row mb-3">
-        <div class="col-md-6">
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-md-6">
             <x-kpi-card 
                 title="Total Outstanding Accounts Payable" 
                 :amount="$totalPayable" 
@@ -17,7 +17,7 @@
                 subtitle="Vendor balances due" 
                 icon="bx-wallet" />
         </div>
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
             <x-kpi-card 
                 title="Suppliers with Pending Balances" 
                 :amount="number_format($suppliersWithBalance)" 
@@ -30,14 +30,14 @@
 
     <!-- Search & Filter Card -->
     <x-filter-card>
-        <div class="col-lg-5 col-md-6">
+        <div class="col-12 col-md-6 col-lg-5">
             <label class="form-label font-size-12 text-muted mb-1">Search Suppliers</label>
             <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bx bx-search text-muted"></i></span>
                 <input type="text" wire:model.live.debounce.300ms="search" class="form-control border-start-0" placeholder="Search supplier, company, phone, code...">
             </div>
         </div>
-        <div class="col-lg-3 col-md-3">
+        <div class="col-12 col-sm-6 col-md-3 col-lg-4">
             <label class="form-label font-size-12 text-muted mb-1">Balance Status</label>
             <x-searchable-select wire:model.live="filter_balance" class="form-select">
                 <option value="all">All Suppliers</option>
@@ -45,7 +45,7 @@
                 <option value="zero_balance">Zero Balance</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-2 col-md-3">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-3">
             <label class="form-label font-size-12 text-muted mb-1">Per Page</label>
             <x-searchable-select wire:model.live="perPage" class="form-select">
                 <option value="15">15</option>
@@ -54,11 +54,13 @@
                 <option value="100">100</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <button type="button" wire:click="resetFilters" class="btn btn-light w-100">
-                <i class="bx bx-reset me-1"></i> Reset Filters
-            </button>
-        </div>
+        <x-slot:extra>
+            <div class="col-12 text-sm-end text-center mt-1">
+                <button type="button" wire:click="resetFilters" class="btn btn-sm btn-light">
+                    <i class="bx bx-reset me-1"></i> Reset Filters
+                </button>
+            </div>
+        </x-slot:extra>
     </x-filter-card>
 
     <!-- Payables Table Card -->
@@ -67,11 +69,11 @@
             <thead class="table-light">
                 <tr>
                     <th style="width: 100px;">Code</th>
-                    <x-th-sort field="name" :sortField="$sortField" :sortDirection="$sortDirection">Supplier Name / Company</x-th-sort>
+                    <x-th-sort field="name" :sortField="$sortField" :sortDirection="$sortDirection" style="min-width: 140px;">Supplier Name / Company</x-th-sort>
                     <th>Mobile / Phone</th>
                     <th>Contact Person</th>
                     <x-th-sort field="current_balance" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Outstanding Payable</x-th-sort>
-                    <th class="text-center" style="width: 120px;">Action</th>
+                    <th class="text-center text-nowrap" style="min-width: 100px;">Action</th>
                 </tr>
             </thead>
             <tbody>

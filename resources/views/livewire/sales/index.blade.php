@@ -1,21 +1,21 @@
 <div>
     <!-- Page Header -->
     <x-page-header title="Sales Invoices" subtitle="Issue customer invoices, track collections, view tax statements, and generate PDF invoices.">
-        <a href="{{ route('sales.create') }}" class="btn btn-success waves-effect waves-light">
+        <a href="{{ route('sales.create') }}" class="btn btn-success waves-effect waves-light w-100 w-sm-auto mt-2 mt-sm-0">
             <i class="bx bx-plus me-1"></i> New Sales Invoice
         </a>
     </x-page-header>
 
     <!-- Search & Filter Card -->
     <x-filter-card>
-        <div class="col-lg-3 col-md-6">
+        <div class="col-12 col-md-6 col-lg-3">
             <label class="form-label font-size-12 text-muted mb-1">Search Sales</label>
             <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bx bx-search text-muted"></i></span>
                 <input type="text" wire:model.live.debounce.300ms="search" class="form-control border-start-0" placeholder="Search by Invoice #, customer...">
             </div>
         </div>
-        <div class="col-lg-2 col-md-3">
+        <div class="col-12 col-sm-6 col-md-3 col-lg-2">
             <label class="form-label font-size-12 text-muted mb-1">Filter Customer</label>
             <x-searchable-select wire:model.live="customer_id_filter" class="form-select" placeholder="All Customers">
                 <option value="">All Customers</option>
@@ -24,7 +24,7 @@
                 @endforeach
             </x-searchable-select>
         </div>
-        <div class="col-lg-2 col-md-3">
+        <div class="col-12 col-sm-6 col-md-3 col-lg-2">
             <label class="form-label font-size-12 text-muted mb-1">Payment Method</label>
             <x-searchable-select wire:model.live="payment_type_filter" class="form-select" placeholder="All Methods">
                 <option value="">All Methods</option>
@@ -33,15 +33,15 @@
                 <option value="Credit">Credit (Receivable)</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-2 col-md-3">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-2">
             <label class="form-label font-size-12 text-muted mb-1">From Date</label>
             <input type="date" wire:model.live="date_from" class="form-control">
         </div>
-        <div class="col-lg-2 col-md-3">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-2">
             <label class="form-label font-size-12 text-muted mb-1">To Date</label>
             <input type="date" wire:model.live="date_to" class="form-control">
         </div>
-        <div class="col-lg-1 col-md-2">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-1">
             <label class="form-label font-size-12 text-muted mb-1">Per Page</label>
             <x-searchable-select wire:model.live="perPage" class="form-select">
                 <option value="10">10</option>
@@ -51,7 +51,7 @@
             </x-searchable-select>
         </div>
         <x-slot:extra>
-            <div class="col-12 text-end">
+            <div class="col-12 text-sm-end text-center mt-1">
                 <button type="button" wire:click="resetFilters" class="btn btn-sm btn-light">
                     <i class="bx bx-reset me-1"></i> Reset Filters
                 </button>
@@ -72,7 +72,7 @@
                     <th class="text-end">Paid Amount</th>
                     <th class="text-end">Due Balance</th>
                     <th>Status</th>
-                    <th class="text-center" style="width: 150px;">Actions</th>
+                    <th class="text-center" style="min-width: 140px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -83,7 +83,7 @@
                         <td>
                             <span class="fw-semibold text-dark">{{ $sale->customer->name ?? 'Walk-in Customer' }}</span>
                             @if($sale->customer && $sale->customer->company_name)
-                                <small class="text-muted d-block">{{ $sale->customer->company_name }}</small>
+                                <small class="text-muted d-block font-size-11">{{ $sale->customer->company_name }}</small>
                             @endif
                         </td>
                         <td>
@@ -91,8 +91,8 @@
                                 {{ $sale->payment_type }}
                             </x-badge>
                         </td>
-                        <td class="text-end fw-bold text-dark">AED {{ number_format($sale->grand_total, 2) }}</td>
-                        <td class="text-end text-success">AED {{ number_format($sale->paid_amount, 2) }}</td>
+                        <td class="text-end fw-bold text-dark font-monospace">AED {{ number_format($sale->grand_total, 2) }}</td>
+                        <td class="text-end text-success font-monospace">AED {{ number_format($sale->paid_amount, 2) }}</td>
                         <td class="text-end font-monospace {{ $sale->due_amount > 0 ? 'text-danger fw-bold' : 'text-muted' }}">
                             AED {{ number_format($sale->due_amount, 2) }}
                         </td>
@@ -101,13 +101,15 @@
                                 {{ $sale->status }}
                             </x-badge>
                         </td>
-                        <td class="text-center">
-                            <button wire:click="viewDetails({{ $sale->id }})" class="btn btn-sm btn-outline-primary" title="View Invoice">
-                                <i class="bx bx-show me-1"></i> View
-                            </button>
-                            <a href="{{ route('sales.pdf', ['id' => $sale->id]) }}" target="_blank" class="btn btn-sm btn-outline-danger ms-1" title="Download PDF">
-                                <i class="bx bxs-file-pdf"></i> PDF
-                            </a>
+                        <td class="text-center text-nowrap">
+                            <div class="d-inline-flex gap-1">
+                                <button wire:click="viewDetails({{ $sale->id }})" class="btn btn-sm btn-outline-primary" title="View Invoice">
+                                    <i class="bx bx-show me-1"></i> View
+                                </button>
+                                <a href="{{ route('sales.pdf', ['id' => $sale->id]) }}" target="_blank" class="btn btn-sm btn-outline-danger" title="Download PDF">
+                                    <i class="bx bxs-file-pdf"></i> PDF
+                                </a>
+                            </div>
                         </td>
                     </tr>
                 @empty
@@ -129,6 +131,8 @@
         </table>
     </x-table-card>
 
-    <!-- Sales Details Modal -->
-    @include('livewire.sales.partials.sale-details-modal')
+    <!-- Sales Details Modal (Lazy Loaded) -->
+    @if($selectedSale)
+        @include('livewire.sales.partials.sale-details-modal')
+    @endif
 </div>

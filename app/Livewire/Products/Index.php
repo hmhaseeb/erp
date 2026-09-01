@@ -255,7 +255,8 @@ class Index extends Component
 
     public function render()
     {
-        $query = Product::with(['category', 'unit']);
+        $query = Product::select('id', 'product_code', 'barcode', 'name', 'category_id', 'unit_id', 'brand', 'purchase_price', 'sales_price', 'current_stock', 'min_stock', 'status', 'image')
+            ->with(['category:id,name', 'unit:id,name,code']);
 
         if ($this->search) {
             $query->where(function ($q) {
@@ -281,8 +282,8 @@ class Index extends Component
         $products = $query->orderBy($this->sortField, $this->sortDirection)
             ->paginate((int)$this->perPage);
 
-        $categories = ProductCategory::all();
-        $units = Unit::all();
+        $categories = ProductCategory::select('id', 'name')->orderBy('name')->get();
+        $units = Unit::select('id', 'name', 'code')->orderBy('name')->get();
 
         return view('livewire.products.index', [
             'products' => $products,

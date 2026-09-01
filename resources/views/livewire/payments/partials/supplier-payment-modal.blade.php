@@ -9,12 +9,12 @@
     theme="primary">
 
     <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Payment Date <span class="text-danger">*</span></label>
             <input type="date" wire:model="payment_date" class="form-control @error('payment_date') is-invalid @enderror">
             @error('payment_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Select Supplier <span class="text-danger">*</span></label>
             <x-searchable-select wire:model.live="supplier_id" class="form-select @error('supplier_id') is-invalid @enderror" placeholder="Select Supplier...">
                 @foreach($suppliers as $s)
@@ -26,7 +26,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Disburse From Account <span class="text-danger">*</span></label>
             <x-searchable-select wire:model="account_id" class="form-select @error('account_id') is-invalid @enderror" placeholder="Select Account...">
                 @foreach($accounts as $acc)
@@ -35,7 +35,7 @@
             </x-searchable-select>
             @error('account_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Total Amount Paid (AED) <span class="text-danger">*</span></label>
             <input type="number" step="0.01" wire:model="amount" class="form-control @error('amount') is-invalid @enderror" placeholder="0.00">
             @error('amount') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -43,11 +43,11 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Cheque / Transfer Reference #</label>
             <input type="text" wire:model="reference_number" class="form-control" placeholder="Cheque # or bank ref">
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Notes / Remarks</label>
             <input type="text" wire:model="notes" class="form-control" placeholder="Payment voucher remarks...">
         </div>

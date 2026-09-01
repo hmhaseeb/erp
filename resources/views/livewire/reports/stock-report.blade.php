@@ -1,14 +1,14 @@
 <div>
     <!-- Page Header -->
     <x-page-header title="Stock Valuation & Inventory Report" subtitle="Total asset value of products in stock using weighted average cost accounting.">
-        <button onclick="window.print()" class="btn btn-secondary waves-effect waves-light">
+        <button onclick="window.print()" class="btn btn-secondary waves-effect waves-light w-100 w-sm-auto mt-2 mt-sm-0">
             <i class="bx bx-printer me-1"></i> Print Stock Report
         </button>
     </x-page-header>
 
     <!-- KPI Summary Row -->
-    <div class="row mb-3">
-        <div class="col-xl-3 col-md-6">
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Total Stock Asset Value" 
                 :amount="$totalValuation" 
@@ -17,7 +17,7 @@
                 subtitle="Weighted Average Cost" 
                 icon="bx-dollar-circle" />
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Total Physical Units" 
                 :amount="number_format($totalStockQty, 2)" 
@@ -26,7 +26,7 @@
                 subtitle="Total inventory count" 
                 icon="bx-layer" />
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Active Catalog SKUs" 
                 :amount="number_format($totalItems)" 
@@ -35,7 +35,7 @@
                 subtitle="Product Variations" 
                 icon="bx-package" />
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Low Stock Alerts" 
                 :amount="number_format($lowStockCount)" 
@@ -48,14 +48,14 @@
 
     <!-- Search & Filter Card -->
     <x-filter-card>
-        <div class="col-lg-4 col-md-6">
+        <div class="col-12 col-md-6 col-lg-4">
             <label class="form-label font-size-12 text-muted mb-1">Search Products</label>
             <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bx bx-search text-muted"></i></span>
                 <input type="text" wire:model.live.debounce.300ms="search" class="form-control border-start-0" placeholder="Search by name, SKU, barcode, brand...">
             </div>
         </div>
-        <div class="col-lg-3 col-md-3">
+        <div class="col-12 col-sm-6 col-md-3 col-lg-3">
             <label class="form-label font-size-12 text-muted mb-1">Filter Category</label>
             <x-searchable-select wire:model.live="category_id_filter" class="form-select" placeholder="All Categories">
                 <option value="">All Categories</option>
@@ -64,7 +64,7 @@
                 @endforeach
             </x-searchable-select>
         </div>
-        <div class="col-lg-2 col-md-3">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-2">
             <label class="form-label font-size-12 text-muted mb-1">Stock Status</label>
             <x-searchable-select wire:model.live="stock_status_filter" class="form-select" placeholder="All Status">
                 <option value="">All Status</option>
@@ -73,7 +73,7 @@
                 <option value="out_of_stock">Out of Stock (0)</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-1 col-md-2">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-1">
             <label class="form-label font-size-12 text-muted mb-1">Per Page</label>
             <x-searchable-select wire:model.live="perPage" class="form-select">
                 <option value="15">15</option>
@@ -82,11 +82,13 @@
                 <option value="100">100</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <button type="button" wire:click="resetFilters" class="btn btn-light w-100">
-                <i class="bx bx-reset me-1"></i> Reset Filters
-            </button>
-        </div>
+        <x-slot:extra>
+            <div class="col-12 text-sm-end text-center mt-1">
+                <button type="button" wire:click="resetFilters" class="btn btn-sm btn-light">
+                    <i class="bx bx-reset me-1"></i> Reset Filters
+                </button>
+            </div>
+        </x-slot:extra>
     </x-filter-card>
 
     <!-- Stock Valuation Table Card -->
@@ -95,7 +97,7 @@
             <thead class="table-light">
                 <tr>
                     <x-th-sort field="product_code" :sortField="$sortField" :sortDirection="$sortDirection" width="120px">SKU / Code</x-th-sort>
-                    <x-th-sort field="name" :sortField="$sortField" :sortDirection="$sortDirection">Product Title</x-th-sort>
+                    <x-th-sort field="name" :sortField="$sortField" :sortDirection="$sortDirection" style="min-width: 140px;">Product Title</x-th-sort>
                     <th>Category</th>
                     <x-th-sort field="current_stock" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Current Stock</x-th-sort>
                     <x-th-sort field="weighted_cost" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Avg Cost (AED)</x-th-sort>

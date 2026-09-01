@@ -9,7 +9,7 @@
     <!-- Top Status / Year Overview KPI Cards -->
     <div class="row g-3 mb-4">
         <!-- Current Year -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Current Year" 
                 :value="$currentYear" 
@@ -19,7 +19,7 @@
         </div>
 
         <!-- Next Sales Invoice Number -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Next Sales Invoice #" 
                 :value="$nextCurrentYearNumber" 
@@ -29,7 +29,7 @@
         </div>
 
         <!-- Last / Previous Year -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 :title="'Last Year (' . $previousYear . ')'" 
                 :value="$previousYearSalesCount . ' Invoices'" 
@@ -39,7 +39,7 @@
         </div>
 
         <!-- Yearly Reset Engine Status -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Yearly Reset Status" 
                 value="Auto-Reset Active" 
@@ -69,14 +69,14 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-12 col-sm-6 mb-3">
                         <label class="form-label font-size-13 fw-semibold">Starting Sequence Number per Year <span class="text-danger">*</span></label>
                         <input type="number" min="1" wire:model.live.debounce.300ms="starting_number" class="form-control @error('starting_number') is-invalid @enderror" placeholder="1">
                         @error('starting_number') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         <small class="text-muted font-size-11">Initial sequence number each calendar year (default: <code>1</code> which pads to <code>0001</code>)</small>
                     </div>
 
-                    <div class="col-md-6 mb-3">
+                    <div class="col-12 col-sm-6 mb-3">
                         <label class="form-label font-size-13 fw-semibold">Paper Size for PDF Invoices & Vouchers <span class="text-danger">*</span></label>
                         <x-searchable-select wire:model="paper_size" class="form-select {{ $errors->has('paper_size') ? 'is-invalid' : '' }}">
                             <option value="A4">A4 (Standard 210mm x 297mm)</option>
@@ -99,7 +99,7 @@
             <div class="card-body">
                 <div class="row g-3">
                     <!-- 1. Sales Invoice -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-12 col-sm-6 col-lg-4">
                         <div class="p-3 border rounded h-100 bg-white shadow-none">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label class="form-label font-size-13 fw-bold mb-0 text-dark">
@@ -124,7 +124,7 @@
                     </div>
 
                     <!-- 2. Purchase Invoice -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-12 col-sm-6 col-lg-4">
                         <div class="p-3 border rounded h-100 bg-white shadow-none">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label class="form-label font-size-13 fw-bold mb-0 text-dark">
@@ -149,7 +149,7 @@
                     </div>
 
                     <!-- 3. Sales Return (Credit Note) -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-12 col-sm-6 col-lg-4">
                         <div class="p-3 border rounded h-100 bg-white shadow-none">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label class="form-label font-size-13 fw-bold mb-0 text-dark">
@@ -174,7 +174,7 @@
                     </div>
 
                     <!-- 4. Purchase Return (Debit Note) -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-12 col-sm-6 col-lg-4">
                         <div class="p-3 border rounded h-100 bg-white shadow-none">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label class="form-label font-size-13 fw-bold mb-0 text-dark">
@@ -199,7 +199,7 @@
                     </div>
 
                     <!-- 5. Customer Payment Receipt -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-12 col-sm-6 col-lg-4">
                         <div class="p-3 border rounded h-100 bg-white shadow-none">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label class="form-label font-size-13 fw-bold mb-0 text-dark">
@@ -224,7 +224,7 @@
                     </div>
 
                     <!-- 6. Supplier Payment Voucher -->
-                    <div class="col-lg-4 col-md-6">
+                    <div class="col-12 col-sm-6 col-lg-4">
                         <div class="p-3 border rounded h-100 bg-white shadow-none">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <label class="form-label font-size-13 fw-bold mb-0 text-dark">
@@ -260,11 +260,11 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-12 col-md-6 mb-3">
                         <label class="form-label font-size-13 fw-semibold">Terms & Conditions (Printed on PDF)</label>
                         <textarea wire:model="terms_conditions" class="form-control font-size-13" rows="3" placeholder="Standard business terms, warranty conditions, or payment policies..."></textarea>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-12 col-md-6 mb-3">
                         <label class="form-label font-size-13 fw-semibold">Bank Payment Details (Printed on PDF)</label>
                         <textarea wire:model="bank_details" class="form-control font-size-13" rows="3" placeholder="Beneficiary Account Name, IBAN, Bank Name, SWIFT code..."></textarea>
                     </div>
@@ -275,8 +275,8 @@
                     <input type="text" wire:model="invoice_footer" class="form-control font-size-13" placeholder="Thank you for your business!">
                 </div>
             </div>
-            <div class="card-footer bg-white border-top py-3 text-end">
-                <button type="submit" class="btn btn-primary px-4">
+            <div class="card-footer bg-white border-top py-3 text-sm-end text-center">
+                <button type="submit" class="btn btn-primary px-4 w-100 w-sm-auto">
                     <span wire:loading.remove wire:target="saveSettings">
                         <i class="bx bx-save me-1"></i> Save Invoice & Numbering Settings
                     </span>

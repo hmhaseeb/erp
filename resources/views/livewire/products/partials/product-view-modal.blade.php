@@ -1,13 +1,27 @@
 @if($viewProduct)
-    <div class="modal fade show d-block" style="background: rgba(0,0,0,0.55);" tabindex="-1" role="dialog" aria-modal="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div x-data="{
+            closing: false,
+            close() {
+                if (this.closing) return;
+                this.closing = true;
+                $wire.closeViewModal();
+            }
+         }"
+         @keydown.escape.window.stop="close()"
+         @click.self.stop="close()"
+         class="modal fade show d-block erp-modal-backdrop" 
+         style="background: rgba(0,0,0,0.55); z-index: 1055;" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-modal="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable erp-modal-dialog" @click.stop>
             <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header bg-light py-3">
                     <div class="d-flex align-items-center gap-2">
                         <span class="badge bg-primary font-size-12">{{ $viewProduct->product_code }}</span>
                         <h5 class="modal-title mb-0 text-dark fw-bold">{{ $viewProduct->name }}</h5>
                     </div>
-                    <button type="button" class="btn-close" wire:click="closeViewModal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" @click.stop="close()" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div class="row g-4 mb-4">
@@ -181,11 +195,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light py-2">
-                    <button type="button" wire:click="editProduct({{ $viewProduct->id }})" class="btn btn-primary">
+                <div class="modal-footer bg-light py-2 d-flex flex-column-reverse flex-sm-row justify-content-sm-end gap-2">
+                    <button type="button" class="btn btn-secondary w-100 w-sm-auto" @click.stop="close()">Close</button>
+                    <button type="button" wire:click="editProduct({{ $viewProduct->id }})" class="btn btn-primary w-100 w-sm-auto">
                         <i class="bx bx-edit me-1"></i> Edit Product
                     </button>
-                    <button type="button" class="btn btn-secondary" wire:click="closeViewModal">Close</button>
                 </div>
             </div>
         </div>

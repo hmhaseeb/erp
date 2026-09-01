@@ -6,11 +6,11 @@
     updateText="Process Return">
 
     <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Return Number</label>
             <input type="text" wire:model="return_number" class="form-control" readonly>
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Return Date <span class="text-danger">*</span></label>
             <input type="date" wire:model="return_date" class="form-control @error('return_date') is-invalid @enderror">
             @error('return_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -38,17 +38,17 @@
     </div>
 
     <div class="row">
-        <div class="col-md-4 mb-3">
+        <div class="col-6 col-sm-4 mb-3">
             <label class="form-label">Qty Returned <span class="text-danger">*</span></label>
             <input type="number" step="0.01" wire:model="quantity" class="form-control @error('quantity') is-invalid @enderror">
             @error('quantity') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-6 col-sm-4 mb-3">
             <label class="form-label">Unit Price (AED) <span class="text-danger">*</span></label>
             <input type="number" step="0.01" wire:model="unit_price" class="form-control @error('unit_price') is-invalid @enderror">
             @error('unit_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-12 col-sm-4 mb-3">
             <label class="form-label">VAT %</label>
             <input type="number" step="0.01" wire:model="vat_percent" class="form-control">
         </div>

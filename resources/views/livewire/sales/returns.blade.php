@@ -1,21 +1,21 @@
 <div>
     <!-- Page Header -->
     <x-page-header title="Sales Returns / Credit Notes" subtitle="Record items returned by customers, restore stock inventory, and issue receivable credits.">
-        <button wire:click="openModal" class="btn btn-primary waves-effect waves-light">
+        <button wire:click="openModal" class="btn btn-primary waves-effect waves-light w-100 w-sm-auto mt-2 mt-sm-0">
             <i class="bx bx-plus me-1"></i> New Sales Return
         </button>
     </x-page-header>
 
     <!-- Search & Filter Card -->
     <x-filter-card>
-        <div class="col-lg-3 col-md-6">
+        <div class="col-12 col-md-6 col-lg-3">
             <label class="form-label font-size-12 text-muted mb-1">Search Returns</label>
             <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bx bx-search text-muted"></i></span>
                 <input type="text" wire:model.live.debounce.300ms="search" class="form-control border-start-0" placeholder="Search by Return #, customer, reason...">
             </div>
         </div>
-        <div class="col-lg-3 col-md-3">
+        <div class="col-12 col-sm-6 col-md-3 col-lg-3">
             <label class="form-label font-size-12 text-muted mb-1">Filter Customer</label>
             <x-searchable-select wire:model.live="customer_id_filter" class="form-select" placeholder="All Customers">
                 <option value="">All Customers</option>
@@ -24,15 +24,15 @@
                 @endforeach
             </x-searchable-select>
         </div>
-        <div class="col-lg-2 col-md-3">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-2">
             <label class="form-label font-size-12 text-muted mb-1">From Date</label>
             <input type="date" wire:model.live="date_from" class="form-control">
         </div>
-        <div class="col-lg-2 col-md-3">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-2">
             <label class="form-label font-size-12 text-muted mb-1">To Date</label>
             <input type="date" wire:model.live="date_to" class="form-control">
         </div>
-        <div class="col-lg-1 col-md-2">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-2">
             <label class="form-label font-size-12 text-muted mb-1">Per Page</label>
             <x-searchable-select wire:model.live="perPage" class="form-select">
                 <option value="10">10</option>
@@ -40,11 +40,13 @@
                 <option value="50">50</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-1 col-md-2">
-            <button type="button" wire:click="resetFilters" class="btn btn-light w-100">
-                <i class="bx bx-reset"></i>
-            </button>
-        </div>
+        <x-slot:extra>
+            <div class="col-12 text-sm-end text-center mt-1">
+                <button type="button" wire:click="resetFilters" class="btn btn-sm btn-light">
+                    <i class="bx bx-reset me-1"></i> Reset Filters
+                </button>
+            </div>
+        </x-slot:extra>
     </x-filter-card>
 
     <!-- Sales Returns Table -->
@@ -54,10 +56,10 @@
                 <tr>
                     <x-th-sort field="return_number" :sortField="$sortField" :sortDirection="$sortDirection" width="130px">Return #</x-th-sort>
                     <x-th-sort field="return_date" :sortField="$sortField" :sortDirection="$sortDirection" width="110px">Date</x-th-sort>
-                    <th>Customer</th>
-                    <th>Items Returned</th>
+                    <th style="min-width: 140px;">Customer</th>
+                    <th style="min-width: 150px;">Items Returned</th>
                     <x-th-sort field="grand_total" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Return Total</x-th-sort>
-                    <th>Reason / Note</th>
+                    <th style="min-width: 140px;">Reason / Note</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -102,6 +104,8 @@
         </table>
     </x-table-card>
 
-    <!-- Sales Return Modal Form -->
-    @include('livewire.sales.partials.return-modal')
+    <!-- Sales Return Modal Form (Lazy Loaded) -->
+    @if($isModalOpen)
+        @include('livewire.sales.partials.return-modal')
+    @endif
 </div>

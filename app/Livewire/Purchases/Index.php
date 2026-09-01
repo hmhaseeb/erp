@@ -102,7 +102,8 @@ class Index extends Component
 
     public function render()
     {
-        $query = Purchase::with(['supplier', 'account']);
+        $query = Purchase::select('id', 'purchase_number', 'reference_number', 'purchase_date', 'supplier_id', 'account_id', 'payment_type', 'grand_total', 'paid_amount', 'due_amount', 'status')
+            ->with(['supplier:id,name,company_name', 'account:id,name']);
 
         if ($this->search) {
             $query->where(function ($q) {
@@ -140,7 +141,7 @@ class Index extends Component
         $purchases = $query->orderBy($this->sortField, $this->sortDirection)
             ->paginate((int)$this->perPage);
 
-        $suppliers = Supplier::orderBy('name')->get();
+        $suppliers = Supplier::select('id', 'name', 'company_name')->orderBy('name')->get();
 
         return view('livewire.purchases.index', [
             'purchases' => $purchases,

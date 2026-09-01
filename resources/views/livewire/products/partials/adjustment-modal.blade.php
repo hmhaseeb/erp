@@ -22,14 +22,14 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Adjustment Type <span class="text-danger">*</span></label>
             <x-searchable-select wire:model="movement_type" class="form-select">
                 <option value="ADJUSTMENT_IN">Stock In (+) / Increase</option>
                 <option value="ADJUSTMENT_OUT">Stock Out (-) / Damaged / Decrease</option>
             </x-searchable-select>
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Quantity <span class="text-danger">*</span></label>
             <input type="number" step="0.01" wire:model="quantity" class="form-control @error('quantity') is-invalid @enderror">
             @error('quantity') <div class="invalid-feedback">{{ $message }}</div> @enderror

@@ -52,6 +52,22 @@
         .transition-icon { transition: transform 0.2s ease; }
         .rotate-180 { transform: rotate(180deg); }
 
+        /* Modal Smooth Animations & Single-Cycle Transitions */
+        @keyframes erpModalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes erpModalPopIn {
+            from { opacity: 0; transform: scale(0.96) translateY(-8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .erp-modal-backdrop {
+            animation: erpModalFadeIn 0.15s ease-out forwards;
+        }
+        .erp-modal-dialog {
+            animation: erpModalPopIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
         /* Sortable Table Columns */
         th.sortable {
             cursor: pointer;
@@ -229,6 +245,52 @@
             width: 7px;
             height: 7px;
             box-shadow: 0 0 6px rgba(81, 86, 190, 0.4);
+        }
+
+        /* Universal Modal Scrolling & Responsiveness Fix */
+        .modal {
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+        .modal-dialog-scrollable {
+            max-height: calc(100vh - 1.5rem) !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        @media (min-width: 576px) {
+            .modal-dialog-scrollable {
+                max-height: calc(100vh - 3.5rem) !important;
+            }
+        }
+        .modal-dialog-scrollable .modal-content {
+            max-height: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
+            min-height: 0 !important;
+        }
+        /* Critical: When form is a direct child of modal-content, preserve flexbox */
+        .modal-dialog-scrollable .modal-content > form {
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+            max-height: 100% !important;
+            min-height: 0 !important;
+            flex: 1 1 auto !important;
+        }
+        .modal-dialog-scrollable .modal-header,
+        .modal-dialog-scrollable .modal-footer {
+            flex-shrink: 0 !important;
+            z-index: 5;
+        }
+        .modal-dialog-scrollable .modal-body {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch;
+            flex: 1 1 auto !important;
+            min-height: 0 !important;
         }
 
         /* Print Styles */

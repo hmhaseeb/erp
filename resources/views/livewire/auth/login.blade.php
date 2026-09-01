@@ -1,8 +1,8 @@
 @php
     $companySetting = \App\Services\SettingsService::getCompany();
 @endphp
-<div class="row g-0 justify-content-center align-items-center min-vh-100 bg-light-subtle">
-    <div class="col-xxl-3 col-lg-4 col-md-6 col-sm-10 px-3">
+<div class="row g-0 justify-content-center align-items-center min-vh-100 bg-light-subtle py-4">
+    <div class="col-xxl-3 col-lg-4 col-md-6 col-sm-10 col-12 px-3">
         <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
             <div class="card-body p-4 p-sm-5">
                 <div class="text-center mb-4">

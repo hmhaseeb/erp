@@ -23,7 +23,7 @@
          class="{{ $attributes->get('class') }} cursor-pointer d-flex align-items-center justify-content-between text-start"
          :class="{ 'is-invalid': {{ $isInvalid ? 'true' : 'false' }}, 'focus': open }"
          @click="toggle()"
-         style="user-select: none; background-color: #fff;">
+         style="user-select: none; background-color: #fff; background-image: none !important; min-height: 38px;">
         <span class="text-truncate" x-text="selectedLabel || '{{ $placeholder }}'"></span>
         <i class="bx bx-chevron-down ms-2 text-muted font-size-16 transition-icon" :class="{ 'rotate-180': open }"></i>
     </div>

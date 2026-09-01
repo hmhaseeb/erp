@@ -1,21 +1,21 @@
 <div>
     <!-- Page Header -->
     <x-page-header title="Product Catalog & Inventory" subtitle="Manage product items, pictures, prices, barcodes, and stock levels.">
-        <button wire:click="openModal" class="btn btn-primary waves-effect waves-light">
+        <button wire:click="openModal" class="btn btn-primary waves-effect waves-light w-100 w-sm-auto mt-2 mt-sm-0">
             <i class="bx bx-plus me-1"></i> Register New Product
         </button>
     </x-page-header>
 
     <!-- Search & Filter Card -->
     <x-filter-card>
-        <div class="col-lg-4 col-md-6">
+        <div class="col-12 col-md-6 col-lg-4">
             <label class="form-label font-size-12 text-muted mb-1">Search Products</label>
             <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bx bx-search text-muted"></i></span>
                 <input type="text" wire:model.live.debounce.300ms="search" class="form-control border-start-0" placeholder="Search by name, SKU, barcode, brand...">
             </div>
         </div>
-        <div class="col-lg-3 col-md-3">
+        <div class="col-12 col-sm-6 col-md-3 col-lg-3">
             <label class="form-label font-size-12 text-muted mb-1">Filter by Category</label>
             <x-searchable-select wire:model.live="category_id_filter" class="form-select" placeholder="All Categories">
                 <option value="">All Categories</option>
@@ -24,7 +24,7 @@
                 @endforeach
             </x-searchable-select>
         </div>
-        <div class="col-lg-2 col-md-3">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-2">
             <label class="form-label font-size-12 text-muted mb-1">Stock Status</label>
             <x-searchable-select wire:model.live="stock_status_filter" class="form-select" placeholder="All Stock Status">
                 <option value="">All Stock Status</option>
@@ -33,7 +33,7 @@
                 <option value="out_of_stock">Out of Stock</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-1 col-md-2">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-1">
             <label class="form-label font-size-12 text-muted mb-1">Per Page</label>
             <x-searchable-select wire:model.live="perPage" class="form-select">
                 <option value="10">10</option>
@@ -42,11 +42,13 @@
                 <option value="100">100</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <button type="button" wire:click="resetFilters" class="btn btn-light w-100">
-                <i class="bx bx-reset me-1"></i> Reset Filters
-            </button>
-        </div>
+        <x-slot:extra>
+            <div class="col-12 text-sm-end text-center mt-1">
+                <button type="button" wire:click="resetFilters" class="btn btn-sm btn-light">
+                    <i class="bx bx-reset me-1"></i> Reset Filters
+                </button>
+            </div>
+        </x-slot:extra>
     </x-filter-card>
 
     <!-- Data Table Card -->
@@ -55,15 +57,15 @@
             <thead class="table-light">
                 <tr>
                     <x-th-sort field="product_code" :sortField="$sortField" :sortDirection="$sortDirection" width="110px">SKU / Code</x-th-sort>
-                    <x-th-sort field="name" :sortField="$sortField" :sortDirection="$sortDirection">Product Details</x-th-sort>
-                    <th>Category</th>
+                    <x-th-sort field="name" :sortField="$sortField" :sortDirection="$sortDirection" style="min-width: 160px;">Product Details</x-th-sort>
+                    <th style="min-width: 110px;">Category</th>
                     <th>Unit</th>
                     <x-th-sort field="purchase_price" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Purchase Cost</x-th-sort>
                     <x-th-sort field="sales_price" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Retail Price</x-th-sort>
                     <x-th-sort field="weighted_cost" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Avg Cost</x-th-sort>
                     <x-th-sort field="current_stock" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Current Stock</x-th-sort>
                     <th>Status</th>
-                    <th class="text-center" style="width: 130px;">Actions</th>
+                    <th class="text-center text-nowrap" style="min-width: 120px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -136,7 +138,12 @@
         </table>
     </x-table-card>
 
-    <!-- Modals -->
-    @include('livewire.products.partials.product-view-modal')
-    @include('livewire.products.partials.product-modal')
+    <!-- Modals (Lazy Loaded) -->
+    @if($viewProduct)
+        @include('livewire.products.partials.product-view-modal')
+    @endif
+
+    @if($isModalOpen)
+        @include('livewire.products.partials.product-modal')
+    @endif
 </div>

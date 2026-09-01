@@ -1,18 +1,18 @@
 <div>
     <!-- Page Header -->
     <x-page-header title="Daily Business Executive Summary" subtitle="Daily financial snapshot of sales, purchases, income, expenses, and cash/bank balances.">
-        <button onclick="window.print()" class="btn btn-secondary waves-effect waves-light">
+        <button onclick="window.print()" class="btn btn-secondary waves-effect waves-light w-100 w-sm-auto mt-2 mt-sm-0">
             <i class="bx bx-printer me-1"></i> Print Daily Report
         </button>
     </x-page-header>
 
     <!-- Date Selection Card -->
     <x-filter-card>
-        <div class="col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label font-size-12 text-muted mb-1">Select Report Date</label>
             <input type="date" wire:model.live="date" class="form-control">
         </div>
-        <div class="col-md-8 text-md-end mt-3 mt-md-0">
+        <div class="col-12 col-md-8 text-md-end mt-3 mt-md-0">
             <x-badge type="primary" size="font-size-13 py-2 px-3">
                 <i class="bx bx-calendar me-1"></i> Selected: {{ date('l, d F Y', strtotime($date)) }}
             </x-badge>
@@ -20,8 +20,8 @@
     </x-filter-card>
 
     <!-- KPI Summary Row -->
-    <div class="row">
-        <div class="col-xl-3 col-md-6">
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Today's Net Sales" 
                 :amount="$report['sales']['net']" 
@@ -30,7 +30,7 @@
                 :subtitle="$report['sales']['count'] . ' Invoices Issued'" 
                 icon="bx-shopping-bag" />
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Today's Net Purchases" 
                 :amount="$report['purchases']['net']" 
@@ -39,7 +39,7 @@
                 :subtitle="$report['purchases']['count'] . ' Bills Received'" 
                 icon="bx-cart" />
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Today's Other Income" 
                 :amount="$report['income']" 
@@ -48,7 +48,7 @@
                 :subtitle="$incomes->count() . ' Transactions'" 
                 icon="bx-trending-up" />
         </div>
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Today's Expenses" 
                 :amount="$report['expense']" 

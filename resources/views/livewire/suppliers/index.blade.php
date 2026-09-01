@@ -1,21 +1,21 @@
 <div>
     <!-- Page Header -->
     <x-page-header title="Suppliers Directory" subtitle="Manage vendor profiles, contact details, payables, and transactions.">
-        <button wire:click="openModal" class="btn btn-primary waves-effect waves-light">
+        <button wire:click="openModal" class="btn btn-primary waves-effect waves-light w-100 w-sm-auto mt-2 mt-sm-0">
             <i class="bx bx-plus me-1"></i> Register Supplier
         </button>
     </x-page-header>
 
     <!-- Search & Filter Card -->
     <x-filter-card>
-        <div class="col-lg-4 col-md-6">
+        <div class="col-12 col-md-6 col-lg-4">
             <label class="form-label font-size-12 text-muted mb-1">Search Suppliers</label>
             <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bx bx-search text-muted"></i></span>
                 <input type="text" wire:model.live.debounce.300ms="search" class="form-control border-start-0" placeholder="Search by name, company, code, phone, email...">
             </div>
         </div>
-        <div class="col-lg-3 col-md-3">
+        <div class="col-12 col-sm-6 col-md-3 col-lg-3">
             <label class="form-label font-size-12 text-muted mb-1">Balance Status</label>
             <x-searchable-select wire:model.live="balance_filter" class="form-select" placeholder="All Balances">
                 <option value="">All Balances</option>
@@ -23,7 +23,7 @@
                 <option value="zero_balance">Settled (0.00)</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-2 col-md-3">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-2">
             <label class="form-label font-size-12 text-muted mb-1">Status</label>
             <x-searchable-select wire:model.live="status_filter" class="form-select" placeholder="All Status">
                 <option value="">All Status</option>
@@ -31,7 +31,7 @@
                 <option value="0">Inactive</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-1 col-md-2">
+        <div class="col-6 col-sm-6 col-md-3 col-lg-1">
             <label class="form-label font-size-12 text-muted mb-1">Per Page</label>
             <x-searchable-select wire:model.live="perPage" class="form-select">
                 <option value="10">10</option>
@@ -40,11 +40,13 @@
                 <option value="100">100</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-2 col-md-4">
-            <button type="button" wire:click="resetFilters" class="btn btn-light w-100">
-                <i class="bx bx-reset me-1"></i> Reset Filters
-            </button>
-        </div>
+        <x-slot:extra>
+            <div class="col-12 text-sm-end text-center mt-1">
+                <button type="button" wire:click="resetFilters" class="btn btn-sm btn-light">
+                    <i class="bx bx-reset me-1"></i> Reset Filters
+                </button>
+            </div>
+        </x-slot:extra>
     </x-filter-card>
 
     <!-- Suppliers Table -->
@@ -53,13 +55,13 @@
             <thead class="table-light">
                 <tr>
                     <x-th-sort field="supplier_code" :sortField="$sortField" :sortDirection="$sortDirection" width="110px">Code</x-th-sort>
-                    <x-th-sort field="name" :sortField="$sortField" :sortDirection="$sortDirection">Supplier / Contact</x-th-sort>
-                    <x-th-sort field="company_name" :sortField="$sortField" :sortDirection="$sortDirection">Company</x-th-sort>
-                    <th>Contact Information</th>
+                    <x-th-sort field="name" :sortField="$sortField" :sortDirection="$sortDirection" style="min-width: 140px;">Supplier / Contact</x-th-sort>
+                    <x-th-sort field="company_name" :sortField="$sortField" :sortDirection="$sortDirection" style="min-width: 130px;">Company</x-th-sort>
+                    <th style="min-width: 140px;">Contact Information</th>
                     <th>TRN / VAT #</th>
                     <x-th-sort field="current_balance" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Payable Balance</x-th-sort>
                     <th>Status</th>
-                    <th class="text-center" style="width: 130px;">Actions</th>
+                    <th class="text-center text-nowrap" style="min-width: 120px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -117,9 +119,13 @@
         </table>
     </x-table-card>
 
-    <!-- Supplier Registration / Edit Modal -->
-    @include('livewire.suppliers.partials.supplier-modal')
+    <!-- Supplier Registration / Edit Modal (Lazy Loaded) -->
+    @if($isModalOpen)
+        @include('livewire.suppliers.partials.supplier-modal')
+    @endif
 
-    <!-- Supplier Show Details Modal -->
-    @include('livewire.suppliers.partials.supplier-show-modal')
+    <!-- Supplier Show Details Modal (Lazy Loaded) -->
+    @if($isViewModalOpen)
+        @include('livewire.suppliers.partials.supplier-show-modal')
+    @endif
 </div>

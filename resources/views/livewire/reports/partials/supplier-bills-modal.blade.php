@@ -1,27 +1,41 @@
 @if($selectedSupplier)
-    <div class="modal fade show d-block" style="background: rgba(0,0,0,0.5);" tabindex="-1" role="dialog" aria-modal="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div x-data="{
+            closing: false,
+            close() {
+                if (this.closing) return;
+                this.closing = true;
+                $wire.closePurchasesModal();
+            }
+         }"
+         @keydown.escape.window.stop="close()"
+         @click.self.stop="close()"
+         class="modal fade show d-block erp-modal-backdrop" 
+         style="background: rgba(0,0,0,0.5); z-index: 1055;" 
+         tabindex="-1" 
+         role="dialog" 
+         aria-modal="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable erp-modal-dialog" @click.stop>
             <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header">
-                    <h5 class="modal-title">Unpaid Purchase Bills — {{ $selectedSupplier->name }}</h5>
-                    <button type="button" class="btn-close" wire:click="closePurchasesModal" aria-label="Close"></button>
+                    <h5 class="modal-title font-size-16 fw-bold">Unpaid Purchase Bills — {{ $selectedSupplier->name }}</h5>
+                    <button type="button" class="btn-close" @click.stop="close()" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Total Supplier Payable: <strong class="text-danger">AED {{ number_format($selectedSupplier->current_balance, 2) }}</strong></span>
-                        <a href="{{ route('payments.supplier') }}" class="btn btn-sm btn-primary">
+                    <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center gap-2 mb-3">
+                        <span class="text-muted">Total Supplier Payable: <strong class="text-danger font-monospace">AED {{ number_format($selectedSupplier->current_balance, 2) }}</strong></span>
+                        <a href="{{ route('payments.supplier') }}" class="btn btn-sm btn-primary w-100 w-sm-auto">
                             <i class="bx bx-plus me-1"></i> Record Payment Voucher
                         </a>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-bordered table-sm font-size-13 mb-0">
+                        <table class="table table-bordered table-sm font-size-13 mb-0 align-middle">
                             <thead class="table-light">
                                 <tr>
-                                    <th>Purchase #</th>
-                                    <th>Date</th>
-                                    <th>Grand Total</th>
-                                    <th>Paid Amount</th>
-                                    <th class="text-end text-danger">Due Amount</th>
+                                    <th class="text-nowrap">Purchase #</th>
+                                    <th class="text-nowrap">Date</th>
+                                    <th class="text-nowrap">Grand Total</th>
+                                    <th class="text-nowrap">Paid Amount</th>
+                                    <th class="text-end text-danger text-nowrap">Due Amount</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -42,8 +56,8 @@
                         </table>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" wire:click="closePurchasesModal">Close</button>
+                <div class="modal-footer d-flex justify-content-sm-end">
+                    <button type="button" class="btn btn-light w-100 w-sm-auto" @click.stop="close()">Close</button>
                 </div>
             </div>
         </div>

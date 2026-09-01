@@ -9,7 +9,7 @@
     <!-- Top KPI Cards Row 1: Operations -->
     <div class="row g-3">
         <!-- Today Sales -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Today Sales" 
                 :amount="$todaySales" 
@@ -19,7 +19,7 @@
         </div>
 
         <!-- Today Purchases -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Today Purchases" 
                 :amount="$todayPurchases" 
@@ -29,7 +29,7 @@
         </div>
 
         <!-- Today Income -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Today Income" 
                 :amount="$todayIncome" 
@@ -39,7 +39,7 @@
         </div>
 
         <!-- Today Expenses -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Today Expenses" 
                 :amount="$todayExpense" 
@@ -52,7 +52,7 @@
     <!-- KPI Cards Row 2: Balances & Receivables/Payables -->
     <div class="row g-3 mt-1">
         <!-- Cash Balance -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Cash In Hand" 
                 :amount="$cashBalance" 
@@ -62,7 +62,7 @@
         </div>
 
         <!-- Bank Balance -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Bank Balance" 
                 :amount="$bankBalance" 
@@ -72,7 +72,7 @@
         </div>
 
         <!-- Receivables -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Customer Receivables" 
                 :amount="$receivables" 
@@ -82,7 +82,7 @@
         </div>
 
         <!-- Payables -->
-        <div class="col-xl-3 col-md-6">
+        <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
                 title="Supplier Payables" 
                 :amount="$payables" 

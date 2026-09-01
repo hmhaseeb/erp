@@ -102,7 +102,8 @@ class Index extends Component
 
     public function render()
     {
-        $query = Sale::with(['customer', 'account']);
+        $query = Sale::select('id', 'invoice_number', 'sale_date', 'customer_id', 'account_id', 'payment_type', 'grand_total', 'paid_amount', 'due_amount', 'status')
+            ->with(['customer:id,name,company_name', 'account:id,name']);
 
         if ($this->search) {
             $query->where(function ($q) {
@@ -139,7 +140,7 @@ class Index extends Component
         $sales = $query->orderBy($this->sortField, $this->sortDirection)
             ->paginate((int)$this->perPage);
 
-        $customers = Customer::orderBy('name')->get();
+        $customers = Customer::select('id', 'name', 'company_name')->orderBy('name')->get();
 
         return view('livewire.sales.index', [
             'sales' => $sales,

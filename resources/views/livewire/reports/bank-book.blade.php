@@ -1,14 +1,14 @@
 <div>
     <!-- Page Header -->
     <x-page-header title="Bank Book Statement" subtitle="Reconciliation and journal records for company banking accounts, cheques, and transfers.">
-        <button onclick="window.print()" class="btn btn-secondary waves-effect waves-light">
+        <button onclick="window.print()" class="btn btn-secondary waves-effect waves-light w-100 w-sm-auto mt-2 mt-sm-0">
             <i class="bx bx-printer me-1"></i> Print Bank Statement
         </button>
     </x-page-header>
 
     <!-- Filter Card -->
     <x-filter-card>
-        <div class="col-lg-3 col-md-4">
+        <div class="col-12 col-md-4">
             <label class="form-label font-size-12 text-muted mb-1">Select Bank Account</label>
             <x-searchable-select wire:model.live="account_id" class="form-select">
                 @foreach($bankAccounts as $bank)
@@ -16,15 +16,15 @@
                 @endforeach
             </x-searchable-select>
         </div>
-        <div class="col-lg-3 col-md-3">
+        <div class="col-6 col-sm-6 col-md-3">
             <label class="form-label font-size-12 text-muted mb-1">From Date</label>
             <input type="date" wire:model.live="start_date" class="form-control">
         </div>
-        <div class="col-lg-3 col-md-3">
+        <div class="col-6 col-sm-6 col-md-3">
             <label class="form-label font-size-12 text-muted mb-1">To Date</label>
             <input type="date" wire:model.live="end_date" class="form-control">
         </div>
-        <div class="col-lg-1 col-md-2">
+        <div class="col-6 col-sm-6 col-md-2">
             <label class="form-label font-size-12 text-muted mb-1">Per Page</label>
             <x-searchable-select wire:model.live="perPage" class="form-select">
                 <option value="15">15</option>
@@ -33,25 +33,25 @@
                 <option value="100">100</option>
             </x-searchable-select>
         </div>
-        <div class="col-lg-2 col-md-2">
-            <button type="button" wire:click="resetFilters" class="btn btn-light w-100">
-                <i class="bx bx-reset me-1"></i> Reset
-            </button>
-        </div>
         <x-slot:extra>
-            <div class="col-12">
+            <div class="col-12 mb-2">
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0"><i class="bx bx-search text-muted"></i></span>
                     <input type="text" wire:model.live.debounce.300ms="search" class="form-control border-start-0" placeholder="Search within bank transactions (description, cheques, transfers)...">
                 </div>
+            </div>
+            <div class="col-12 text-sm-end text-center">
+                <button type="button" wire:click="resetFilters" class="btn btn-sm btn-light">
+                    <i class="bx bx-reset me-1"></i> Reset Filters
+                </button>
             </div>
         </x-slot:extra>
     </x-filter-card>
 
     @if($selectedAccount)
         <!-- KPI Summary Row -->
-        <div class="row mb-3">
-            <div class="col-md-3">
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6 col-xl-3">
                 <x-kpi-card 
                     title="Period Opening Balance" 
                     :amount="$openingBalance" 
@@ -60,7 +60,7 @@
                     subtitle="Brought forward" 
                     icon="bx-archive" />
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-xl-3">
                 <x-kpi-card 
                     title="Total Bank Deposits (+)" 
                     :amount="$totalDebits" 
@@ -69,7 +69,7 @@
                     subtitle="Account deposits" 
                     icon="bx-arrow-to-bottom" />
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-xl-3">
                 <x-kpi-card 
                     title="Total Withdrawals (-)" 
                     :amount="$totalCredits" 
@@ -78,7 +78,7 @@
                     subtitle="Account disbursements" 
                     icon="bx-arrow-from-bottom" />
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-xl-3">
                 <x-kpi-card 
                     title="Closing Bank Balance" 
                     :amount="$closingBalance" 
@@ -96,7 +96,7 @@
                     <tr>
                         <th style="width: 110px;">Date</th>
                         <th>Transaction Type</th>
-                        <th>Particulars / Description</th>
+                        <th style="min-width: 160px;">Particulars / Description</th>
                         <th class="text-end text-success" style="width: 140px;">Deposits (+)</th>
                         <th class="text-end text-danger" style="width: 140px;">Withdrawals (-)</th>
                         <th class="text-end" style="width: 150px;">Running Balance</th>

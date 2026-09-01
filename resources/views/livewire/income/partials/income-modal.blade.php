@@ -8,12 +8,12 @@
     theme="success">
 
     <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Income Date <span class="text-danger">*</span></label>
             <input type="date" wire:model="date" class="form-control @error('date') is-invalid @enderror">
             @error('date') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Income Category <span class="text-danger">*</span></label>
             <x-searchable-select wire:model="income_category_id" class="form-select @error('income_category_id') is-invalid @enderror" placeholder="Select Category...">
                 @foreach($categories as $c)
@@ -25,7 +25,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Deposit Into Account <span class="text-danger">*</span></label>
             <x-searchable-select wire:model="account_id" class="form-select @error('account_id') is-invalid @enderror" placeholder="Select Account...">
                 @foreach($accounts as $acc)
@@ -34,7 +34,7 @@
             </x-searchable-select>
             @error('account_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Amount (AED) <span class="text-danger">*</span></label>
             <input type="number" step="0.01" wire:model="amount" class="form-control @error('amount') is-invalid @enderror" placeholder="0.00">
             @error('amount') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -47,11 +47,11 @@
     </div>
 
     <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Reference Number</label>
             <input type="text" wire:model="reference_number" class="form-control" placeholder="Receipt or bank ref #">
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-12 col-sm-6 mb-3">
             <label class="form-label">Upload Receipt / Invoice (Optional)</label>
             <input type="file" wire:model="attachment" class="form-control @error('attachment') is-invalid @enderror">
             @error('attachment') <div class="invalid-feedback">{{ $message }}</div> @enderror
