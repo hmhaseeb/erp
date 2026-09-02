@@ -68,23 +68,30 @@ class Create extends Component
 
     public function addItem()
     {
-        $selectedIds = array_filter(array_column($this->items, 'product_id'));
-        $firstProd = Product::where('status', true)
-            ->whereNotIn('id', $selectedIds)
-            ->orderBy('name')
-            ->first();
+        // Require selecting a product on existing items before adding another line
+        foreach ($this->items as $idx => $item) {
+            if (empty($item['product_id'])) {
+                $msg = "Please select a product for Item #" . ($idx + 1) . " before adding another line.";
+                $this->addError("items.{$idx}.product_id", $msg);
+                $this->dispatch('toast', message: $msg, type: 'warning', title: 'Product Required');
+                return;
+            }
+        }
 
-        if (!$firstProd && count($selectedIds) > 0) {
+        $selectedIds = array_filter(array_column($this->items, 'product_id'));
+        $totalAvailable = Product::where('status', true)->count();
+
+        if ($totalAvailable > 0 && count($selectedIds) >= $totalAvailable) {
             $this->dispatch('toast', message: 'All available products have already been added to this purchase invoice.', type: 'warning', title: 'Cannot Add More Products');
             return;
         }
 
         $this->items[] = [
-            'product_id' => $firstProd ? $firstProd->id : '',
+            'product_id' => '',
             'quantity' => 1,
-            'unit_price' => $firstProd ? $firstProd->purchase_price : 0,
+            'unit_price' => 0,
             'discount_amount' => 0,
-            'vat_percent' => $firstProd ? $firstProd->tax_percent : 5,
+            'vat_percent' => 5,
             'vat_amount' => 0,
             'line_total' => 0,
         ];
@@ -105,6 +112,14 @@ class Create extends Component
         $field = $parts[1] ?? null;
 
         if ($field === 'product_id') {
+            if (empty($value)) {
+                $this->items[$index]['product_id'] = '';
+                $this->items[$index]['unit_price'] = 0;
+                $this->items[$index]['vat_percent'] = 5;
+                $this->calculateTotals();
+                return;
+            }
+
             $duplicate = false;
             foreach ($this->items as $i => $item) {
                 if ($i != $index && !empty($item['product_id']) && $item['product_id'] == $value) {
@@ -127,8 +142,9 @@ class Create extends Component
 
             $prod = Product::find($value);
             if ($prod) {
-                $this->items[$index]['unit_price'] = $prod->purchase_price;
-                $this->items[$index]['vat_percent'] = $prod->tax_percent ?? 5;
+                $this->items[$index]['unit_price'] = (float)$prod->purchase_price;
+                $this->items[$index]['vat_percent'] = (float)($prod->tax_percent ?? 5);
+                $this->resetErrorBag("items.{$index}.product_id");
             }
         }
 
@@ -180,6 +196,12 @@ class Create extends Component
             'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_price' => 'required|numeric|min:0',
             'discount_amount' => 'numeric|min:0',
+        ], [
+            'supplier_id.required' => 'Please select a supplier.',
+            'items.*.product_id.required' => 'Please select a product for all invoice items.',
+            'items.*.product_id.exists' => 'Selected product is invalid.',
+            'items.*.quantity.required' => 'Quantity is required.',
+            'items.*.quantity.min' => 'Quantity must be at least 0.01.',
         ]);
 
         // Validate duplicates

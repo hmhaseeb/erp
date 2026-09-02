@@ -32,6 +32,7 @@
                             </button>
                         </div>
                         <x-searchable-select wire:model.live="customer_id" class="form-select {{ $errors->has('customer_id') ? 'is-invalid' : '' }}" placeholder="Select Customer...">
+                            <option value="">Select Customer...</option>
                             @foreach($customers as $c)
                                 <option value="{{ $c->id }}">{{ $c->name }} ({{ $c->company_name ?? 'Individual' }})</option>
                             @endforeach
@@ -111,7 +112,8 @@
                                             $availStock = $selectedProduct ? (float)$selectedProduct->current_stock : 0;
                                         @endphp
                                         <label class="form-label font-size-11 text-muted d-md-none mb-1">Product <span class="text-danger">*</span></label>
-                                        <x-searchable-select wire:model.live="items.{{ $index }}.product_id" class="form-select {{ $errors->has('items.'.$index.'.product_id') ? 'is-invalid' : '' }}" placeholder="Select In-Stock Product...">
+                                        <x-searchable-select wire:model.live="items.{{ $index }}.product_id" class="form-select {{ $errors->has('items.'.$index.'.product_id') ? 'is-invalid' : '' }}" placeholder="Select Product...">
+                                            <option value="">Select Product...</option>
                                             @foreach($products as $p)
                                                 @if(!in_array((string)$p->id, $otherSelectedProductIds, true))
                                                     @php

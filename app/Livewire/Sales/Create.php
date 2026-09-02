@@ -57,37 +57,37 @@ class Create extends Component
 
     public function addItem()
     {
+        // Require selecting a product on existing items before adding another line
+        foreach ($this->items as $idx => $item) {
+            if (empty($item['product_id'])) {
+                $msg = "Please select a product for Item #" . ($idx + 1) . " before adding another line.";
+                $this->addError("items.{$idx}.product_id", $msg);
+                $this->dispatch('toast', message: $msg, type: 'warning', title: 'Product Required');
+                return;
+            }
+        }
+
         $selectedIds = array_filter(array_column($this->items, 'product_id'));
         $generalSetting = GeneralSetting::first();
         $allowNegativeStock = $generalSetting ? (bool)$generalSetting->allow_negative_stock : false;
 
-        $firstProdQuery = Product::where('status', true)
-            ->whereNotIn('id', $selectedIds)
-            ->orderBy('name');
-
+        $availableProductsQuery = Product::where('status', true);
         if (!$allowNegativeStock) {
-            $firstProdQuery->where('current_stock', '>', 0);
+            $availableProductsQuery->where('current_stock', '>', 0);
         }
+        $totalAvailable = $availableProductsQuery->count();
 
-        $firstProd = $firstProdQuery->first();
-
-        if (!$firstProd && count($selectedIds) > 0) {
+        if ($totalAvailable > 0 && count($selectedIds) >= $totalAvailable) {
             $this->dispatch('toast', message: 'All available in-stock products have already been added to this sales invoice.', type: 'warning', title: 'Cannot Add More Products');
             return;
         }
 
-        $availStock = $firstProd ? (float)$firstProd->current_stock : 0;
-        $initialQty = 1;
-        if ($availStock > 0 && $availStock < 1) {
-            $initialQty = $availStock;
-        }
-
         $this->items[] = [
-            'product_id' => $firstProd ? $firstProd->id : '',
-            'quantity' => $initialQty,
-            'unit_price' => $firstProd ? (float)$firstProd->sales_price : 0,
+            'product_id' => '',
+            'quantity' => 1,
+            'unit_price' => 0,
             'discount_amount' => 0,
-            'vat_percent' => $firstProd ? (float)($firstProd->tax_percent ?? 5) : 5,
+            'vat_percent' => 5,
             'vat_amount' => 0,
             'line_total' => 0,
         ];
@@ -108,6 +108,14 @@ class Create extends Component
         $field = $parts[1] ?? null;
 
         if ($field === 'product_id') {
+            if (empty($value)) {
+                $this->items[$index]['product_id'] = '';
+                $this->items[$index]['unit_price'] = 0;
+                $this->items[$index]['vat_percent'] = 5;
+                $this->calculateTotals();
+                return;
+            }
+
             $duplicate = false;
             foreach ($this->items as $i => $item) {
                 if ($i !== $index && !empty($item['product_id']) && (string)$item['product_id'] === (string)$value) {
@@ -255,6 +263,12 @@ class Create extends Component
             'items.*.quantity' => 'required|numeric|gt:0',
             'items.*.unit_price' => 'required|numeric|min:0',
             'discount_amount' => 'numeric|min:0',
+        ], [
+            'customer_id.required' => 'Please select a customer.',
+            'items.*.product_id.required' => 'Please select a product for all invoice items.',
+            'items.*.product_id.exists' => 'Selected product is invalid.',
+            'items.*.quantity.required' => 'Quantity is required.',
+            'items.*.quantity.gt' => 'Quantity must be greater than zero.',
         ]);
 
         // Validate duplicates

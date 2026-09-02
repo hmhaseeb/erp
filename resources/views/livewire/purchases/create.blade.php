@@ -29,6 +29,7 @@
                             </button>
                         </div>
                         <x-searchable-select wire:model.live="supplier_id" class="form-select {{ $errors->has('supplier_id') ? 'is-invalid' : '' }}" placeholder="Select Supplier...">
+                            <option value="">Select Supplier...</option>
                             @foreach($suppliers as $sup)
                                 <option value="{{ $sup->id }}">{{ $sup->name }} @if($sup->company_name) ({{ $sup->company_name }}) @endif</option>
                             @endforeach
@@ -103,6 +104,7 @@
                                         @endphp
                                         <label class="form-label font-size-11 text-muted d-md-none mb-1">Product <span class="text-danger">*</span></label>
                                         <x-searchable-select wire:model.live="items.{{ $index }}.product_id" class="form-select {{ $errors->has('items.'.$index.'.product_id') ? 'is-invalid' : '' }}" placeholder="Select Product...">
+                                            <option value="">Select Product...</option>
                                             @foreach($products as $p)
                                                 @if(!in_array((string)$p->id, $otherSelectedProductIds, true))
                                                     @php
