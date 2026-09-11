@@ -53,6 +53,7 @@ class CompanySettings extends Component
             $this->currency = 'AED';
             $this->currency_symbol = 'AED';
             $this->default_vat_percent = 5.00;
+            $this->country = 'United Arab Emirates';
         }
 
         $code = strtoupper(trim($this->currency));
@@ -105,7 +106,7 @@ class CompanySettings extends Component
                 'legal_name' => $this->legal_name,
                 'address' => $this->address,
                 'city' => $this->city,
-                'country' => $this->country,
+                'country' => $this->country ?: 'United Arab Emirates',
                 'phone' => $this->phone,
                 'mobile' => $this->mobile,
                 'email' => $this->email,
