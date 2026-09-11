@@ -52,10 +52,10 @@
     @if($selectedAccount)
         <!-- Ledger Summary KPI Row -->
         <div class="row mb-3">
-            <x-kpi-card col="col-md-3" title="Period Opening Balance" :value="number_format($openingBalance, 2)" prefix="AED " color="dark" />
-            <x-kpi-card col="col-md-3" title="Total Debits (Inflows +)" :value="'+ ' . number_format($totalDebits, 2)" prefix="AED " color="success" />
-            <x-kpi-card col="col-md-3" title="Total Credits (Outflows -)" :value="'- ' . number_format($totalCredits, 2)" prefix="AED " color="danger" />
-            <x-kpi-card col="col-md-3" title="Closing Balance" :value="number_format($closingBalance, 2)" prefix="AED " :color="$closingBalance >= 0 ? 'primary' : 'danger'" />
+            <x-kpi-card col="col-md-3" title="Period Opening Balance" :value="number_format($openingBalance, 2)" prefix="{{ currency() }} " color="dark" />
+            <x-kpi-card col="col-md-3" title="Total Debits (Inflows +)" :value="'+ ' . number_format($totalDebits, 2)" prefix="{{ currency() }} " color="success" />
+            <x-kpi-card col="col-md-3" title="Total Credits (Outflows -)" :value="'- ' . number_format($totalCredits, 2)" prefix="{{ currency() }} " color="danger" />
+            <x-kpi-card col="col-md-3" title="Closing Balance" :value="number_format($closingBalance, 2)" prefix="{{ currency() }} " :color="$closingBalance >= 0 ? 'primary' : 'danger'" />
         </div>
 
         <!-- Ledger Statement Table Card -->
@@ -91,7 +91,7 @@
                                 <td>Brought Forward Opening Balance</td>
                                 <td class="text-end">-</td>
                                 <td class="text-end">-</td>
-                                <td class="text-end font-monospace text-dark">AED {{ number_format($openingBalance, 2) }}</td>
+                                <td class="text-end font-monospace text-dark">{{ currency() }} {{ number_format($openingBalance, 2) }}</td>
                             </tr>
 
                             @php
@@ -117,7 +117,7 @@
                                         {{ $t->credit > 0 ? number_format($t->credit, 2) : '-' }}
                                     </td>
                                     <td class="text-end font-monospace fw-bold {{ $running >= 0 ? 'text-dark' : 'text-danger' }}">
-                                        AED {{ number_format($running, 2) }}
+                                        {{ currency() }} {{ number_format($running, 2) }}
                                     </td>
                                 </tr>
                             @empty
@@ -131,9 +131,9 @@
                             <!-- Closing Balance Summary Row -->
                             <tr class="table-light fw-bold font-size-14">
                                 <td colspan="3" class="text-end">Total Period Activity & Ending Balance:</td>
-                                <td class="text-end text-success font-monospace">+ AED {{ number_format($totalDebits, 2) }}</td>
-                                <td class="text-end text-danger font-monospace">- AED {{ number_format($totalCredits, 2) }}</td>
-                                <td class="text-end text-primary font-monospace">AED {{ number_format($closingBalance, 2) }}</td>
+                                <td class="text-end text-success font-monospace">+ {{ currency() }} {{ number_format($totalDebits, 2) }}</td>
+                                <td class="text-end text-danger font-monospace">- {{ currency() }} {{ number_format($totalCredits, 2) }}</td>
+                                <td class="text-end text-primary font-monospace">{{ currency() }} {{ number_format($closingBalance, 2) }}</td>
                             </tr>
                         </tbody>
                     </table>

@@ -10,6 +10,9 @@ class LogoSettings extends Component
 {
     use WithFileUploads;
 
+    public const DEFAULT_LOGO_PATH = 'logos/defaults/smallbiz-logo.png';
+    public const DEFAULT_ICON_PATH = 'logos/defaults/smallbiz-icon.png';
+
     public $main_logo, $invoice_logo, $report_logo, $login_logo, $favicon;
     public $existing_main_logo, $existing_invoice_logo, $existing_report_logo, $existing_login_logo, $existing_favicon;
 
@@ -22,6 +25,57 @@ class LogoSettings extends Component
             $this->existing_report_logo = $setting->report_logo;
             $this->existing_login_logo = $setting->login_logo;
             $this->existing_favicon = $setting->favicon;
+        }
+    }
+
+    public function applyDefaultLogos()
+    {
+        $setting = CompanySetting::firstOrCreate(['id' => 1]);
+
+        $setting->update([
+            'main_logo' => self::DEFAULT_LOGO_PATH,
+            'invoice_logo' => self::DEFAULT_LOGO_PATH,
+            'report_logo' => self::DEFAULT_LOGO_PATH,
+            'login_logo' => self::DEFAULT_LOGO_PATH,
+            'favicon' => self::DEFAULT_ICON_PATH,
+        ]);
+
+        \App\Services\SettingsService::clearCache();
+
+        $this->generatePwaIcons(public_path('assets/images/branding/smallbiz-icon.png'));
+
+        session()->flash('success', 'Official SmallBiz ERP branding applied! Main Logo, Invoice PDF Logo, Report Header Logo, Login Page Logo, and Browser Favicon / PWA icons have been updated.');
+        $this->mount();
+        $this->dispatch('check-and-open-setup-wizard');
+    }
+
+    public function useDefault(string $type)
+    {
+        $setting = CompanySetting::firstOrCreate(['id' => 1]);
+
+        if ($type === 'favicon') {
+            $setting->update(['favicon' => self::DEFAULT_ICON_PATH]);
+            $this->generatePwaIcons(public_path('assets/images/branding/smallbiz-icon.png'));
+            session()->flash('success', 'Default SmallBiz icon applied for Browser Favicon and PWA icons.');
+        } elseif (in_array($type, ['main_logo', 'invoice_logo', 'report_logo', 'login_logo'])) {
+            $setting->update([$type => self::DEFAULT_LOGO_PATH]);
+            session()->flash('success', 'Default SmallBiz logo applied for ' . str_replace('_', ' ', $type) . '.');
+        }
+
+        \App\Services\SettingsService::clearCache();
+        $this->mount();
+        $this->dispatch('check-and-open-setup-wizard');
+    }
+
+    public function removeLogo(string $type)
+    {
+        $setting = CompanySetting::first();
+        if ($setting && in_array($type, ['main_logo', 'invoice_logo', 'report_logo', 'login_logo', 'favicon'])) {
+            $setting->update([$type => null]);
+            \App\Services\SettingsService::clearCache();
+            session()->flash('success', ucfirst(str_replace('_', ' ', $type)) . ' cleared.');
+            $this->mount();
+            $this->dispatch('refresh-setup-status');
         }
     }
 
@@ -69,6 +123,7 @@ class LogoSettings extends Component
                     storage_path('app/public/' . $cleanPath),
                     public_path('storage/' . $cleanPath),
                     public_path($cleanPath),
+                    public_path('assets/images/branding/' . basename($cleanPath)),
                 ];
                 foreach ($possible as $p) {
                     if (file_exists($p) && is_file($p)) {
@@ -78,14 +133,20 @@ class LogoSettings extends Component
                 }
             }
 
+            if (!$sourcePath) {
+                $sourcePath = public_path('assets/images/branding/smallbiz-icon.png');
+            }
+
             $this->generatePwaIcons($sourcePath);
 
-            session()->flash('success', 'Logos and PWA app icons updated successfully.');
+            session()->flash('success', 'Custom logos and PWA app icons saved successfully.');
+            $this->reset(['main_logo', 'invoice_logo', 'report_logo', 'login_logo', 'favicon']);
             $this->mount();
+            $this->dispatch('check-and-open-setup-wizard');
         }
     }
 
-    protected function generatePwaIcons(?string $sourceImagePath = null)
+    public function generatePwaIcons(?string $sourceImagePath = null)
     {
         $sizes = [72, 96, 128, 144, 152, 180, 192, 384, 512];
         $dir = public_path('assets/images/icons');
@@ -93,8 +154,12 @@ class LogoSettings extends Component
             mkdir($dir, 0777, true);
         }
 
+        if (!$sourceImagePath || !file_exists($sourceImagePath)) {
+            $sourceImagePath = public_path('assets/images/branding/smallbiz-icon.png');
+        }
+
         $srcImg = null;
-        if ($sourceImagePath && file_exists($sourceImagePath)) {
+        if (file_exists($sourceImagePath)) {
             $info = @getimagesize($sourceImagePath);
             if ($info && isset($info['mime'])) {
                 $mime = strtolower($info['mime']);
@@ -143,6 +208,23 @@ class LogoSettings extends Component
 
             imagedestroy($canvas);
         }
+
+        // Also update favicon.ico
+        $favCanvas = imagecreatetruecolor(32, 32);
+        imagealphablending($favCanvas, false);
+        imagesavealpha($favCanvas, true);
+        $transparent = imagecolorallocatealpha($favCanvas, 0, 0, 0, 127);
+        imagefilledrectangle($favCanvas, 0, 0, 32, 32, $transparent);
+        $ratio = min(32 / $srcW, 32 / $srcH);
+        $dstW = max(1, (int)($srcW * $ratio));
+        $dstH = max(1, (int)($srcH * $ratio));
+        $dstX = (int)((32 - $dstW) / 2);
+        $dstY = (int)((32 - $dstH) / 2);
+        imagealphablending($favCanvas, true);
+        imagecopyresampled($favCanvas, $srcImg, $dstX, $dstY, 0, 0, $dstW, $dstH, $srcW, $srcH);
+        imagepng($favCanvas, public_path('assets/images/favicon.ico'));
+        imagepng($favCanvas, public_path('favicon.ico'));
+        imagedestroy($favCanvas);
 
         imagedestroy($srcImg);
     }

@@ -104,8 +104,9 @@ class Categories extends Component
 
             session()->flash('success', "Product Category '{$this->name}' created successfully.");
         }
-
         $this->closeModal();
+
+        $this->dispatch('check-and-open-setup-wizard');
     }
 
     public function deleteCategory($id)

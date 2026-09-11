@@ -91,13 +91,13 @@
                         <div class="col-md-3 col-6">
                             <div class="p-3 bg-light rounded border text-center">
                                 <span class="text-muted font-size-12 d-block">Cost Price</span>
-                                <h5 class="mb-0 text-dark fw-bold font-monospace">AED {{ number_format($viewProduct->purchase_price, 2) }}</h5>
+                                <h5 class="mb-0 text-dark fw-bold font-monospace">{{ currency() }} {{ number_format($viewProduct->purchase_price, 2) }}</h5>
                             </div>
                         </div>
                         <div class="col-md-3 col-6">
                             <div class="p-3 bg-light rounded border text-center">
                                 <span class="text-muted font-size-12 d-block">Retail Price</span>
-                                <h5 class="mb-0 text-success fw-bold font-monospace">AED {{ number_format($viewProduct->sales_price, 2) }}</h5>
+                                <h5 class="mb-0 text-success fw-bold font-monospace">{{ currency() }} {{ number_format($viewProduct->sales_price, 2) }}</h5>
                             </div>
                         </div>
                         <div class="col-md-3 col-6">
@@ -139,7 +139,7 @@
                             <div class="p-3 bg-light rounded border">
                                 <span class="text-muted font-size-12 d-block">Total Asset Valuation</span>
                                 <h4 class="mb-0 text-primary fw-bold font-monospace mt-1">
-                                    AED {{ number_format($viewProduct->current_stock * $viewProduct->weighted_cost, 2) }}
+                                    {{ currency() }} {{ number_format($viewProduct->current_stock * $viewProduct->weighted_cost, 2) }}
                                 </h4>
                             </div>
                         </div>
@@ -182,7 +182,7 @@
                                             </td>
                                             <td class="text-end text-success font-monospace">{{ $mov->quantity_in > 0 ? '+' . number_format($mov->quantity_in, 2) : '-' }}</td>
                                             <td class="text-end text-danger font-monospace">{{ $mov->quantity_out > 0 ? '-' . number_format($mov->quantity_out, 2) : '-' }}</td>
-                                            <td class="text-end font-monospace text-muted">AED {{ number_format($mov->unit_cost, 2) }}</td>
+                                            <td class="text-end font-monospace text-muted">{{ currency() }} {{ number_format($mov->unit_cost, 2) }}</td>
                                             <td class="text-muted">{{ $mov->notes ?? '-' }}</td>
                                         </tr>
                                     @empty

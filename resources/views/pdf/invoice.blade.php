@@ -68,7 +68,7 @@
                     <th class="text-end" style="width: 12%;">Qty</th>
                     <th class="text-end" style="width: 15%;">Unit Price</th>
                     <th class="text-end" style="width: 10%;">VAT %</th>
-                    <th class="text-end" style="width: 13%;">Total (AED)</th>
+                    <th class="text-end" style="width: 13%;">Total ({{ currency() }})</th>
                 </tr>
             </thead>
             <tbody>
@@ -102,21 +102,21 @@
                     <table>
                         <tr>
                             <td>Subtotal:</td>
-                            <td class="text-end">AED {{ number_format($sale->subtotal, 2) }}</td>
+                            <td class="text-end">{{ currency() }} {{ number_format($sale->subtotal, 2) }}</td>
                         </tr>
                         @if($sale->discount_amount > 0)
                             <tr>
                                 <td>Discount:</td>
-                                <td class="text-end">- AED {{ number_format($sale->discount_amount, 2) }}</td>
+                                <td class="text-end">- {{ currency() }} {{ number_format($sale->discount_amount, 2) }}</td>
                             </tr>
                         @endif
                         <tr>
                             <td>VAT Tax Amount:</td>
-                            <td class="text-end">AED {{ number_format($sale->vat_amount, 2) }}</td>
+                            <td class="text-end">{{ currency() }} {{ number_format($sale->vat_amount, 2) }}</td>
                         </tr>
                         <tr style="border-top: 2px solid #0f172a; font-size: 15px;" class="fw-bold">
                             <td>Grand Total:</td>
-                            <td class="text-end">AED {{ number_format($sale->grand_total, 2) }}</td>
+                            <td class="text-end">{{ currency() }} {{ number_format($sale->grand_total, 2) }}</td>
                         </tr>
                     </table>
                 </td>

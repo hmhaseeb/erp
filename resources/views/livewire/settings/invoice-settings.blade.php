@@ -4,6 +4,9 @@
         <x-badge type="primary" size="font-size-13 py-2 px-3">
             <i class="bx bx-calendar me-1"></i> Current Year: {{ $currentYear }}
         </x-badge>
+        <button type="button" wire:click="loadDefaults" class="btn btn-sm btn-soft-warning px-3 ms-2">
+            <i class="bx bx-magic-wand me-1"></i> Load Demo Defaults
+        </button>
     </x-page-header>
 
     <!-- Top Status / Year Overview KPI Cards -->
@@ -261,18 +264,34 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-12 col-md-6 mb-3">
-                        <label class="form-label font-size-13 fw-semibold">Terms & Conditions (Printed on PDF)</label>
-                        <textarea wire:model="terms_conditions" class="form-control font-size-13" rows="3" placeholder="Standard business terms, warranty conditions, or payment policies..."></textarea>
+                        <label class="form-label font-size-13 fw-semibold">Terms & Conditions <span class="text-muted font-size-11 fw-normal">(Printed on PDF Invoice)</span></label>
+                        <textarea wire:model="terms_conditions" class="form-control font-size-13" rows="5" placeholder="e.g. 1. Payment due within 30 days.&#10;2. Goods remain property of seller until paid.&#10;3. Returns accepted within 7 days."></textarea>
+                        <small class="text-muted font-size-11">These terms will appear at the bottom of every printed PDF invoice.</small>
                     </div>
                     <div class="col-12 col-md-6 mb-3">
-                        <label class="form-label font-size-13 fw-semibold">Bank Payment Details (Printed on PDF)</label>
-                        <textarea wire:model="bank_details" class="form-control font-size-13" rows="3" placeholder="Beneficiary Account Name, IBAN, Bank Name, SWIFT code..."></textarea>
+                        <label class="form-label font-size-13 fw-semibold">Bank Payment Details <span class="text-muted font-size-11 fw-normal">(Printed on PDF Invoice)</span></label>
+                        <textarea wire:model="bank_details" class="form-control font-size-13" rows="5" placeholder="Account Name: Your Company&#10;Bank: National Bank&#10;Account No: 1234-5678&#10;IBAN: SA00 0000 0000&#10;SWIFT: ABCDSA1X"></textarea>
+                        <small class="text-muted font-size-11">Customer bank transfer instructions printed on invoices.</small>
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label font-size-13 fw-semibold">Invoice Footer Note</label>
-                    <input type="text" wire:model="invoice_footer" class="form-control font-size-13" placeholder="Thank you for your business!">
+                <div class="row">
+                    <div class="col-12 col-md-6 mb-3">
+                        <label class="form-label font-size-13 fw-semibold">Payment Terms</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bx bx-time"></i></span>
+                            <input type="text" wire:model="payment_terms" class="form-control font-size-13" placeholder="e.g. Net 30 Days, Due on Receipt, 50% Advance">
+                        </div>
+                        <small class="text-muted font-size-11">Displayed on PDF invoices under payment information.</small>
+                    </div>
+                    <div class="col-12 col-md-6 mb-3">
+                        <label class="form-label font-size-13 fw-semibold">Invoice Footer Note</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted"><i class="bx bx-comment-detail"></i></span>
+                            <input type="text" wire:model="invoice_footer" class="form-control font-size-13" placeholder="Thank you for your business!">
+                        </div>
+                        <small class="text-muted font-size-11">A short closing message printed at the very bottom of the invoice PDF.</small>
+                    </div>
                 </div>
             </div>
             <div class="card-footer bg-white border-top py-3 text-sm-end text-center">

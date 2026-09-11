@@ -12,7 +12,7 @@
             <x-kpi-card 
                 title="Total Purchases Spend" 
                 :amount="$totalPurchases" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="primary" 
                 :subtitle="'In period (' . $start_date . ' to ' . $end_date . ')'" 
                 icon="bx-dollar-circle" />
@@ -21,7 +21,7 @@
             <x-kpi-card 
                 title="VAT Input Tax (5%)" 
                 :amount="$totalVat" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="info" 
                 subtitle="Recoverable Input Tax" 
                 icon="bx-receipt" />
@@ -39,7 +39,7 @@
             <x-kpi-card 
                 title="Average Purchase Order" 
                 :amount="$avgBill" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="secondary" 
                 subtitle="Per Order" 
                 icon="bx-calculator" />
@@ -110,7 +110,7 @@
                     <th>Payment Type</th>
                     <th class="text-end">Subtotal (Excl. VAT)</th>
                     <th class="text-end text-info">VAT Amount (5%)</th>
-                    <x-th-sort field="grand_total" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Grand Total (AED)</x-th-sort>
+                    <x-th-sort field="grand_total" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Grand Total ({{ currency() }})</x-th-sort>
                 </tr>
             </thead>
             <tbody>
@@ -129,9 +129,9 @@
                                 {{ $p->payment_type }}
                             </x-badge>
                         </td>
-                        <td class="text-end text-muted font-monospace">AED {{ number_format($p->subtotal, 2) }}</td>
-                        <td class="text-end text-info font-monospace">AED {{ number_format($p->vat_amount, 2) }}</td>
-                        <td class="text-end fw-bold text-dark font-monospace font-size-14">AED {{ number_format($p->grand_total, 2) }}</td>
+                        <td class="text-end text-muted font-monospace">{{ currency() }} {{ number_format($p->subtotal, 2) }}</td>
+                        <td class="text-end text-info font-monospace">{{ currency() }} {{ number_format($p->vat_amount, 2) }}</td>
+                        <td class="text-end fw-bold text-dark font-monospace font-size-14">{{ currency() }} {{ number_format($p->grand_total, 2) }}</td>
                     </tr>
                 @empty
                     <tr>

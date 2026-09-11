@@ -37,7 +37,7 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Unit Cost Price (AED) <span class="text-danger">*</span></label>
+        <label class="form-label">Unit Cost Price ({{ currency() }}) <span class="text-danger">*</span></label>
         <input type="number" step="0.01" wire:model="unit_cost" class="form-control @error('unit_cost') is-invalid @enderror">
         @error('unit_cost') <div class="invalid-feedback">{{ $message }}</div> @enderror
     </div>

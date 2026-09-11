@@ -22,7 +22,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center gap-2 mb-3">
-                        <span class="text-muted">Total Customer Balance: <strong class="text-danger font-monospace">AED {{ number_format($selectedCustomer->current_balance, 2) }}</strong></span>
+                        <span class="text-muted">Total Customer Balance: <strong class="text-danger font-monospace">{{ currency() }} {{ number_format($selectedCustomer->current_balance, 2) }}</strong></span>
                         <a href="{{ route('payments.customer') }}" class="btn btn-sm btn-success w-100 w-sm-auto">
                             <i class="bx bx-plus me-1"></i> Record Receipt Voucher
                         </a>
@@ -43,9 +43,9 @@
                                     <tr>
                                         <td><code>{{ $inv->invoice_number }}</code></td>
                                         <td>{{ $inv->sale_date }}</td>
-                                        <td>AED {{ number_format($inv->grand_total, 2) }}</td>
-                                        <td class="text-success">AED {{ number_format($inv->paid_amount, 2) }}</td>
-                                        <td class="text-end font-monospace text-danger fw-bold">AED {{ number_format($inv->due_amount, 2) }}</td>
+                                        <td>{{ currency() }} {{ number_format($inv->grand_total, 2) }}</td>
+                                        <td class="text-success">{{ currency() }} {{ number_format($inv->paid_amount, 2) }}</td>
+                                        <td class="text-end font-monospace text-danger fw-bold">{{ currency() }} {{ number_format($inv->due_amount, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>

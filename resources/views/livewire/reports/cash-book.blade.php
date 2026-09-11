@@ -12,7 +12,7 @@
             <x-kpi-card 
                 title="Period Opening Cash" 
                 :amount="$openingBalance" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="secondary" 
                 subtitle="Brought forward" 
                 icon="bx-archive" />
@@ -21,7 +21,7 @@
             <x-kpi-card 
                 title="Total Cash Receipts (+)" 
                 :amount="$totalDebits" 
-                prefix="+ AED " 
+                prefix="+ {{ currency() }} " 
                 color="success" 
                 subtitle="Cash inflows" 
                 icon="bx-arrow-to-bottom" />
@@ -30,7 +30,7 @@
             <x-kpi-card 
                 title="Total Cash Disbursements (-)" 
                 :amount="$totalCredits" 
-                prefix="- AED " 
+                prefix="- {{ currency() }} " 
                 color="danger" 
                 subtitle="Cash outflows" 
                 icon="bx-arrow-from-bottom" />
@@ -39,7 +39,7 @@
             <x-kpi-card 
                 title="Closing Cash Balance" 
                 :amount="$closingBalance" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="primary" 
                 subtitle="Carried forward" 
                 icon="bx-wallet" />
@@ -102,7 +102,7 @@
                     <td colspan="3">Brought Forward Cash Balance</td>
                     <td class="text-end">-</td>
                     <td class="text-end">-</td>
-                    <td class="text-end font-monospace text-dark">AED {{ number_format($openingBalance, 2) }}</td>
+                    <td class="text-end font-monospace text-dark">{{ currency() }} {{ number_format($openingBalance, 2) }}</td>
                 </tr>
 
                 @php
@@ -129,7 +129,7 @@
                             {{ $t->credit > 0 ? number_format($t->credit, 2) : '-' }}
                         </td>
                         <td class="text-end font-monospace fw-bold {{ $running >= 0 ? 'text-dark' : 'text-danger' }}">
-                            AED {{ number_format($running, 2) }}
+                            {{ currency() }} {{ number_format($running, 2) }}
                         </td>
                     </tr>
                 @empty
@@ -147,9 +147,9 @@
                 <!-- Summary Footer Row -->
                 <tr class="table-light fw-bold font-size-14">
                     <td colspan="4" class="text-end">Total Cash Activity & Ending Balance:</td>
-                    <td class="text-end text-success font-monospace">+ AED {{ number_format($totalDebits, 2) }}</td>
-                    <td class="text-end text-danger font-monospace">- AED {{ number_format($totalCredits, 2) }}</td>
-                    <td class="text-end text-primary font-monospace">AED {{ number_format($closingBalance, 2) }}</td>
+                    <td class="text-end text-success font-monospace">+ {{ currency() }} {{ number_format($totalDebits, 2) }}</td>
+                    <td class="text-end text-danger font-monospace">- {{ currency() }} {{ number_format($totalCredits, 2) }}</td>
+                    <td class="text-end text-primary font-monospace">{{ currency() }} {{ number_format($closingBalance, 2) }}</td>
                 </tr>
             </tbody>
         </table>

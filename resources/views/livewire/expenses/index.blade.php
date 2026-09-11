@@ -85,7 +85,7 @@
                         </td>
                         <td>{{ $exp->account->name ?? 'Default Cash' }}</td>
                         <td class="text-end fw-bold text-danger font-size-14 font-monospace">
-                            AED {{ number_format($exp->amount, 2) }}
+                            {{ currency() }} {{ number_format($exp->amount, 2) }}
                         </td>
                         <td>{{ $exp->reference_number ?? '-' }}</td>
                         <td>

@@ -24,6 +24,22 @@ class SettingsService
     }
 
     /**
+     * Retrieve configured currency code (defaults to 'AED')
+     */
+    public static function currency(): string
+    {
+        return self::getCompany()?->currency ?: 'AED';
+    }
+
+    /**
+     * Retrieve configured currency symbol (e.g. '$', 'AED', 'Rs.')
+     */
+    public static function currencySymbol(): string
+    {
+        return self::getCompany()?->currency_symbol ?: (self::getCompany()?->currency ?: 'AED');
+    }
+
+    /**
      * Retrieve cached General Setting
      */
     public static function getGeneral(): ?GeneralSetting

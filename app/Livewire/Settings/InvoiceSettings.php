@@ -16,10 +16,10 @@ class InvoiceSettings extends Component
     public $purchase_return_prefix = 'PR-';
     public $customer_payment_prefix = 'REC-';
     public $supplier_payment_prefix = 'PAY-';
-    public $invoice_footer;
-    public $terms_conditions;
-    public $payment_terms;
-    public $bank_details;
+    public $invoice_footer = 'Thank you for your business! We appreciate your trust and look forward to serving you again.';
+    public $terms_conditions = "1. Payment is due within 30 days of invoice date.\n2. Goods remain the property of the seller until full payment is received.\n3. All disputes are subject to the jurisdiction of the local court.\n4. Returned goods are accepted only within 7 days of delivery with original packaging.";
+    public $payment_terms = 'Net 30 Days';
+    public $bank_details = "Account Name: Your Company Name\nBank Name: National Commercial Bank\nAccount No: 1234-5678-9012\nIBAN: SA00 0000 0000 0000 0000\nSWIFT/BIC: NCBKSAJE";
     public $paper_size = 'A4';
 
     protected function rules()
@@ -47,10 +47,10 @@ class InvoiceSettings extends Component
             $this->purchase_return_prefix = $setting->purchase_return_prefix ?: 'PR-';
             $this->customer_payment_prefix = $setting->customer_payment_prefix ?: 'REC-';
             $this->supplier_payment_prefix = $setting->supplier_payment_prefix ?: 'PAY-';
-            $this->invoice_footer = $setting->invoice_footer;
-            $this->terms_conditions = $setting->terms_conditions;
-            $this->payment_terms = $setting->payment_terms;
-            $this->bank_details = $setting->bank_details;
+            $this->invoice_footer = $setting->invoice_footer ?: $this->invoice_footer;
+            $this->terms_conditions = $setting->terms_conditions ?: $this->terms_conditions;
+            $this->payment_terms = $setting->payment_terms ?: $this->payment_terms;
+            $this->bank_details = $setting->bank_details ?: $this->bank_details;
             $this->paper_size = $setting->paper_size ?: 'A4';
         }
     }
@@ -81,6 +81,26 @@ class InvoiceSettings extends Component
 
         session()->flash('success', 'Invoice & numbering settings updated successfully.');
         $this->dispatch('toast', message: 'Invoice & numbering settings updated successfully.', type: 'success', title: 'Settings Saved');
+
+        $this->dispatch('check-and-open-setup-wizard');
+    }
+
+    public function loadDefaults()
+    {
+        $this->invoice_prefix         = 'INV-';
+        $this->purchase_prefix        = 'PUR-';
+        $this->sales_return_prefix    = 'SR-';
+        $this->purchase_return_prefix = 'PR-';
+        $this->customer_payment_prefix = 'REC-';
+        $this->supplier_payment_prefix = 'PAY-';
+        $this->starting_number        = 1;
+        $this->paper_size             = 'A4';
+        $this->payment_terms          = 'Net 30 Days';
+        $this->invoice_footer         = 'Thank you for your business! We appreciate your trust and look forward to serving you again.';
+        $this->terms_conditions       = "1. Payment is due within 30 days of invoice date.\n2. Goods remain the property of the seller until full payment is received.\n3. All disputes are subject to the jurisdiction of the local court.\n4. Returned goods are accepted only within 7 days of delivery with original packaging.";
+        $this->bank_details           = "Account Name: Your Company Name\nBank Name: National Commercial Bank\nAccount No: 1234-5678-9012\nIBAN: SA00 0000 0000 0000 0000\nSWIFT/BIC: NCBKSAJE";
+
+        $this->dispatch('toast', message: 'Demo defaults loaded. Review and click Save to apply.', type: 'info', title: 'Defaults Loaded');
     }
 
     public function render()

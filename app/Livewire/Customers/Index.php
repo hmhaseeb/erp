@@ -194,8 +194,8 @@ class Index extends Component
     {
         $customer = Customer::findOrFail($id);
         if ($customer->current_balance != 0) {
-            session()->flash('error', "Cannot delete customer with an outstanding balance (AED {$customer->current_balance}).");
-            $this->dispatch('toast', message: "Cannot delete customer with an outstanding balance (AED {$customer->current_balance}).", type: 'danger', title: 'Action Denied');
+            session()->flash('error', "Cannot delete customer with an outstanding balance (" . currency() . " {$customer->current_balance}).");
+            $this->dispatch('toast', message: "Cannot delete customer with an outstanding balance (" . currency() . " {$customer->current_balance}).", type: 'danger', title: 'Action Denied');
             return;
         }
 

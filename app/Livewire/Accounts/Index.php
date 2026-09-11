@@ -72,6 +72,10 @@ class Index extends Component
     public function mount()
     {
         $this->opening_balance_date = now()->toDateString();
+        if (request()->query('create') || (!Account::exists() && !session()->has('account_modal_opened'))) {
+            session()->flash('account_modal_opened', true);
+            $this->openModal();
+        }
     }
 
     public function openModal()
@@ -135,13 +139,14 @@ class Index extends Component
         }
 
         $this->closeModal();
+        $this->dispatch('check-and-open-setup-wizard');
     }
 
     public function deleteAccount($id)
     {
         $account = Account::findOrFail($id);
         if ($account->current_balance != 0) {
-            session()->flash('error', "Cannot delete account with a non-zero balance (AED {$account->current_balance}).");
+            session()->flash('error', "Cannot delete account with a non-zero balance (" . currency() . " {$account->current_balance}).");
             return;
         }
 

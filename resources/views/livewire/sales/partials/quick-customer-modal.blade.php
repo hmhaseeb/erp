@@ -58,12 +58,12 @@
     <div class="form-section-title mt-2">3. Credit Limit & Terms</div>
     <div class="row">
         <div class="col-12 col-sm-4 mb-3">
-            <label class="form-label font-size-12">Opening Receivable (AED)</label>
+            <label class="form-label font-size-12">Opening Receivable ({{ currency() }})</label>
             <input type="number" step="0.01" wire:model="cust_opening_balance" class="form-control" placeholder="0.00">
             @error('cust_opening_balance') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
         <div class="col-12 col-sm-4 mb-3">
-            <label class="form-label font-size-12">Credit Limit (AED)</label>
+            <label class="form-label font-size-12">Credit Limit ({{ currency() }})</label>
             <input type="number" step="0.01" wire:model="cust_credit_limit" class="form-control" placeholder="0.00">
             @error('cust_credit_limit') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>

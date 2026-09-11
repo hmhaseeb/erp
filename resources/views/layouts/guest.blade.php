@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     @php
         $companySetting = \App\Services\SettingsService::getCompany();
-        $favicon = $companySetting && $companySetting->favicon ? asset('storage/' . $companySetting->favicon) : asset('assets/images/favicon.ico');
+        $favicon = $companySetting && $companySetting->favicon ? asset('storage/' . $companySetting->favicon) : asset('assets/images/branding/smallbiz-icon.png');
     @endphp
     <title>Login | {{ $companySetting->company_name ?? 'Small Business ERP' }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">

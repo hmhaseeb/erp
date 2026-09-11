@@ -6,6 +6,67 @@
         </span>
     </x-page-header>
 
+    @php
+        $setupSteps = \App\Services\SetupWizardService::getSteps();
+        $setupCompletedCount = \App\Services\SetupWizardService::getCompletedCount();
+        $setupTotalCount = \App\Services\SetupWizardService::getTotalCount();
+        $setupPercentage = \App\Services\SetupWizardService::getPercentage();
+        $isSetupComplete = \App\Services\SetupWizardService::isComplete();
+        $nextIncomplete = \App\Services\SetupWizardService::getNextIncompleteStep();
+    @endphp
+
+    @if(!$isSetupComplete)
+        <!-- Initial Setup Wizard Checklist Card -->
+        <div class="card border border-warning-subtle shadow-sm mb-4" style="background: linear-gradient(135deg, #fffdf5 0%, #ffffff 100%);">
+            <div class="card-body p-3 p-md-4">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar-md flex-shrink-0">
+                            <span class="avatar-title rounded-circle bg-warning text-dark font-size-22 shadow-sm">
+                                <i class="bx bx-rocket"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <h5 class="fw-bold mb-0 text-dark">Initial Business Setup Checklist</h5>
+                                <span class="badge bg-warning text-dark font-size-11 px-2 py-1 font-monospace">{{ $setupCompletedCount }}/{{ $setupTotalCount }} Completed ({{ $setupPercentage }}%)</span>
+                            </div>
+                            <p class="text-muted font-size-12 mb-0 mt-1">
+                                Complete your company profile, branding logos, general system settings, invoice numbering, and product categories.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
+                        @if($nextIncomplete)
+                            <a href="{{ $nextIncomplete['url'] }}" class="btn btn-primary btn-sm px-3 shadow-sm">
+                                <i class="bx bx-right-arrow-alt me-1"></i> Continue: {{ $nextIncomplete['title'] }}
+                            </a>
+                        @endif
+                        <button type="button" onclick="Livewire.dispatch('open-setup-wizard')" class="btn btn-outline-warning text-dark btn-sm px-3">
+                            <i class="bx bx-list-check me-1"></i> Open Setup Wizard
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5 Steps Quick Nav Pills -->
+                <div class="row g-2 mt-2 pt-3 border-top">
+                    @foreach($setupSteps as $sNum => $s)
+                        <div class="col-12 col-sm-6 col-lg">
+                            <a href="{{ $s['url'] }}" class="text-decoration-none d-block p-2 rounded border {{ $s['is_completed'] ? 'bg-success-subtle border-success-subtle text-success' : 'bg-white border-warning-subtle text-dark shadow-xs' }} transition-all">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="font-size-11 fw-semibold text-truncate">
+                                        <i class="{{ $s['is_completed'] ? 'bx bx-check-circle text-success' : 'bx bx-time text-warning' }} me-1"></i>
+                                        {{ $sNum }}. {{ $s['title'] }}
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Top KPI Cards Row 1: Operations -->
     <div class="row g-3">
         <!-- Today Sales -->
@@ -13,7 +74,7 @@
             <x-kpi-card 
                 title="Today Sales" 
                 :amount="$todaySales" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="success" 
                 icon="bx bx-shopping-bag" />
         </div>
@@ -23,7 +84,7 @@
             <x-kpi-card 
                 title="Today Purchases" 
                 :amount="$todayPurchases" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="primary" 
                 icon="bx bx-cart" />
         </div>
@@ -33,7 +94,7 @@
             <x-kpi-card 
                 title="Today Income" 
                 :amount="$todayIncome" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="info" 
                 icon="bx bx-trending-up" />
         </div>
@@ -43,7 +104,7 @@
             <x-kpi-card 
                 title="Today Expenses" 
                 :amount="$todayExpense" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="danger" 
                 icon="bx bx-trending-down" />
         </div>
@@ -56,7 +117,7 @@
             <x-kpi-card 
                 title="Cash In Hand" 
                 :amount="$cashBalance" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="dark" 
                 icon="bx bx-wallet" />
         </div>
@@ -66,7 +127,7 @@
             <x-kpi-card 
                 title="Bank Balance" 
                 :amount="$bankBalance" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="primary" 
                 icon="bx bx-buildings" />
         </div>
@@ -76,7 +137,7 @@
             <x-kpi-card 
                 title="Customer Receivables" 
                 :amount="$receivables" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="warning" 
                 icon="bx bx-user-pin" />
         </div>
@@ -86,7 +147,7 @@
             <x-kpi-card 
                 title="Supplier Payables" 
                 :amount="$payables" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="danger" 
                 icon="bx bx-wallet-alt" />
         </div>
@@ -107,7 +168,7 @@
                         </span>
                     </div>
                     <p class="text-muted mb-1 font-size-13">Total Inventory Asset Value</p>
-                    <h3 class="text-primary fw-bold mb-0 font-monospace">AED {{ number_format($stockValue, 2) }}</h3>
+                    <h3 class="text-primary fw-bold mb-0 font-monospace">{{ currency() }} {{ number_format($stockValue, 2) }}</h3>
                 </div>
             </div>
 
@@ -192,7 +253,7 @@
                                             </x-badge>
                                         </td>
                                         <td class="text-end fw-bold font-monospace text-dark">
-                                            AED {{ number_format($sale->grand_total, 2) }}
+                                            {{ currency() }} {{ number_format($sale->grand_total, 2) }}
                                         </td>
                                     </tr>
                                 @empty
@@ -245,7 +306,7 @@
                                             </x-badge>
                                         </td>
                                         <td class="text-end fw-bold font-monospace text-dark">
-                                            AED {{ number_format($pur->grand_total, 2) }}
+                                            {{ currency() }} {{ number_format($pur->grand_total, 2) }}
                                         </td>
                                     </tr>
                                 @empty

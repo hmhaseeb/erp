@@ -79,10 +79,10 @@
                             @if($c->mobile) <div><i class="bx bx-phone font-size-12 text-muted me-1"></i> {{ $c->mobile }}</div> @endif
                             @if($c->email) <div class="text-muted"><i class="bx bx-envelope font-size-12 text-muted me-1"></i> {{ $c->email }}</div> @endif
                         </td>
-                        <td>AED {{ number_format($c->credit_limit, 2) }}</td>
+                        <td>{{ currency() }} {{ number_format($c->credit_limit, 2) }}</td>
                         <td class="text-end">
                             <span class="fw-bold {{ $c->current_balance > 0 ? 'text-danger' : 'text-success' }}">
-                                AED {{ number_format($c->current_balance, 2) }}
+                                {{ currency() }} {{ number_format($c->current_balance, 2) }}
                             </span>
                         </td>
                         <td>

@@ -18,7 +18,7 @@
             <label class="form-label">Select Supplier <span class="text-danger">*</span></label>
             <x-searchable-select wire:model.live="supplier_id" class="form-select @error('supplier_id') is-invalid @enderror" placeholder="Select Supplier...">
                 @foreach($suppliers as $s)
-                    <option value="{{ $s->id }}">{{ $s->name }} (Payable: AED {{ number_format($s->current_balance, 2) }})</option>
+                    <option value="{{ $s->id }}">{{ $s->name }} (Payable: {{ currency() }} {{ number_format($s->current_balance, 2) }})</option>
                 @endforeach
             </x-searchable-select>
             @error('supplier_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -30,13 +30,13 @@
             <label class="form-label">Disburse From Account <span class="text-danger">*</span></label>
             <x-searchable-select wire:model="account_id" class="form-select @error('account_id') is-invalid @enderror" placeholder="Select Account...">
                 @foreach($accounts as $acc)
-                    <option value="{{ $acc->id }}">{{ $acc->name }} (Balance: AED {{ number_format($acc->current_balance, 2) }})</option>
+                    <option value="{{ $acc->id }}">{{ $acc->name }} (Balance: {{ currency() }} {{ number_format($acc->current_balance, 2) }})</option>
                 @endforeach
             </x-searchable-select>
             @error('account_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
         <div class="col-12 col-sm-6 mb-3">
-            <label class="form-label">Total Amount Paid (AED) <span class="text-danger">*</span></label>
+            <label class="form-label">Total Amount Paid ({{ currency() }}) <span class="text-danger">*</span></label>
             <input type="number" step="0.01" wire:model="amount" class="form-control @error('amount') is-invalid @enderror" placeholder="0.00">
             @error('amount') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
@@ -63,7 +63,7 @@
                             <th>Purchase #</th>
                             <th>Date</th>
                             <th class="text-end">Due Amount</th>
-                            <th style="width: 130px;" class="text-end">Allocate (AED)</th>
+                            <th style="width: 130px;" class="text-end">Allocate ({{ currency() }})</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,7 +71,7 @@
                             <tr>
                                 <td><code>{{ $pur->purchase_number }}</code></td>
                                 <td>{{ $pur->purchase_date }}</td>
-                                <td class="text-end font-monospace text-danger">AED {{ number_format($pur->due_amount, 2) }}</td>
+                                <td class="text-end font-monospace text-danger">{{ currency() }} {{ number_format($pur->due_amount, 2) }}</td>
                                 <td>
                                     <input type="number" step="0.01" wire:model="allocations.{{ $pur->id }}" class="form-control form-control-sm text-end" placeholder="0.00">
                                 </td>

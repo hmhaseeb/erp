@@ -8,9 +8,9 @@
 
     <!-- Summary KPI Cards -->
     <div class="row g-3 mb-3">
-        <x-kpi-card col="col-12 col-md-4" title="Cash Drawers Balance" :value="number_format($totalCash, 2)" prefix="AED " color="success" icon="bx bx-money" />
-        <x-kpi-card col="col-12 col-md-4" title="Bank Accounts Balance" :value="number_format($totalBank, 2)" prefix="AED " color="primary" icon="bx bx-buildings" />
-        <x-kpi-card col="col-12 col-md-4" title="Total Liquid Funds" :value="number_format($totalLiquid, 2)" prefix="AED " color="dark" icon="bx bx-wallet" />
+        <x-kpi-card col="col-12 col-md-4" title="Cash Drawers Balance" :value="number_format($totalCash, 2)" prefix="{{ currency() }} " color="success" icon="bx bx-money" />
+        <x-kpi-card col="col-12 col-md-4" title="Bank Accounts Balance" :value="number_format($totalBank, 2)" prefix="{{ currency() }} " color="primary" icon="bx bx-buildings" />
+        <x-kpi-card col="col-12 col-md-4" title="Total Liquid Funds" :value="number_format($totalLiquid, 2)" prefix="{{ currency() }} " color="dark" icon="bx bx-wallet" />
     </div>
 
     <!-- Search & Filter Card -->
@@ -75,9 +75,9 @@
                         </td>
                         <td>{{ $acc->bank_name ?? '-' }}</td>
                         <td><code>{{ $acc->account_number ?? '-' }}</code></td>
-                        <td class="text-end text-muted">AED {{ number_format($acc->opening_balance, 2) }}</td>
+                        <td class="text-end text-muted">{{ currency() }} {{ number_format($acc->opening_balance, 2) }}</td>
                         <td class="text-end fw-bold font-size-14 {{ $acc->current_balance >= 0 ? 'text-success' : 'text-danger' }}">
-                            AED {{ number_format($acc->current_balance, 2) }}
+                            {{ currency() }} {{ number_format($acc->current_balance, 2) }}
                         </td>
                         <td>
                             <x-badge :type="$acc->status ? 'success' : 'secondary'">{{ $acc->status ? 'Active' : 'Inactive' }}</x-badge>

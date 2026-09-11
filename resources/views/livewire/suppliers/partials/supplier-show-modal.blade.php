@@ -17,14 +17,14 @@
                 <div class="p-3 bg-light rounded text-center">
                     <span class="text-muted font-size-12 d-block mb-1">Outstanding Payable</span>
                     <h5 class="mb-0 font-monospace fw-bold {{ $selectedSupplier->current_balance > 0 ? 'text-danger' : 'text-success' }}">
-                        AED {{ number_format($selectedSupplier->current_balance, 2) }}
+                        {{ currency() }} {{ number_format($selectedSupplier->current_balance, 2) }}
                     </h5>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="p-3 bg-light rounded text-center">
                     <span class="text-muted font-size-12 d-block mb-1">Opening Balance</span>
-                    <h5 class="mb-0 font-monospace text-dark fw-bold">AED {{ number_format($selectedSupplier->opening_balance, 2) }}</h5>
+                    <h5 class="mb-0 font-monospace text-dark fw-bold">{{ currency() }} {{ number_format($selectedSupplier->opening_balance, 2) }}</h5>
                 </div>
             </div>
             <div class="col-md-3">
@@ -137,9 +137,9 @@
                                         <td><code>{{ $pur->purchase_number }}</code></td>
                                         <td>{{ $pur->purchase_date }}</td>
                                         <td><x-badge type="primary">{{ $pur->payment_type }}</x-badge></td>
-                                        <td class="text-end font-monospace">AED {{ number_format($pur->grand_total, 2) }}</td>
-                                        <td class="text-end font-monospace text-success">AED {{ number_format($pur->paid_amount, 2) }}</td>
-                                        <td class="text-end font-monospace fw-bold text-danger">AED {{ number_format($pur->due_amount, 2) }}</td>
+                                        <td class="text-end font-monospace">{{ currency() }} {{ number_format($pur->grand_total, 2) }}</td>
+                                        <td class="text-end font-monospace text-success">{{ currency() }} {{ number_format($pur->paid_amount, 2) }}</td>
+                                        <td class="text-end font-monospace fw-bold text-danger">{{ currency() }} {{ number_format($pur->due_amount, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -171,7 +171,7 @@
                                         <td>{{ $pmt->payment_date }}</td>
                                         <td><x-badge type="info">{{ $pmt->account->name ?? 'Bank/Cash' }}</x-badge></td>
                                         <td>{{ $pmt->reference_number ?? '-' }}</td>
-                                        <td class="text-end font-monospace text-success fw-bold font-size-14">AED {{ number_format($pmt->amount, 2) }}</td>
+                                        <td class="text-end font-monospace text-success fw-bold font-size-14">{{ currency() }} {{ number_format($pmt->amount, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -204,12 +204,12 @@
                                         <td><x-badge :type="$tx->debit > 0 ? 'danger' : 'success'">{{ $tx->transaction_type }}</x-badge></td>
                                         <td>{{ $tx->description ?? '-' }}</td>
                                         <td class="text-end font-monospace {{ $tx->debit > 0 ? 'text-danger fw-bold' : 'text-muted' }}">
-                                            {{ $tx->debit > 0 ? 'AED ' . number_format($tx->debit, 2) : '-' }}
+                                            {{ $tx->debit > 0 ? currency() . ' ' . number_format($tx->debit, 2) : '-' }}
                                         </td>
                                         <td class="text-end font-monospace {{ $tx->credit > 0 ? 'text-success fw-bold' : 'text-muted' }}">
-                                            {{ $tx->credit > 0 ? 'AED ' . number_format($tx->credit, 2) : '-' }}
+                                            {{ $tx->credit > 0 ? currency() . ' ' . number_format($tx->credit, 2) : '-' }}
                                         </td>
-                                        <td class="text-end font-monospace fw-bold">AED {{ number_format($tx->balance, 2) }}</td>
+                                        <td class="text-end font-monospace fw-bold">{{ currency() }} {{ number_format($tx->balance, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>

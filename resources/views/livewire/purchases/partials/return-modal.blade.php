@@ -22,7 +22,7 @@
         <label class="form-label">Supplier <span class="text-danger">*</span></label>
         <x-searchable-select wire:model="supplier_id" class="form-select @error('supplier_id') is-invalid @enderror" placeholder="Select Supplier...">
             @foreach($suppliers as $s)
-                <option value="{{ $s->id }}">{{ $s->name }} (Balance: AED {{ number_format($s->current_balance, 2) }})</option>
+                <option value="{{ $s->id }}">{{ $s->name }} (Balance: {{ currency() }} {{ number_format($s->current_balance, 2) }})</option>
             @endforeach
         </x-searchable-select>
         @error('supplier_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -45,7 +45,7 @@
             @error('quantity') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
         <div class="col-6 col-sm-4 mb-3">
-            <label class="form-label">Cost Price (AED) <span class="text-danger">*</span></label>
+            <label class="form-label">Cost Price ({{ currency() }}) <span class="text-danger">*</span></label>
             <input type="number" step="0.01" wire:model="unit_price" class="form-control @error('unit_price') is-invalid @enderror">
             @error('unit_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>

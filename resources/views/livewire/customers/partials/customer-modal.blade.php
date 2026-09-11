@@ -56,12 +56,12 @@
     <div class="row">
         @if(!$isEditMode)
             <div class="col-12 col-sm-4 mb-3">
-                <label class="form-label">Opening Receivable (AED)</label>
+                <label class="form-label">Opening Receivable ({{ currency() }})</label>
                 <input type="number" step="0.01" wire:model="opening_balance" class="form-control" placeholder="0.00">
             </div>
         @endif
         <div class="{{ $isEditMode ? 'col-12 col-sm-6' : 'col-12 col-sm-4' }} mb-3">
-            <label class="form-label">Credit Limit (AED)</label>
+            <label class="form-label">Credit Limit ({{ currency() }})</label>
             <input type="number" step="0.01" wire:model="credit_limit" class="form-control" placeholder="0.00">
         </div>
         <div class="{{ $isEditMode ? 'col-12 col-sm-6' : 'col-12 col-sm-4' }} mb-3">

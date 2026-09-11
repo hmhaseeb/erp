@@ -111,9 +111,9 @@
                         </td>
                         <td>{{ $p->category->name ?? '-' }}</td>
                         <td><x-badge type="secondary">{{ $p->unit->name ?? '-' }}</x-badge></td>
-                        <td class="text-end text-muted font-monospace">AED {{ number_format($p->purchase_price, 2) }}</td>
-                        <td class="text-end fw-bold text-success font-monospace">AED {{ number_format($p->sales_price, 2) }}</td>
-                        <td class="text-end text-muted font-monospace">AED {{ number_format($p->weighted_cost, 2) }}</td>
+                        <td class="text-end text-muted font-monospace">{{ currency() }} {{ number_format($p->purchase_price, 2) }}</td>
+                        <td class="text-end fw-bold text-success font-monospace">{{ currency() }} {{ number_format($p->sales_price, 2) }}</td>
+                        <td class="text-end text-muted font-monospace">{{ currency() }} {{ number_format($p->weighted_cost, 2) }}</td>
                         <td class="text-end font-monospace">
                             @if($p->current_stock <= 0)
                                 <x-badge type="danger">0.00 (Out of Stock)</x-badge>
@@ -217,7 +217,7 @@
                         <div class="text-end">
                             <span class="text-muted font-size-11 d-block text-uppercase fw-semibold">Retail Price</span>
                             <span class="font-monospace fw-bold font-size-14 text-success">
-                                AED {{ number_format($p->sales_price, 2) }}
+                                {{ currency() }} {{ number_format($p->sales_price, 2) }}
                             </span>
                         </div>
                     </div>
@@ -239,11 +239,11 @@
                     <div x-show="expanded" x-collapse x-cloak class="inventory-detail-box">
                         <div class="inventory-detail-item">
                             <span class="text-muted">Purchase Cost:</span>
-                            <span class="font-monospace text-dark fw-medium">AED {{ number_format($p->purchase_price, 2) }}</span>
+                            <span class="font-monospace text-dark fw-medium">{{ currency() }} {{ number_format($p->purchase_price, 2) }}</span>
                         </div>
                         <div class="inventory-detail-item">
                             <span class="text-muted">Average Cost:</span>
-                            <span class="font-monospace text-muted">AED {{ number_format($p->weighted_cost, 2) }}</span>
+                            <span class="font-monospace text-muted">{{ currency() }} {{ number_format($p->weighted_cost, 2) }}</span>
                         </div>
                         <div class="inventory-detail-item">
                             <span class="text-muted">Unit of Measure:</span>

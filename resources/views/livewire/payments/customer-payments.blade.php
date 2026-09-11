@@ -87,7 +87,7 @@
                             <x-badge type="info">{{ $p->account->name ?? 'Default Cash' }}</x-badge>
                         </td>
                         <td class="text-end fw-bold text-success font-size-14">
-                            AED {{ number_format($p->amount, 2) }}
+                            {{ currency() }} {{ number_format($p->amount, 2) }}
                         </td>
                         <td>{{ $p->reference_number ?? '-' }}</td>
                         <td><span class="text-muted font-size-12">{{ $p->notes ?? '-' }}</span></td>

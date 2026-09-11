@@ -22,7 +22,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center gap-2 mb-3">
-                        <span class="text-muted">Total Supplier Payable: <strong class="text-danger font-monospace">AED {{ number_format($selectedSupplier->current_balance, 2) }}</strong></span>
+                        <span class="text-muted">Total Supplier Payable: <strong class="text-danger font-monospace">{{ currency() }} {{ number_format($selectedSupplier->current_balance, 2) }}</strong></span>
                         <a href="{{ route('payments.supplier') }}" class="btn btn-sm btn-primary w-100 w-sm-auto">
                             <i class="bx bx-plus me-1"></i> Record Payment Voucher
                         </a>
@@ -43,9 +43,9 @@
                                     <tr>
                                         <td><code>{{ $pur->purchase_number }}</code></td>
                                         <td>{{ $pur->purchase_date }}</td>
-                                        <td>AED {{ number_format($pur->grand_total, 2) }}</td>
-                                        <td class="text-success">AED {{ number_format($pur->paid_amount, 2) }}</td>
-                                        <td class="text-end font-monospace text-danger fw-bold">AED {{ number_format($pur->due_amount, 2) }}</td>
+                                        <td>{{ currency() }} {{ number_format($pur->grand_total, 2) }}</td>
+                                        <td class="text-success">{{ currency() }} {{ number_format($pur->paid_amount, 2) }}</td>
+                                        <td class="text-end font-monospace text-danger fw-bold">{{ currency() }} {{ number_format($pur->due_amount, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>

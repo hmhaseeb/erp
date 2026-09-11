@@ -96,10 +96,10 @@
                             </span>
                         </td>
                         <td class="text-end font-monospace {{ $t->debit > 0 ? 'text-success fw-bold' : 'text-muted' }}">
-                            {{ $t->debit > 0 ? 'AED ' . number_format($t->debit, 2) : '-' }}
+                            {{ $t->debit > 0 ? currency() . ' ' . number_format($t->debit, 2) : '-' }}
                         </td>
                         <td class="text-end font-monospace {{ $t->credit > 0 ? 'text-danger fw-bold' : 'text-muted' }}">
-                            {{ $t->credit > 0 ? 'AED ' . number_format($t->credit, 2) : '-' }}
+                            {{ $t->credit > 0 ? currency() . ' ' . number_format($t->credit, 2) : '-' }}
                         </td>
                     </tr>
                 @empty

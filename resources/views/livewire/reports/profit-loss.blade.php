@@ -32,7 +32,7 @@
             <div class="text-center mb-4">
                 <h4 class="fw-bold mb-1">STATEMENT OF PROFIT AND LOSS</h4>
                 <p class="text-muted font-size-13 mb-0">For the period from <strong>{{ $start_date }}</strong> to <strong>{{ $end_date }}</strong></p>
-                <small class="text-muted">All amounts in UAE Dirhams (AED)</small>
+                <small class="text-muted">All amounts in {{ currency() }}</small>
             </div>
 
             <div class="table-responsive">
@@ -43,23 +43,23 @@
                             <td colspan="2" class="fw-bold text-dark font-size-15">
                                 <i class="bx bx-chevron-right text-primary me-1"></i> 1. Operating Revenue
                             </td>
-                            <td class="text-end fw-bold text-dark" style="width: 220px;">Amount (AED)</td>
+                            <td class="text-end fw-bold text-dark" style="width: 220px;">Amount ({{ currency() }})</td>
                         </tr>
                         <tr>
                             <td style="padding-left: 2.5rem;">Gross Sales (Revenue from Goods Sold)</td>
-                            <td class="text-end text-muted font-monospace">AED {{ number_format($report['revenue']['gross_sales'], 2) }}</td>
+                            <td class="text-end text-muted font-monospace">{{ currency() }} {{ number_format($report['revenue']['gross_sales'], 2) }}</td>
                             <td class="text-end"></td>
                         </tr>
                         <tr>
                             <td style="padding-left: 2.5rem;">Less: Sales Returns & Allowances</td>
-                            <td class="text-end text-danger font-monospace">- AED {{ number_format($report['revenue']['sales_returns'], 2) }}</td>
+                            <td class="text-end text-danger font-monospace">- {{ currency() }} {{ number_format($report['revenue']['sales_returns'], 2) }}</td>
                             <td class="text-end"></td>
                         </tr>
                         <tr class="fw-bold">
                             <td style="padding-left: 1.5rem;" class="text-dark">Net Sales Revenue</td>
                             <td></td>
                             <td class="text-end font-monospace text-success font-size-15">
-                                AED {{ number_format($report['revenue']['net_sales'], 2) }}
+                                {{ currency() }} {{ number_format($report['revenue']['net_sales'], 2) }}
                             </td>
                         </tr>
 
@@ -72,19 +72,19 @@
                         </tr>
                         <tr>
                             <td style="padding-left: 2.5rem;">Total Purchases in Period</td>
-                            <td class="text-end text-muted font-monospace">AED {{ number_format($report['cogs']['purchases'], 2) }}</td>
+                            <td class="text-end text-muted font-monospace">{{ currency() }} {{ number_format($report['cogs']['purchases'], 2) }}</td>
                             <td class="text-end"></td>
                         </tr>
                         <tr>
                             <td style="padding-left: 2.5rem;">Less: Purchase Returns & Allowances</td>
-                            <td class="text-end text-success font-monospace">- AED {{ number_format($report['cogs']['purchase_returns'], 2) }}</td>
+                            <td class="text-end text-success font-monospace">- {{ currency() }} {{ number_format($report['cogs']['purchase_returns'], 2) }}</td>
                             <td class="text-end"></td>
                         </tr>
                         <tr class="fw-bold">
                             <td style="padding-left: 1.5rem;" class="text-dark">Net Cost of Goods Sold</td>
                             <td></td>
                             <td class="text-end font-monospace text-danger font-size-15">
-                                (AED {{ number_format($report['cogs']['net_purchases'], 2) }})
+                                ({{ currency() }} {{ number_format($report['cogs']['net_purchases'], 2) }})
                             </td>
                         </tr>
 
@@ -94,7 +94,7 @@
                                 <i class="bx bx-trophy text-primary me-1"></i> GROSS PROFIT (Net Sales - COGS)
                             </td>
                             <td class="text-end font-monospace {{ $report['gross_profit'] >= 0 ? 'text-primary' : 'text-danger' }}">
-                                AED {{ number_format($report['gross_profit'], 2) }}
+                                {{ currency() }} {{ number_format($report['gross_profit'], 2) }}
                             </td>
                         </tr>
 
@@ -108,13 +108,13 @@
                         @forelse($report['other_income_breakdown'] as $category => $amount)
                             <tr>
                                 <td style="padding-left: 2.5rem;">{{ $category }}</td>
-                                <td class="text-end text-muted font-monospace">AED {{ number_format($amount, 2) }}</td>
+                                <td class="text-end text-muted font-monospace">{{ currency() }} {{ number_format($amount, 2) }}</td>
                                 <td class="text-end"></td>
                             </tr>
                         @empty
                             <tr>
                                 <td style="padding-left: 2.5rem;" class="text-muted">No miscellaneous income in period</td>
-                                <td class="text-end text-muted font-monospace">AED 0.00</td>
+                                <td class="text-end text-muted font-monospace">{{ currency() }} 0.00</td>
                                 <td class="text-end"></td>
                             </tr>
                         @endforelse
@@ -122,7 +122,7 @@
                             <td style="padding-left: 1.5rem;" class="text-dark">Total Other Income</td>
                             <td></td>
                             <td class="text-end font-monospace text-success font-size-15">
-                                + AED {{ number_format($report['other_income'], 2) }}
+                                + {{ currency() }} {{ number_format($report['other_income'], 2) }}
                             </td>
                         </tr>
 
@@ -136,13 +136,13 @@
                         @forelse($report['expenses_breakdown'] as $category => $amount)
                             <tr>
                                 <td style="padding-left: 2.5rem;">{{ $category }}</td>
-                                <td class="text-end text-muted font-monospace">AED {{ number_format($amount, 2) }}</td>
+                                <td class="text-end text-muted font-monospace">{{ currency() }} {{ number_format($amount, 2) }}</td>
                                 <td class="text-end"></td>
                             </tr>
                         @empty
                             <tr>
                                 <td style="padding-left: 2.5rem;" class="text-muted">No operating expenses recorded in period</td>
-                                <td class="text-end text-muted font-monospace">AED 0.00</td>
+                                <td class="text-end text-muted font-monospace">{{ currency() }} 0.00</td>
                                 <td class="text-end"></td>
                             </tr>
                         @endforelse
@@ -150,7 +150,7 @@
                             <td style="padding-left: 1.5rem;" class="text-dark">Total Operating Expenses</td>
                             <td></td>
                             <td class="text-end font-monospace text-danger font-size-15">
-                                (AED {{ number_format($report['expenses'], 2) }})
+                                ({{ currency() }} {{ number_format($report['expenses'], 2) }})
                             </td>
                         </tr>
 
@@ -161,7 +161,7 @@
                                 FINAL NET {{ $report['net_profit'] >= 0 ? 'PROFIT' : 'LOSS' }}
                             </td>
                             <td class="text-end font-monospace {{ $report['net_profit'] >= 0 ? 'text-success' : 'text-danger' }}">
-                                AED {{ number_format($report['net_profit'], 2) }}
+                                {{ currency() }} {{ number_format($report['net_profit'], 2) }}
                             </td>
                         </tr>
                     </tbody>

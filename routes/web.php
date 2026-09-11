@@ -84,4 +84,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings/invoice', Settings\InvoiceSettings::class)->name('settings.invoice');
     Route::get('/settings/logos', Settings\LogoSettings::class)->name('settings.logos');
     Route::get('/settings/general', Settings\GeneralSettings::class)->name('settings.general');
+
+    // User Profile & Security Password Change
+    Route::get('/profile', \App\Livewire\Profile\Index::class)->name('profile');
 });

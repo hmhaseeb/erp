@@ -12,7 +12,7 @@
             <x-kpi-card 
                 title="Total Outstanding Accounts Payable" 
                 :amount="$totalPayable" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="danger" 
                 subtitle="Vendor balances due" 
                 icon="bx-wallet" />
@@ -89,7 +89,7 @@
                         <td>{{ $s->mobile ?? '-' }}</td>
                         <td>{{ $s->contact_person ?? '-' }}</td>
                         <td class="text-end font-monospace fw-bold font-size-14 {{ $s->current_balance > 0 ? 'text-danger' : 'text-success' }}">
-                            AED {{ number_format($s->current_balance, 2) }}
+                            {{ currency() }} {{ number_format($s->current_balance, 2) }}
                         </td>
                         <td class="text-center">
                             <button wire:click="viewSupplierPurchases({{ $s->id }})" class="btn btn-sm btn-outline-primary" title="View Unpaid Bills">

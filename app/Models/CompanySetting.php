@@ -16,6 +16,12 @@ class CompanySetting extends Model
         $logoPath = $this->invoice_logo ?: $this->main_logo;
 
         if (!$logoPath) {
+            $defaultLogo = public_path('assets/images/branding/smallbiz-logo.png');
+            if (file_exists($defaultLogo) && is_file($defaultLogo)) {
+                $mime = mime_content_type($defaultLogo) ?: 'image/png';
+                $base64 = base64_encode(file_get_contents($defaultLogo));
+                return "data:{$mime};base64,{$base64}";
+            }
             return null;
         }
 
@@ -25,6 +31,7 @@ class CompanySetting extends Model
             storage_path('app/public/' . $cleanPath),
             public_path('storage/' . $cleanPath),
             public_path($cleanPath),
+            public_path('assets/images/branding/' . basename($cleanPath)),
         ];
 
         foreach ($possiblePaths as $fullPath) {

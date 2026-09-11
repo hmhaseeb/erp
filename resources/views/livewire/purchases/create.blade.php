@@ -53,7 +53,7 @@
                             <label class="form-label font-size-13 fw-semibold">Deposit / Payment Account <span class="text-danger">*</span></label>
                             <x-searchable-select wire:model="account_id" class="form-select">
                                 @foreach($accounts as $acc)
-                                    <option value="{{ $acc->id }}">{{ $acc->name }} (AED {{ number_format($acc->current_balance, 2) }})</option>
+                                    <option value="{{ $acc->id }}">{{ $acc->name }} ({{ currency() }} {{ number_format($acc->current_balance, 2) }})</option>
                                 @endforeach
                             </x-searchable-select>
                         </div>
@@ -76,7 +76,7 @@
                             <tr>
                                 <th style="width: 38%; min-width: 260px;">Product</th>
                                 <th style="width: 12%; min-width: 90px;" class="text-center">Qty</th>
-                                <th style="width: 16%; min-width: 130px;" class="text-end">Unit Cost (AED)</th>
+                                <th style="width: 16%; min-width: 130px;" class="text-end">Unit Cost ({{ currency() }})</th>
                                 <th style="width: 10%; min-width: 90px;" class="text-center">VAT %</th>
                                 <th style="width: 16%; min-width: 120px;" class="text-end">Line Total</th>
                                 <th style="width: 8%; min-width: 60px;" class="text-center">Action</th>
@@ -130,7 +130,7 @@
                                         @endif
                                     </td>
                                     <td class="col-price">
-                                        <label class="form-label font-size-11 text-muted d-md-none mb-1">Cost (AED) <span class="text-danger">*</span></label>
+                                        <label class="form-label font-size-11 text-muted d-md-none mb-1">Cost ({{ currency() }}) <span class="text-danger">*</span></label>
                                         <input type="number" step="0.01" wire:model.live.debounce.300ms="items.{{ $index }}.unit_price" class="form-control text-end font-monospace" placeholder="Unit Cost">
                                     </td>
                                     <td class="col-vat">
@@ -140,7 +140,7 @@
                                     <td class="col-total text-md-end font-monospace">
                                         <span class="d-md-none text-muted font-size-11 fw-normal me-2">Line Total:</span>
                                         <div class="d-flex align-items-center justify-content-end font-monospace fw-bold text-dark font-size-14" style="min-height: 38px;">
-                                            AED {{ number_format($item['line_total'], 2) }}
+                                            {{ currency() }} {{ number_format($item['line_total'], 2) }}
                                         </div>
                                     </td>
                                     <td class="col-action text-center d-none d-md-table-cell">
@@ -182,20 +182,20 @@
                         <div class="bg-light p-3 rounded">
                             <div class="d-flex justify-content-between mb-2 font-size-13">
                                 <span class="text-muted">Subtotal:</span>
-                                <span class="fw-bold font-monospace">AED {{ number_format($subtotal, 2) }}</span>
+                                <span class="fw-bold font-monospace">{{ currency() }} {{ number_format($subtotal, 2) }}</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2 font-size-13">
                                 <span class="text-muted">VAT Total:</span>
-                                <span class="fw-bold font-monospace text-info">AED {{ number_format($vat_amount, 2) }}</span>
+                                <span class="fw-bold font-monospace text-info">{{ currency() }} {{ number_format($vat_amount, 2) }}</span>
                             </div>
                             <div class="d-flex justify-content-between mb-2 align-items-center font-size-13">
-                                <span class="text-muted">Discount (AED):</span>
+                                <span class="text-muted">Discount ({{ currency() }}):</span>
                                 <input type="number" step="0.01" wire:model.live.debounce.300ms="discount_amount" class="form-control form-control-sm text-end font-monospace" style="max-width: 140px;" placeholder="0.00">
                             </div>
                             <hr class="my-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="fw-bold font-size-15 text-dark">Grand Total:</span>
-                                <span class="fw-bold text-primary font-size-18 font-monospace">AED {{ number_format($grand_total, 2) }}</span>
+                                <span class="fw-bold text-primary font-size-18 font-monospace">{{ currency() }} {{ number_format($grand_total, 2) }}</span>
                             </div>
                         </div>
                     </div>

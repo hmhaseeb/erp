@@ -29,13 +29,13 @@
             <label class="form-label">Deposit Into Account <span class="text-danger">*</span></label>
             <x-searchable-select wire:model="account_id" class="form-select @error('account_id') is-invalid @enderror" placeholder="Select Account...">
                 @foreach($accounts as $acc)
-                    <option value="{{ $acc->id }}">{{ $acc->name }} (Balance: AED {{ number_format($acc->current_balance, 2) }})</option>
+                    <option value="{{ $acc->id }}">{{ $acc->name }} (Balance: {{ currency() }} {{ number_format($acc->current_balance, 2) }})</option>
                 @endforeach
             </x-searchable-select>
             @error('account_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
         <div class="col-12 col-sm-6 mb-3">
-            <label class="form-label">Amount (AED) <span class="text-danger">*</span></label>
+            <label class="form-label">Amount ({{ currency() }}) <span class="text-danger">*</span></label>
             <input type="number" step="0.01" wire:model="amount" class="form-control @error('amount') is-invalid @enderror" placeholder="0.00">
             @error('amount') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>

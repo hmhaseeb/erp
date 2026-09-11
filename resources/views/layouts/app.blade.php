@@ -11,7 +11,7 @@
 
     @php
         $companySetting = \App\Services\SettingsService::getCompany();
-        $favicon = $companySetting && $companySetting->favicon ? asset('storage/' . $companySetting->favicon) : asset('assets/images/favicon.ico');
+        $favicon = $companySetting && $companySetting->favicon ? asset('storage/' . $companySetting->favicon) : asset('assets/images/branding/smallbiz-icon.png');
     @endphp
     <link rel="shortcut icon" href="{{ $favicon }}">
 
@@ -423,18 +423,13 @@
                     <div class="navbar-brand-box">
                         <a href="{{ route('dashboard') }}" class="logo logo-dark">
                             <span class="logo-sm">
-                                <i class="bx bx-store-alt text-primary font-size-24"></i>
+                                <img src="{{ asset('assets/images/branding/smallbiz-icon.png') }}" alt="Icon" style="max-height: 28px; max-width: 28px; object-fit: contain;">
                             </span>
                             <span class="logo-lg d-flex align-items-center">
                                 @if($companySetting && $companySetting->main_logo)
                                     <img src="{{ asset('storage/' . $companySetting->main_logo) }}" alt="Logo" style="max-height: 38px; max-width: 170px; object-fit: contain;">
                                 @else
-                                    <span class="avatar-xs me-2 d-inline-flex align-items-center justify-content-center rounded bg-primary-subtle text-primary" style="width: 32px; height: 32px; min-width: 32px;">
-                                        <i class="bx bx-store-alt font-size-18"></i>
-                                    </span>
-                                    <span class="logo-txt fw-bold text-dark font-size-15 text-truncate" style="max-width: 165px;" title="{{ $companySetting->company_name ?? 'Small Business ERP' }}">
-                                        {{ $companySetting->company_name ?? 'Small Business ERP' }}
-                                    </span>
+                                    <img src="{{ asset('assets/images/branding/smallbiz-logo.png') }}" alt="Logo" style="max-height: 38px; max-width: 170px; object-fit: contain;">
                                 @endif
                             </span>
                         </a>
@@ -446,6 +441,23 @@
                 </div>
 
                 <div class="d-flex align-items-center">
+
+                    @php
+                        $setupCompletedCount = \App\Services\SetupWizardService::getCompletedCount();
+                        $setupTotalCount = \App\Services\SetupWizardService::getTotalCount();
+                        $isSetupComplete = \App\Services\SetupWizardService::isComplete();
+                    @endphp
+
+                    @if(!$isSetupComplete)
+                        <button type="button" 
+                                onclick="Livewire.dispatch('open-setup-wizard')" 
+                                class="btn btn-sm btn-outline-warning d-inline-flex align-items-center me-2 shadow-sm" 
+                                title="Complete Initial Business Setup ({{ $setupCompletedCount }}/{{ $setupTotalCount }} Completed)">
+                            <i class="bx bx-rocket me-1 font-size-15 text-warning"></i>
+                            <span class="font-size-12 fw-bold text-dark d-none d-sm-inline">Setup Wizard</span>
+                            <span class="badge bg-warning text-dark rounded-pill ms-1 font-size-11">{{ $setupCompletedCount }}/{{ $setupTotalCount }}</span>
+                        </button>
+                    @endif
 
                     <button type="button" id="pwa-install-btn" class="btn btn-sm btn-soft-primary me-2 d-none align-items-center" title="Install Inventory ERP App">
                         <i class="bx bx-download me-1 font-size-15"></i> <span class="d-none d-sm-inline font-size-13 fw-semibold">Install App</span>
@@ -460,11 +472,29 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-end">
                             <!-- item-->
-                            <a class="dropdown-item" href="{{ route('settings.company') }}"><i class="mdi mdi-cog font-size-16 align-middle me-1"></i> Company Settings</a>
+                            <a class="dropdown-item" href="{{ route('profile') }}">
+                                <i class="bx bx-user font-size-16 align-middle me-1 text-primary"></i> My Profile
+                            </a>
+                            @if(!$isSetupComplete)
+                                <a class="dropdown-item cursor-pointer" onclick="Livewire.dispatch('open-setup-wizard')">
+                                    <i class="bx bx-rocket font-size-16 align-middle me-1 text-warning"></i> Setup Wizard
+                                    <span class="badge bg-warning text-dark rounded-pill ms-1 font-size-10">{{ $setupCompletedCount }}/{{ $setupTotalCount }}</span>
+                                </a>
+                            @else
+                                <span class="dropdown-item text-success pe-none">
+                                    <i class="bx bx-check-shield font-size-16 align-middle me-1 text-success"></i> Setup Complete
+                                    <span class="badge bg-success-subtle text-success border border-success font-size-10 ms-1">6/6 ✓</span>
+                                </span>
+                            @endif
+                            <a class="dropdown-item" href="{{ route('settings.company') }}">
+                                <i class="mdi mdi-cog font-size-16 align-middle me-1"></i> Company Settings
+                            </a>
                             <div class="dropdown-divider"></div>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="dropdown-item text-danger"><i class="mdi mdi-logout font-size-16 align-middle me-1 text-danger"></i> Logout</button>
+                                <button type="submit" class="dropdown-item text-danger">
+                                    <i class="mdi mdi-logout font-size-16 align-middle me-1 text-danger"></i> Logout
+                                </button>
                             </form>
                         </div>
                     </div>
@@ -623,6 +653,11 @@
                                 <span data-key="t-settings">Settings</span>
                             </a>
                             <ul class="sub-menu {{ request()->routeIs('settings.*') ? 'mm-show' : '' }}" aria-expanded="{{ request()->routeIs('settings.*') ? 'true' : 'false' }}">
+                                @if(!$isSetupComplete)
+                                    <li><a href="javascript:void(0);" onclick="Livewire.dispatch('open-setup-wizard')"><i class="bx bx-rocket text-warning me-1"></i> Setup Wizard <span class="badge bg-warning text-dark rounded-pill ms-1 font-size-10">{{ $setupCompletedCount }}/{{ $setupTotalCount }}</span></a></li>
+                                @else
+                                    <li><a href="javascript:void(0);" class="text-success pe-none"><i class="bx bx-check-shield text-success me-1"></i> Setup Complete <span class="badge bg-success-subtle text-success border border-success font-size-10 ms-1">6/6 ✓</span></a></li>
+                                @endif
                                 <li><a href="{{ route('settings.company') }}" class="{{ request()->routeIs('settings.company') ? 'active' : '' }}">Company Settings</a></li>
                                 <li><a href="{{ route('settings.invoice') }}" class="{{ request()->routeIs('settings.invoice') ? 'active' : '' }}">Invoice Settings</a></li>
                                 <li><a href="{{ route('settings.logos') }}" class="{{ request()->routeIs('settings.logos') ? 'active' : '' }}">Logo Management</a></li>
@@ -647,6 +682,9 @@
 
                     <!-- Global Toast Notifications -->
                     <x-toast-notification />
+
+                    <!-- Initial Setup Wizard Component & Modal -->
+                    <livewire:components.setup-wizard />
 
                     {{ $slot }}
 

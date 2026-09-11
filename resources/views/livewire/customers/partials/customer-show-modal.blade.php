@@ -17,14 +17,14 @@
                 <div class="p-3 bg-light rounded text-center">
                     <span class="text-muted font-size-12 d-block mb-1">Outstanding Receivable</span>
                     <h5 class="mb-0 font-monospace fw-bold {{ $selectedCustomer->current_balance > 0 ? 'text-danger' : 'text-success' }}">
-                        AED {{ number_format($selectedCustomer->current_balance, 2) }}
+                        {{ currency() }} {{ number_format($selectedCustomer->current_balance, 2) }}
                     </h5>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="p-3 bg-light rounded text-center">
                     <span class="text-muted font-size-12 d-block mb-1">Credit Limit</span>
-                    <h5 class="mb-0 font-monospace text-dark fw-bold">AED {{ number_format($selectedCustomer->credit_limit, 2) }}</h5>
+                    <h5 class="mb-0 font-monospace text-dark fw-bold">{{ currency() }} {{ number_format($selectedCustomer->credit_limit, 2) }}</h5>
                 </div>
             </div>
             <div class="col-md-3">
@@ -98,11 +98,11 @@
                                 </tr>
                                 <tr>
                                     <th class="text-muted">Credit Limit:</th>
-                                    <td class="font-monospace text-primary fw-semibold">AED {{ number_format($selectedCustomer->credit_limit, 2) }}</td>
+                                    <td class="font-monospace text-primary fw-semibold">{{ currency() }} {{ number_format($selectedCustomer->credit_limit, 2) }}</td>
                                 </tr>
                                 <tr>
                                     <th class="text-muted">Opening Balance:</th>
-                                    <td class="font-monospace">AED {{ number_format($selectedCustomer->opening_balance, 2) }}</td>
+                                    <td class="font-monospace">{{ currency() }} {{ number_format($selectedCustomer->opening_balance, 2) }}</td>
                                 </tr>
                                 <tr>
                                     <th class="text-muted">Payment Terms:</th>
@@ -145,9 +145,9 @@
                                         <td><code>{{ $sale->invoice_number }}</code></td>
                                         <td>{{ $sale->sale_date }}</td>
                                         <td><x-badge type="info">{{ $sale->payment_type }}</x-badge></td>
-                                        <td class="text-end font-monospace">AED {{ number_format($sale->grand_total, 2) }}</td>
-                                        <td class="text-end font-monospace text-success">AED {{ number_format($sale->paid_amount, 2) }}</td>
-                                        <td class="text-end font-monospace fw-bold text-danger">AED {{ number_format($sale->due_amount, 2) }}</td>
+                                        <td class="text-end font-monospace">{{ currency() }} {{ number_format($sale->grand_total, 2) }}</td>
+                                        <td class="text-end font-monospace text-success">{{ currency() }} {{ number_format($sale->paid_amount, 2) }}</td>
+                                        <td class="text-end font-monospace fw-bold text-danger">{{ currency() }} {{ number_format($sale->due_amount, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -179,7 +179,7 @@
                                         <td>{{ $pmt->payment_date }}</td>
                                         <td><x-badge type="info">{{ $pmt->account->name ?? 'Bank/Cash' }}</x-badge></td>
                                         <td>{{ $pmt->reference_number ?? '-' }}</td>
-                                        <td class="text-end font-monospace text-success fw-bold font-size-14">AED {{ number_format($pmt->amount, 2) }}</td>
+                                        <td class="text-end font-monospace text-success fw-bold font-size-14">{{ currency() }} {{ number_format($pmt->amount, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -212,12 +212,12 @@
                                         <td><x-badge :type="$tx->debit > 0 ? 'warning' : 'success'">{{ $tx->transaction_type }}</x-badge></td>
                                         <td>{{ $tx->description ?? '-' }}</td>
                                         <td class="text-end font-monospace {{ $tx->debit > 0 ? 'text-danger fw-bold' : 'text-muted' }}">
-                                            {{ $tx->debit > 0 ? 'AED ' . number_format($tx->debit, 2) : '-' }}
+                                            {{ $tx->debit > 0 ? currency() . ' ' . number_format($tx->debit, 2) : '-' }}
                                         </td>
                                         <td class="text-end font-monospace {{ $tx->credit > 0 ? 'text-success fw-bold' : 'text-muted' }}">
-                                            {{ $tx->credit > 0 ? 'AED ' . number_format($tx->credit, 2) : '-' }}
+                                            {{ $tx->credit > 0 ? currency() . ' ' . number_format($tx->credit, 2) : '-' }}
                                         </td>
-                                        <td class="text-end font-monospace fw-bold">AED {{ number_format($tx->balance, 2) }}</td>
+                                        <td class="text-end font-monospace fw-bold">{{ currency() }} {{ number_format($tx->balance, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>

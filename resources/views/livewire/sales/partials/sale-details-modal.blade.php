@@ -65,10 +65,10 @@
                                             @endif
                                         </td>
                                         <td class="text-end font-monospace">{{ number_format($item->quantity, 2) }}</td>
-                                        <td class="text-end font-monospace">AED {{ number_format($item->unit_price, 2) }}</td>
-                                        <td class="text-end font-monospace">AED {{ number_format($item->discount_amount, 2) }}</td>
-                                        <td class="text-end font-monospace">AED {{ number_format($item->vat_amount, 2) }}</td>
-                                        <td class="text-end fw-bold font-monospace">AED {{ number_format($item->line_total, 2) }}</td>
+                                        <td class="text-end font-monospace">{{ currency() }} {{ number_format($item->unit_price, 2) }}</td>
+                                        <td class="text-end font-monospace">{{ currency() }} {{ number_format($item->discount_amount, 2) }}</td>
+                                        <td class="text-end font-monospace">{{ currency() }} {{ number_format($item->vat_amount, 2) }}</td>
+                                        <td class="text-end fw-bold font-monospace">{{ currency() }} {{ number_format($item->line_total, 2) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -86,22 +86,22 @@
                             <div class="bg-light p-3 rounded">
                                 <div class="d-flex justify-content-between mb-1 font-size-13">
                                     <span class="text-muted">Subtotal:</span>
-                                    <span class="font-monospace fw-semibold">AED {{ number_format($selectedSale->subtotal, 2) }}</span>
+                                    <span class="font-monospace fw-semibold">{{ currency() }} {{ number_format($selectedSale->subtotal, 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-1 font-size-13">
                                     <span class="text-muted">VAT Amount:</span>
-                                    <span class="font-monospace fw-semibold">AED {{ number_format($selectedSale->vat_amount, 2) }}</span>
+                                    <span class="font-monospace fw-semibold">{{ currency() }} {{ number_format($selectedSale->vat_amount, 2) }}</span>
                                 </div>
                                 @if($selectedSale->discount_amount > 0)
                                     <div class="d-flex justify-content-between mb-1 font-size-13 text-danger">
                                         <span>Discount:</span>
-                                        <span class="font-monospace fw-semibold">- AED {{ number_format($selectedSale->discount_amount, 2) }}</span>
+                                        <span class="font-monospace fw-semibold">- {{ currency() }} {{ number_format($selectedSale->discount_amount, 2) }}</span>
                                     </div>
                                 @endif
                                 <hr class="my-2">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="fw-bold">Grand Total:</span>
-                                    <span class="text-success fw-bold font-monospace fs-5">AED {{ number_format($selectedSale->grand_total, 2) }}</span>
+                                    <span class="text-success fw-bold font-monospace fs-5">{{ currency() }} {{ number_format($selectedSale->grand_total, 2) }}</span>
                                 </div>
                             </div>
                         </div>

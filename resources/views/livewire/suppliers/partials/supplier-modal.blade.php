@@ -56,7 +56,7 @@
     <div class="row">
         @if(!$isEditMode)
             <div class="col-12 col-sm-6 mb-3">
-                <label class="form-label">Opening Balance (AED)</label>
+                <label class="form-label">Opening Balance ({{ currency() }})</label>
                 <input type="number" step="0.01" wire:model="opening_balance" class="form-control" placeholder="0.00">
             </div>
         @endif

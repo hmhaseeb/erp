@@ -21,7 +21,7 @@
         <label class="form-label">Customer <span class="text-danger">*</span></label>
         <x-searchable-select wire:model="customer_id" class="form-select @error('customer_id') is-invalid @enderror" placeholder="Select Customer...">
             @foreach($customers as $c)
-                <option value="{{ $c->id }}">{{ $c->name }} (Receivable: AED {{ number_format($c->current_balance, 2) }})</option>
+                <option value="{{ $c->id }}">{{ $c->name }} (Receivable: {{ currency() }} {{ number_format($c->current_balance, 2) }})</option>
             @endforeach
         </x-searchable-select>
         @error('customer_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
@@ -44,7 +44,7 @@
             @error('quantity') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
         <div class="col-6 col-sm-4 mb-3">
-            <label class="form-label">Unit Price (AED) <span class="text-danger">*</span></label>
+            <label class="form-label">Unit Price ({{ currency() }}) <span class="text-danger">*</span></label>
             <input type="number" step="0.01" wire:model="unit_price" class="form-control @error('unit_price') is-invalid @enderror">
             @error('unit_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>

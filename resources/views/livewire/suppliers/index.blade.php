@@ -82,7 +82,7 @@
                         <td>{{ $s->trn_number ?? '-' }}</td>
                         <td class="text-end">
                             <span class="fw-bold {{ $s->current_balance > 0 ? 'text-danger' : 'text-success' }}">
-                                AED {{ number_format($s->current_balance, 2) }}
+                                {{ currency() }} {{ number_format($s->current_balance, 2) }}
                             </span>
                         </td>
                         <td>

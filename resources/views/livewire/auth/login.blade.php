@@ -11,10 +11,8 @@
                             <img src="{{ asset('storage/' . ($companySetting->login_logo ?: $companySetting->main_logo)) }}" alt="Logo" style="max-height: 55px; max-width: 220px; object-fit: contain;">
                         </div>
                     @else
-                        <div class="avatar-md mx-auto mb-3">
-                            <div class="avatar-title bg-primary-subtle text-primary rounded-circle font-size-28">
-                                <i class="bx bx-store-alt"></i>
-                            </div>
+                        <div class="mb-3">
+                            <img src="{{ asset('assets/images/branding/smallbiz-logo.png') }}" alt="Logo" style="max-height: 55px; max-width: 220px; object-fit: contain;">
                         </div>
                     @endif
                     <h4 class="mb-1 text-dark fw-bold">{{ $companySetting->company_name ?? 'Small Business ERP' }}</h4>

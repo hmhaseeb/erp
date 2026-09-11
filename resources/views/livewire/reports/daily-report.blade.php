@@ -25,7 +25,7 @@
             <x-kpi-card 
                 title="Today's Net Sales" 
                 :amount="$report['sales']['net']" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="success" 
                 :subtitle="$report['sales']['count'] . ' Invoices Issued'" 
                 icon="bx-shopping-bag" />
@@ -34,7 +34,7 @@
             <x-kpi-card 
                 title="Today's Net Purchases" 
                 :amount="$report['purchases']['net']" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="primary" 
                 :subtitle="$report['purchases']['count'] . ' Bills Received'" 
                 icon="bx-cart" />
@@ -43,7 +43,7 @@
             <x-kpi-card 
                 title="Today's Other Income" 
                 :amount="$report['income']" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="info" 
                 :subtitle="$incomes->count() . ' Transactions'" 
                 icon="bx-trending-up" />
@@ -52,7 +52,7 @@
             <x-kpi-card 
                 title="Today's Expenses" 
                 :amount="$report['expense']" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="danger" 
                 :subtitle="$expenses->count() . ' Entries'" 
                 icon="bx-trending-down" />
@@ -66,7 +66,7 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Today's Sales Invoices</h5>
-                    <x-badge type="success" size="font-size-12">Total: AED {{ number_format($report['sales']['gross'], 2) }}</x-badge>
+                    <x-badge type="success" size="font-size-12">Total: {{ currency() }} {{ number_format($report['sales']['gross'], 2) }}</x-badge>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive" style="max-height: 280px;">
@@ -85,7 +85,7 @@
                                         <td><code>{{ $s->invoice_number }}</code></td>
                                         <td>{{ $s->customer->name ?? 'Walk-in' }}</td>
                                         <td><x-badge type="info">{{ $s->payment_type }}</x-badge></td>
-                                        <td class="text-end fw-bold text-success">AED {{ number_format($s->grand_total, 2) }}</td>
+                                        <td class="text-end fw-bold text-success">{{ currency() }} {{ number_format($s->grand_total, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -104,7 +104,7 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Today's Purchase Bills</h5>
-                    <x-badge type="primary" size="font-size-12">Total: AED {{ number_format($report['purchases']['gross'], 2) }}</x-badge>
+                    <x-badge type="primary" size="font-size-12">Total: {{ currency() }} {{ number_format($report['purchases']['gross'], 2) }}</x-badge>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive" style="max-height: 280px;">
@@ -123,7 +123,7 @@
                                         <td><code>{{ $p->purchase_number }}</code></td>
                                         <td>{{ $p->supplier->name ?? '-' }}</td>
                                         <td><x-badge type="primary">{{ $p->payment_type }}</x-badge></td>
-                                        <td class="text-end fw-bold text-dark">AED {{ number_format($p->grand_total, 2) }}</td>
+                                        <td class="text-end fw-bold text-dark">{{ currency() }} {{ number_format($p->grand_total, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -145,7 +145,7 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Today's Income Transactions</h5>
-                    <x-badge type="info" size="font-size-12">Total: AED {{ number_format($report['income'], 2) }}</x-badge>
+                    <x-badge type="info" size="font-size-12">Total: {{ currency() }} {{ number_format($report['income'], 2) }}</x-badge>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive" style="max-height: 240px;">
@@ -164,7 +164,7 @@
                                         <td><x-badge type="success">{{ $inc->category->name ?? 'Income' }}</x-badge></td>
                                         <td>{{ $inc->description ?? '-' }}</td>
                                         <td>{{ $inc->account->name ?? '-' }}</td>
-                                        <td class="text-end fw-bold text-success">AED {{ number_format($inc->amount, 2) }}</td>
+                                        <td class="text-end fw-bold text-success">{{ currency() }} {{ number_format($inc->amount, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -183,7 +183,7 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Today's Expenses</h5>
-                    <x-badge type="danger" size="font-size-12">Total: AED {{ number_format($report['expense'], 2) }}</x-badge>
+                    <x-badge type="danger" size="font-size-12">Total: {{ currency() }} {{ number_format($report['expense'], 2) }}</x-badge>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive" style="max-height: 240px;">
@@ -202,7 +202,7 @@
                                         <td><x-badge type="danger">{{ $exp->category->name ?? 'Expense' }}</x-badge></td>
                                         <td>{{ $exp->description ?? '-' }}</td>
                                         <td>{{ $exp->account->name ?? '-' }}</td>
-                                        <td class="text-end fw-bold text-danger">AED {{ number_format($exp->amount, 2) }}</td>
+                                        <td class="text-end fw-bold text-danger">{{ currency() }} {{ number_format($exp->amount, 2) }}</td>
                                     </tr>
                                 @empty
                                     <tr>

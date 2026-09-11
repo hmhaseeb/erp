@@ -118,9 +118,9 @@
                         <td class="text-end font-monospace {{ $m->quantity_out > 0 ? 'text-danger fw-bold' : 'text-muted' }}">
                             {{ $m->quantity_out > 0 ? '-' . number_format($m->quantity_out, 2) : '-' }}
                         </td>
-                        <td class="text-end text-muted">AED {{ number_format($m->unit_cost, 2) }}</td>
+                        <td class="text-end text-muted">{{ currency() }} {{ number_format($m->unit_cost, 2) }}</td>
                         <td class="text-end fw-bold text-dark">
-                            AED {{ number_format(($m->quantity_in + $m->quantity_out) * $m->unit_cost, 2) }}
+                            {{ currency() }} {{ number_format(($m->quantity_in + $m->quantity_out) * $m->unit_cost, 2) }}
                         </td>
                         <td>
                             <span class="text-truncate d-inline-block" style="max-width: 250px;" title="{{ $m->notes }}">

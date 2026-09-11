@@ -80,7 +80,7 @@
                             @endforeach
                         </td>
                         <td class="text-end fw-bold text-danger">
-                            AED {{ number_format($r->grand_total, 2) }}
+                            {{ currency() }} {{ number_format($r->grand_total, 2) }}
                         </td>
                         <td>{{ $r->return_reason ?? '-' }}</td>
                         <td>

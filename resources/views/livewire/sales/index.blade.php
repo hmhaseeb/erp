@@ -91,10 +91,10 @@
                                 {{ $sale->payment_type }}
                             </x-badge>
                         </td>
-                        <td class="text-end fw-bold text-dark font-monospace">AED {{ number_format($sale->grand_total, 2) }}</td>
-                        <td class="text-end text-success font-monospace">AED {{ number_format($sale->paid_amount, 2) }}</td>
+                        <td class="text-end fw-bold text-dark font-monospace">{{ currency() }} {{ number_format($sale->grand_total, 2) }}</td>
+                        <td class="text-end text-success font-monospace">{{ currency() }} {{ number_format($sale->paid_amount, 2) }}</td>
                         <td class="text-end font-monospace {{ $sale->due_amount > 0 ? 'text-danger fw-bold' : 'text-muted' }}">
-                            AED {{ number_format($sale->due_amount, 2) }}
+                            {{ currency() }} {{ number_format($sale->due_amount, 2) }}
                         </td>
                         <td>
                             <x-badge :type="$sale->status === 'Confirmed' ? 'success' : ($sale->status === 'Cancelled' ? 'danger' : 'warning')">

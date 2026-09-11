@@ -75,12 +75,12 @@
     <div class="form-section-title mt-2">2. Pricing & VAT Details</div>
     <div class="row">
         <div class="col-6 col-sm-4 mb-3">
-            <label class="form-label">Cost Price (AED) <span class="text-danger">*</span></label>
+            <label class="form-label">Cost Price ({{ currency() }}) <span class="text-danger">*</span></label>
             <input type="number" step="0.01" wire:model="purchase_price" class="form-control @error('purchase_price') is-invalid @enderror">
             @error('purchase_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
         <div class="col-6 col-sm-4 mb-3">
-            <label class="form-label">Selling Price (AED) <span class="text-danger">*</span></label>
+            <label class="form-label">Selling Price ({{ currency() }}) <span class="text-danger">*</span></label>
             <input type="number" step="0.01" wire:model="sales_price" class="form-control @error('sales_price') is-invalid @enderror">
             @error('sales_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>

@@ -58,7 +58,7 @@
     <div class="form-section-title mt-2">3. Opening Balance & Payment Terms</div>
     <div class="row">
         <div class="col-12 col-sm-6 mb-3">
-            <label class="form-label font-size-12">Opening Balance (AED)</label>
+            <label class="form-label font-size-12">Opening Balance ({{ currency() }})</label>
             <input type="number" step="0.01" wire:model="supp_opening_balance" class="form-control" placeholder="0.00">
             @error('supp_opening_balance') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>

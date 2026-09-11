@@ -12,7 +12,7 @@
             <x-kpi-card 
                 title="Total Stock Asset Value" 
                 :amount="$totalValuation" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="primary" 
                 subtitle="Weighted Average Cost" 
                 icon="bx-dollar-circle" />
@@ -100,8 +100,8 @@
                     <x-th-sort field="name" :sortField="$sortField" :sortDirection="$sortDirection" style="min-width: 140px;">Product Title</x-th-sort>
                     <th>Category</th>
                     <x-th-sort field="current_stock" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Current Stock</x-th-sort>
-                    <x-th-sort field="weighted_cost" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Avg Cost (AED)</x-th-sort>
-                    <x-th-sort field="sales_price" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Retail Price (AED)</x-th-sort>
+                    <x-th-sort field="weighted_cost" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Avg Cost ({{ currency() }})</x-th-sort>
+                    <x-th-sort field="sales_price" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Retail Price ({{ currency() }})</x-th-sort>
                     <th class="text-end">Total Asset Value</th>
                     <th>Status</th>
                 </tr>
@@ -131,10 +131,10 @@
                                 {{ number_format($p->current_stock, 2) }} {{ $p->unit->name ?? '' }}
                             </x-badge>
                         </td>
-                        <td class="text-end text-muted font-monospace">AED {{ number_format($p->weighted_cost, 2) }}</td>
-                        <td class="text-end text-success font-monospace">AED {{ number_format($p->sales_price, 2) }}</td>
+                        <td class="text-end text-muted font-monospace">{{ currency() }} {{ number_format($p->weighted_cost, 2) }}</td>
+                        <td class="text-end text-success font-monospace">{{ currency() }} {{ number_format($p->sales_price, 2) }}</td>
                         <td class="text-end fw-bold text-primary font-monospace font-size-14">
-                            AED {{ number_format($p->current_stock * $p->weighted_cost, 2) }}
+                            {{ currency() }} {{ number_format($p->current_stock * $p->weighted_cost, 2) }}
                         </td>
                         <td>
                             @if($p->current_stock <= 0)

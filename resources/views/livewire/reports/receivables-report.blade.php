@@ -12,7 +12,7 @@
             <x-kpi-card 
                 title="Total Outstanding Receivables" 
                 :amount="$totalReceivable" 
-                prefix="AED " 
+                prefix="{{ currency() }} " 
                 color="danger" 
                 subtitle="Customer balances due" 
                 icon="bx-dollar-circle" />
@@ -89,9 +89,9 @@
                         </td>
                         <td>{{ $c->mobile ?? '-' }}</td>
                         <td>{{ $c->contact_person ?? '-' }}</td>
-                        <td class="text-end text-muted font-monospace">AED {{ number_format($c->credit_limit, 2) }}</td>
+                        <td class="text-end text-muted font-monospace">{{ currency() }} {{ number_format($c->credit_limit, 2) }}</td>
                         <td class="text-end font-monospace fw-bold font-size-14 {{ $c->current_balance > 0 ? 'text-danger' : 'text-success' }}">
-                            AED {{ number_format($c->current_balance, 2) }}
+                            {{ currency() }} {{ number_format($c->current_balance, 2) }}
                         </td>
                         <td class="text-center">
                             <button wire:click="viewCustomerInvoices({{ $c->id }})" class="btn btn-sm btn-outline-primary" title="View Unpaid Invoices">

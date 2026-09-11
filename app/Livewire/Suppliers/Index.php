@@ -190,8 +190,8 @@ class Index extends Component
     {
         $supplier = Supplier::findOrFail($id);
         if ($supplier->current_balance != 0) {
-            session()->flash('error', "Cannot delete supplier with an outstanding balance (AED {$supplier->current_balance}).");
-            $this->dispatch('toast', message: "Cannot delete supplier with an outstanding balance (AED {$supplier->current_balance}).", type: 'danger', title: 'Action Denied');
+            session()->flash('error', "Cannot delete supplier with an outstanding balance (" . currency() . " {$supplier->current_balance}).");
+            $this->dispatch('toast', message: "Cannot delete supplier with an outstanding balance (" . currency() . " {$supplier->current_balance}).", type: 'danger', title: 'Action Denied');
             return;
         }
 

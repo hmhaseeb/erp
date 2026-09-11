@@ -91,10 +91,10 @@
                                 {{ $pur->payment_type }}
                             </x-badge>
                         </td>
-                        <td class="text-end fw-bold text-dark">AED {{ number_format($pur->grand_total, 2) }}</td>
-                        <td class="text-end text-success">AED {{ number_format($pur->paid_amount, 2) }}</td>
+                        <td class="text-end fw-bold text-dark">{{ currency() }} {{ number_format($pur->grand_total, 2) }}</td>
+                        <td class="text-end text-success">{{ currency() }} {{ number_format($pur->paid_amount, 2) }}</td>
                         <td class="text-end font-monospace {{ $pur->due_amount > 0 ? 'text-danger fw-bold' : 'text-muted' }}">
-                            AED {{ number_format($pur->due_amount, 2) }}
+                            {{ currency() }} {{ number_format($pur->due_amount, 2) }}
                         </td>
                         <td>
                             <x-badge :type="$pur->status === 'Confirmed' ? 'success' : ($pur->status === 'Cancelled' ? 'danger' : 'warning')">
