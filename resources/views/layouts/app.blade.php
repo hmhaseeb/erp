@@ -293,6 +293,87 @@
             min-height: 0 !important;
         }
 
+        /* Mobile Responsive Inventory Cards & Table System */
+        .inventory-mobile-card {
+            background: #ffffff;
+            border: 1px solid #e9edf4;
+            border-radius: 10px;
+            padding: 0.95rem;
+            margin-bottom: 0.85rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            transition: all 0.2s ease-in-out;
+            overflow: hidden;
+            word-break: break-word;
+        }
+        .inventory-mobile-card:hover {
+            border-color: #d1d9e6;
+            box-shadow: 0 4px 12px rgba(81, 86, 190, 0.08);
+        }
+        .inventory-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px dashed #edf2f7;
+            margin-bottom: 0.75rem;
+        }
+        .inventory-card-title {
+            font-size: 14.5px;
+            font-weight: 600;
+            color: #2a3042;
+            line-height: 1.35;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+        .inventory-card-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.65rem;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 0.65rem 0.85rem;
+            margin: 0.75rem 0;
+            border: 1px solid #f1f5f9;
+        }
+        .inventory-detail-box {
+            background: #fdfdfe;
+            border: 1px solid #eef2f7;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-top: 0.65rem;
+        }
+        .inventory-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.35rem 0;
+            border-bottom: 1px solid #f3f6f9;
+            font-size: 12.5px;
+        }
+        .inventory-detail-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .inventory-card-actions .btn {
+            min-height: 38px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+        @media (max-width: 767.98px) {
+            .page-content {
+                padding: calc(55px + 0.75rem) calc(0.75rem) 40px calc(0.75rem) !important;
+                overflow-x: hidden !important;
+            }
+            .card-body {
+                padding: 1rem !important;
+            }
+        }
+
         /* Print Styles */
         @media print {
             body {
