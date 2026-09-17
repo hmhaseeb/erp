@@ -133,6 +133,7 @@
                                 <tr>
                                     <th>Invoice #</th>
                                     <th>Date</th>
+                                    <th>Sales Person</th>
                                     <th>Payment Type</th>
                                     <th class="text-end">Grand Total</th>
                                     <th class="text-end">Paid Amount</th>
@@ -144,6 +145,7 @@
                                     <tr>
                                         <td><code>{{ $sale->invoice_number }}</code></td>
                                         <td>{{ $sale->sale_date }}</td>
+                                        <td><span class="text-dark">{{ $sale->sales_person ?: '-' }}</span></td>
                                         <td><x-badge type="info">{{ $sale->payment_type }}</x-badge></td>
                                         <td class="text-end font-monospace">{{ currency() }} {{ number_format($sale->grand_total, 2) }}</td>
                                         <td class="text-end font-monospace text-success">{{ currency() }} {{ number_format($sale->paid_amount, 2) }}</td>
@@ -151,7 +153,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-3 text-muted">No sales invoices recorded for this customer.</td>
+                                        <td colspan="7" class="text-center py-3 text-muted">No sales invoices recorded for this customer.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

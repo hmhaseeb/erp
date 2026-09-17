@@ -28,10 +28,8 @@
                                 <p class="mb-1 text-muted"><strong>Company:</strong> {{ $selectedSale->customer->company_name }}</p>
                             @endif
                             <p class="mb-1"><strong>Sale Date:</strong> {{ $selectedSale->sale_date }}</p>
+                            <p class="mb-1"><strong>Sales Person:</strong> <span class="fw-semibold text-dark">{{ $selectedSale->sales_person ?: '-' }}</span></p>
                             <p class="mb-1"><strong>Payment Method:</strong> {{ $selectedSale->payment_type }}</p>
-                            @if(!empty($selectedSale->sales_person))
-                                <p class="mb-0"><strong>Sales Person:</strong> {{ $selectedSale->sales_person }}</p>
-                            @endif
                         </div>
                         <div class="col-12 col-md-5 text-start text-md-end mt-2 mt-md-0">
                             <div class="mb-2">

@@ -67,6 +67,7 @@
                     <x-th-sort field="purchase_number" :sortField="$sortField" :sortDirection="$sortDirection" width="130px">Purchase #</x-th-sort>
                     <x-th-sort field="purchase_date" :sortField="$sortField" :sortDirection="$sortDirection" width="110px">Date</x-th-sort>
                     <th style="min-width: 140px;">Supplier</th>
+                    <x-th-sort field="sales_person" :sortField="$sortField" :sortDirection="$sortDirection" style="min-width: 130px;">Sales Person</x-th-sort>
                     <th>Payment Type</th>
                     <x-th-sort field="grand_total" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Grand Total</x-th-sort>
                     <th class="text-end">Paid Amount</th>
@@ -85,6 +86,9 @@
                             @if($pur->supplier && $pur->supplier->company_name)
                                 <small class="text-muted d-block">{{ $pur->supplier->company_name }}</small>
                             @endif
+                        </td>
+                        <td>
+                            <span class="text-dark fw-medium">{{ $pur->sales_person ?: '-' }}</span>
                         </td>
                         <td>
                             <x-badge :type="$pur->payment_type === 'Cash' ? 'success' : ($pur->payment_type === 'Bank' ? 'info' : 'warning')">
@@ -109,7 +113,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9">
+                        <td colspan="10">
                             <x-empty-state 
                                 icon="bx bx-shopping-bag" 
                                 title="No purchase invoices created yet" 

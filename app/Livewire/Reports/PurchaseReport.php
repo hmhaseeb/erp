@@ -81,7 +81,7 @@ class PurchaseReport extends Component
 
     public function render()
     {
-        $query = Purchase::select('id', 'purchase_number', 'reference_number', 'purchase_date', 'supplier_id', 'payment_type', 'subtotal', 'vat_amount', 'grand_total', 'paid_amount', 'due_amount', 'status')
+        $query = Purchase::select('id', 'purchase_number', 'reference_number', 'sales_person', 'purchase_date', 'supplier_id', 'payment_type', 'subtotal', 'vat_amount', 'grand_total', 'paid_amount', 'due_amount', 'status')
             ->with('supplier:id,name,company_name')
             ->whereBetween('purchase_date', [$this->start_date, $this->end_date])
             ->where('status', 'Confirmed');
@@ -90,6 +90,7 @@ class PurchaseReport extends Component
             $query->where(function ($q) {
                 $q->where('purchase_number', 'like', '%' . $this->search . '%')
                   ->orWhere('reference_number', 'like', '%' . $this->search . '%')
+                  ->orWhere('sales_person', 'like', '%' . $this->search . '%')
                   ->orWhere('payment_type', 'like', '%' . $this->search . '%')
                   ->orWhereHas('supplier', function ($sq) {
                       $sq->where('name', 'like', '%' . $this->search . '%')

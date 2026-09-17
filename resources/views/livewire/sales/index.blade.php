@@ -64,9 +64,10 @@
         <table class="table align-middle table-hover table-nowrap mb-0 font-size-13">
             <thead class="table-light">
                 <tr>
-                    <x-th-sort field="invoice_number" :sortField="$sortField" :sortDirection="$sortDirection" width="130px">Invoice #</x-th-sort>
+                    <x-th-sort field="invoice_number" :sortField="$sortField" :sortDirection="$sortDirection" width="140px">Invoice #</x-th-sort>
                     <x-th-sort field="sale_date" :sortField="$sortField" :sortDirection="$sortDirection" width="110px">Date</x-th-sort>
-                    <th>Customer</th>
+                    <th style="min-width: 150px;">Customer</th>
+                    <x-th-sort field="sales_person" :sortField="$sortField" :sortDirection="$sortDirection" style="min-width: 130px;">Sales Person</x-th-sort>
                     <th>Payment Type</th>
                     <x-th-sort field="grand_total" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Grand Total</x-th-sort>
                     <th class="text-end">Paid Amount</th>
@@ -85,6 +86,9 @@
                             @if($sale->customer && $sale->customer->company_name)
                                 <small class="text-muted d-block font-size-11">{{ $sale->customer->company_name }}</small>
                             @endif
+                        </td>
+                        <td>
+                            <span class="text-dark fw-medium">{{ $sale->sales_person ?: '-' }}</span>
                         </td>
                         <td>
                             <x-badge :type="$sale->payment_type === 'Cash' ? 'success' : ($sale->payment_type === 'Bank' ? 'info' : 'warning')">
@@ -114,7 +118,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9">
+                        <td colspan="10">
                             <x-empty-state 
                                 icon="bx bx-shopping-bag" 
                                 title="No sales invoices found" 

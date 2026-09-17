@@ -155,4 +155,54 @@ class InvoicePaymentTypeAndSalesPersonTest extends TestCase
         $this->assertEquals('Credit', $purchase->payment_type);
         $this->assertNull($purchase->account_id);
     }
+
+    public function test_sales_index_table_and_view_modal_display_sales_person()
+    {
+        $sale = Sale::create([
+            'invoice_number' => 'INV-SP-TEST-001',
+            'sale_date' => now()->toDateString(),
+            'customer_id' => $this->customer->id,
+            'sales_person' => 'Michael Scott',
+            'payment_type' => 'Cash',
+            'subtotal' => 200,
+            'vat_amount' => 10,
+            'grand_total' => 210,
+            'paid_amount' => 210,
+            'due_amount' => 0,
+            'status' => 'Confirmed',
+        ]);
+
+        Livewire::actingAs($this->user)
+            ->test(\App\Livewire\Sales\Index::class)
+            ->assertSee('Sales Person')
+            ->assertSee('Michael Scott')
+            ->call('viewDetails', $sale->id)
+            ->assertSee('Sales Person:')
+            ->assertSee('Michael Scott');
+    }
+
+    public function test_purchases_index_table_and_view_modal_display_sales_person()
+    {
+        $purchase = Purchase::create([
+            'purchase_number' => 'PUR-SP-TEST-001',
+            'purchase_date' => now()->toDateString(),
+            'supplier_id' => $this->supplier->id,
+            'sales_person' => 'Dwight Schrute',
+            'payment_type' => 'Cash',
+            'subtotal' => 500,
+            'vat_amount' => 25,
+            'grand_total' => 525,
+            'paid_amount' => 525,
+            'due_amount' => 0,
+            'status' => 'Confirmed',
+        ]);
+
+        Livewire::actingAs($this->user)
+            ->test(\App\Livewire\Purchases\Index::class)
+            ->assertSee('Sales Person')
+            ->assertSee('Dwight Schrute')
+            ->call('viewDetails', $purchase->id)
+            ->assertSee('Sales Person:')
+            ->assertSee('Dwight Schrute');
+    }
 }

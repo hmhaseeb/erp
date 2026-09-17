@@ -28,6 +28,7 @@
                                 <p class="mb-1 text-muted"><strong>Company:</strong> {{ $selectedPurchase->supplier->company_name }}</p>
                             @endif
                             <p class="mb-1"><strong>Date:</strong> {{ $selectedPurchase->purchase_date }}</p>
+                            <p class="mb-1"><strong>Sales Person:</strong> <span class="fw-semibold text-dark">{{ $selectedPurchase->sales_person ?: '-' }}</span></p>
                             <p class="mb-0"><strong>Payment Method:</strong> {{ $selectedPurchase->payment_type }}</p>
                         </div>
                         <div class="col-12 col-md-6 text-start text-md-end">
@@ -39,9 +40,6 @@
                             </p>
                             @if($selectedPurchase->reference_number)
                                 <p class="mb-1 text-muted"><strong>Supplier Bill Ref:</strong> {{ $selectedPurchase->reference_number }}</p>
-                            @endif
-                            @if(!empty($selectedPurchase->sales_person))
-                                <p class="mb-1 text-muted"><strong>Sales Person:</strong> {{ $selectedPurchase->sales_person }}</p>
                             @endif
                         </div>
                     </div>

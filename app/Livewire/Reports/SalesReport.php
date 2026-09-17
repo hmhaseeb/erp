@@ -81,7 +81,7 @@ class SalesReport extends Component
 
     public function render()
     {
-        $query = Sale::select('id', 'invoice_number', 'sale_date', 'customer_id', 'payment_type', 'subtotal', 'vat_amount', 'grand_total', 'paid_amount', 'due_amount', 'status')
+        $query = Sale::select('id', 'invoice_number', 'sale_date', 'customer_id', 'sales_person', 'payment_type', 'subtotal', 'vat_amount', 'grand_total', 'paid_amount', 'due_amount', 'status')
             ->with('customer:id,name,company_name')
             ->whereBetween('sale_date', [$this->start_date, $this->end_date])
             ->where('status', 'Confirmed');
@@ -89,6 +89,7 @@ class SalesReport extends Component
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('invoice_number', 'like', '%' . $this->search . '%')
+                  ->orWhere('sales_person', 'like', '%' . $this->search . '%')
                   ->orWhere('payment_type', 'like', '%' . $this->search . '%')
                   ->orWhereHas('customer', function ($cq) {
                       $cq->where('name', 'like', '%' . $this->search . '%')

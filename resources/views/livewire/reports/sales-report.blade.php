@@ -107,6 +107,7 @@
                     <x-th-sort field="invoice_number" :sortField="$sortField" :sortDirection="$sortDirection" width="130px">Invoice #</x-th-sort>
                     <x-th-sort field="sale_date" :sortField="$sortField" :sortDirection="$sortDirection" width="110px">Date</x-th-sort>
                     <th style="min-width: 140px;">Customer</th>
+                    <x-th-sort field="sales_person" :sortField="$sortField" :sortDirection="$sortDirection" style="min-width: 130px;">Sales Person</x-th-sort>
                     <th>Payment Type</th>
                     <th class="text-end">Subtotal (Excl. {{ tax_name() }})</th>
                     <th class="text-end text-info">{{ tax_name() }} Amount</th>
@@ -122,6 +123,9 @@
                             <span class="fw-semibold text-dark">{{ $s->customer->name ?? 'Walk-in Customer' }}</span>
                         </td>
                         <td>
+                            <span class="text-dark fw-medium">{{ $s->sales_person ?: '-' }}</span>
+                        </td>
+                        <td>
                             <x-badge :type="$s->payment_type === 'Cash' ? 'success' : ($s->payment_type === 'Bank' ? 'info' : 'warning')">
                                 {{ $s->payment_type }}
                             </x-badge>
@@ -132,7 +136,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7">
+                        <td colspan="8">
                             <x-empty-state 
                                 icon="bx bx-file-blank" 
                                 title="No sales invoices found" 
