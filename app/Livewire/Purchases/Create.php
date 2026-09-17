@@ -14,8 +14,8 @@ class Create extends Component
 {
     use WithFileUploads;
 
-    public $purchase_number, $purchase_date, $supplier_id, $reference_number;
-    public $payment_type = 'Credit', $account_id;
+    public $purchase_number, $purchase_date, $supplier_id, $reference_number, $sales_person = '';
+    public $payment_type = '', $account_id = null;
     public $notes;
 
     public $items = [];
@@ -47,11 +47,6 @@ class Create extends Component
             $this->supplier_id = $firstSupplier->id;
         }
 
-        $firstAccount = Account::first();
-        if ($firstAccount) {
-            $this->account_id = $firstAccount->id;
-        }
-
         // Add 1 default row
         $this->addItem();
     }
@@ -59,6 +54,29 @@ class Create extends Component
     public function updatedPurchaseDate()
     {
         $this->generatePurchaseNumber();
+    }
+
+    public function updatedPaymentType($value)
+    {
+        $this->resetErrorBag('payment_type');
+        if (in_array($value, ['Cash', 'Bank'])) {
+            if (!$this->account_id) {
+                $account = Account::where('status', true);
+                if ($value === 'Cash') {
+                    $account = $account->where('type', 'Cash')->first() ?: Account::where('status', true)->first();
+                } elseif ($value === 'Bank') {
+                    $account = $account->where('type', 'Bank')->first() ?: Account::where('status', true)->first();
+                } else {
+                    $account = $account->first();
+                }
+                if ($account) {
+                    $this->account_id = $account->id;
+                }
+            }
+        } else {
+            $this->account_id = null;
+            $this->resetErrorBag('account_id');
+        }
     }
 
     public function generatePurchaseNumber()
@@ -189,6 +207,8 @@ class Create extends Component
             'purchase_number' => 'required|string|unique:purchases,purchase_number',
             'purchase_date' => 'required|date',
             'supplier_id' => 'required|exists:suppliers,id',
+            'reference_number' => 'nullable|string|max:100',
+            'sales_person' => 'nullable|string|max:191',
             'payment_type' => 'required|in:Cash,Bank,Credit',
             'account_id' => 'required_if:payment_type,Cash,Bank|nullable|exists:accounts,id',
             'items' => 'required|array|min:1',
@@ -198,6 +218,9 @@ class Create extends Component
             'discount_amount' => 'numeric|min:0',
         ], [
             'supplier_id.required' => 'Please select a supplier.',
+            'payment_type.required' => 'Please select a payment type.',
+            'payment_type.in' => 'Please select a valid payment type.',
+            'account_id.required_if' => 'Please select a payment account.',
             'items.*.product_id.required' => 'Please select a product for all invoice items.',
             'items.*.product_id.exists' => 'Selected product is invalid.',
             'items.*.quantity.required' => 'Quantity is required.',
@@ -217,8 +240,9 @@ class Create extends Component
             'purchase_date' => $this->purchase_date,
             'supplier_id' => $this->supplier_id,
             'reference_number' => $this->reference_number,
+            'sales_person' => !empty(trim($this->sales_person ?? '')) ? trim($this->sales_person) : null,
             'payment_type' => $this->payment_type,
-            'account_id' => $this->account_id,
+            'account_id' => in_array($this->payment_type, ['Cash', 'Bank']) ? $this->account_id : null,
             'subtotal' => $this->subtotal,
             'discount_amount' => (float)$this->discount_amount,
             'vat_amount' => $this->vat_amount,

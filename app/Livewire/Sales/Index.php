@@ -102,12 +102,13 @@ class Index extends Component
 
     public function render()
     {
-        $query = Sale::select('id', 'invoice_number', 'sale_date', 'customer_id', 'account_id', 'payment_type', 'grand_total', 'paid_amount', 'due_amount', 'status')
+        $query = Sale::select('id', 'invoice_number', 'sale_date', 'customer_id', 'sales_person', 'account_id', 'payment_type', 'grand_total', 'paid_amount', 'due_amount', 'status')
             ->with(['customer:id,name,company_name', 'account:id,name']);
 
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('invoice_number', 'like', '%' . $this->search . '%')
+                  ->orWhere('sales_person', 'like', '%' . $this->search . '%')
                   ->orWhere('payment_type', 'like', '%' . $this->search . '%')
                   ->orWhere('grand_total', 'like', '%' . $this->search . '%')
                   ->orWhereHas('customer', function ($cq) {

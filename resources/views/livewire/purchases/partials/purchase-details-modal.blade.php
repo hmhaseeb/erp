@@ -40,6 +40,9 @@
                             @if($selectedPurchase->reference_number)
                                 <p class="mb-1 text-muted"><strong>Supplier Bill Ref:</strong> {{ $selectedPurchase->reference_number }}</p>
                             @endif
+                            @if(!empty($selectedPurchase->sales_person))
+                                <p class="mb-1 text-muted"><strong>Sales Person:</strong> {{ $selectedPurchase->sales_person }}</p>
+                            @endif
                         </div>
                     </div>
 

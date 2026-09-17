@@ -102,13 +102,14 @@ class Index extends Component
 
     public function render()
     {
-        $query = Purchase::select('id', 'purchase_number', 'reference_number', 'purchase_date', 'supplier_id', 'account_id', 'payment_type', 'grand_total', 'paid_amount', 'due_amount', 'status')
+        $query = Purchase::select('id', 'purchase_number', 'reference_number', 'sales_person', 'purchase_date', 'supplier_id', 'account_id', 'payment_type', 'grand_total', 'paid_amount', 'due_amount', 'status')
             ->with(['supplier:id,name,company_name', 'account:id,name']);
 
         if ($this->search) {
             $query->where(function ($q) {
                 $q->where('purchase_number', 'like', '%' . $this->search . '%')
                   ->orWhere('reference_number', 'like', '%' . $this->search . '%')
+                  ->orWhere('sales_person', 'like', '%' . $this->search . '%')
                   ->orWhere('payment_type', 'like', '%' . $this->search . '%')
                   ->orWhere('grand_total', 'like', '%' . $this->search . '%')
                   ->orWhereHas('supplier', function ($sq) {

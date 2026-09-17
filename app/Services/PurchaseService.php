@@ -36,6 +36,7 @@ class PurchaseService
                 'purchase_date' => $header['purchase_date'],
                 'supplier_id' => $header['supplier_id'],
                 'reference_number' => $header['reference_number'] ?? null,
+                'sales_person' => $header['sales_person'] ?? null,
                 'payment_type' => $header['payment_type'],
                 'account_id' => $header['account_id'] ?? null,
                 'subtotal' => $header['subtotal'],

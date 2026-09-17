@@ -97,6 +97,7 @@ class SalesService
                 'invoice_number' => $invNum,
                 'sale_date' => $header['sale_date'],
                 'customer_id' => $header['customer_id'],
+                'sales_person' => $header['sales_person'] ?? null,
                 'payment_type' => $header['payment_type'],
                 'account_id' => $header['account_id'] ?? null,
                 'subtotal' => $header['subtotal'],

@@ -39,23 +39,30 @@
                         </x-searchable-select>
                         @error('customer_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
-                    <div class="col-12 col-sm-6 col-lg-3 {{ $payment_type !== 'Credit' ? 'col-xl-2' : 'col-xl-5' }}">
+                    <div class="col-12 col-sm-6 col-lg-3 col-xl-2">
+                        <label class="form-label font-size-13 fw-semibold">Sales Person Name <span class="text-muted font-size-11 fw-normal">(Optional)</span></label>
+                        <input type="text" wire:model="sales_person" class="form-control" placeholder="e.g. Sales Rep / Agent">
+                    </div>
+                    <div class="col-12 col-sm-6 col-lg-3 col-xl-3">
                         <label class="form-label font-size-13 fw-semibold">Payment Type <span class="text-danger">*</span></label>
-                        <x-searchable-select wire:model.live="payment_type" class="form-select">
+                        <x-searchable-select wire:model.live="payment_type" class="form-select {{ $errors->has('payment_type') ? 'is-invalid' : '' }}" placeholder="Select Payment Type">
+                            <option value="">Select Payment Type</option>
                             <option value="Cash">Cash Sale</option>
                             <option value="Bank">Bank / Online</option>
                             <option value="Credit">Credit (Receivable)</option>
                         </x-searchable-select>
+                        @error('payment_type') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                     </div>
-                    @if($payment_type !== 'Credit')
-                        <div class="col-12 col-sm-6 col-lg-12 col-xl-3">
+                    @if(in_array($payment_type, ['Cash', 'Bank']))
+                        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
                             <label class="form-label font-size-13 fw-semibold">Deposit Account <span class="text-danger">*</span></label>
                             <x-searchable-select wire:model="account_id" class="form-select {{ $errors->has('account_id') ? 'is-invalid' : '' }}" placeholder="Select Account...">
+                                <option value="">Select Account...</option>
                                 @foreach($accounts as $acc)
                                     <option value="{{ $acc->id }}">{{ $acc->name }} ({{ $acc->type }}) - {{ currency() }} {{ number_format($acc->current_balance, 2) }}</option>
                                 @endforeach
                             </x-searchable-select>
-                            @error('account_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            @error('account_id') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                         </div>
                     @endif
                 </div>

@@ -31,7 +31,7 @@ class SalesStockValidationTest extends TestCase
     public function test_cannot_sell_quantity_exceeding_available_stock_in_livewire_update()
     {
         $user = User::first();
-        $cat = ProductCategory::first() ?? ProductCategory::create(['name' => 'General', 'slug' => 'general']);
+        $cat = ProductCategory::first() ?? ProductCategory::create(['name' => 'General', 'code' => 'GEN']);
         $unit = Unit::first() ?? Unit::create(['name' => 'PCS', 'code' => 'PCS']);
 
         $product = Product::create([
@@ -57,7 +57,7 @@ class SalesStockValidationTest extends TestCase
     public function test_cannot_sell_zero_or_negative_quantity()
     {
         $user = User::first();
-        $cat = ProductCategory::first() ?? ProductCategory::create(['name' => 'General', 'slug' => 'general']);
+        $cat = ProductCategory::first() ?? ProductCategory::create(['name' => 'General', 'code' => 'GEN']);
         $unit = Unit::first() ?? Unit::create(['name' => 'PCS', 'code' => 'PCS']);
 
         $product = Product::create([
@@ -82,7 +82,7 @@ class SalesStockValidationTest extends TestCase
     public function test_cannot_submit_invoice_with_quantity_exceeding_stock()
     {
         $user = User::first();
-        $cat = ProductCategory::first() ?? ProductCategory::create(['name' => 'General', 'slug' => 'general']);
+        $cat = ProductCategory::first() ?? ProductCategory::create(['name' => 'General', 'code' => 'GEN']);
         $unit = Unit::first() ?? Unit::create(['name' => 'PCS', 'code' => 'PCS']);
 
         $product = Product::create([
@@ -103,7 +103,7 @@ class SalesStockValidationTest extends TestCase
         ]);
 
         $account = Account::first() ?? Account::create([
-            'code' => 'ACC-002',
+            'account_number' => 'ACC-002',
             'name' => 'Bank Account',
             'type' => 'Bank',
             'status' => true,
@@ -133,7 +133,7 @@ class SalesStockValidationTest extends TestCase
     public function test_valid_sale_deducts_stock_correctly()
     {
         $user = User::first();
-        $cat = ProductCategory::first() ?? ProductCategory::create(['name' => 'General', 'slug' => 'general']);
+        $cat = ProductCategory::first() ?? ProductCategory::create(['name' => 'General', 'code' => 'GEN']);
         $unit = Unit::first() ?? Unit::create(['name' => 'PCS', 'code' => 'PCS']);
 
         $product = Product::create([
@@ -155,7 +155,7 @@ class SalesStockValidationTest extends TestCase
         ]);
 
         $account = Account::first() ?? Account::create([
-            'code' => 'ACC-003',
+            'account_number' => 'ACC-003',
             'name' => 'Main Cash',
             'type' => 'Cash',
             'status' => true,

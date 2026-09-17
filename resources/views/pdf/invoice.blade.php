@@ -40,6 +40,9 @@
                         <strong>Invoice #:</strong> {{ $sale->invoice_number }}<br>
                         <strong>Date:</strong> {{ $sale->sale_date }}<br>
                         <strong>Payment Type:</strong> {{ $sale->payment_type }}
+                        @if(!empty($sale->sales_person))
+                            <br><strong>Sales Person:</strong> {{ $sale->sales_person }}
+                        @endif
                     </div>
                 </td>
             </tr>
