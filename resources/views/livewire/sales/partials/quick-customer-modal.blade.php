@@ -29,8 +29,8 @@
             @error('cust_name') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
         <div class="col-12 col-sm-6 mb-3">
-            <label class="form-label font-size-12">TRN / Tax Number</label>
-            <input type="text" wire:model="cust_trn_number" class="form-control" placeholder="15-digit TRN">
+            <label class="form-label font-size-12">{{ tax_number_name() }} / Tax Number</label>
+            <input type="text" wire:model="cust_trn_number" class="form-control" placeholder="{{ tax_number_name() }} Number">
         </div>
     </div>
 

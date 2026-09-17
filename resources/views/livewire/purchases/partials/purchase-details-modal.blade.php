@@ -54,7 +54,7 @@
                                     <th class="text-end text-nowrap">Qty</th>
                                     <th class="text-end text-nowrap">Unit Cost</th>
                                     <th class="text-end text-nowrap">Discount</th>
-                                    <th class="text-end text-nowrap">VAT</th>
+                                    <th class="text-end text-nowrap">{{ tax_name() }}</th>
                                     <th class="text-end text-nowrap">Line Total</th>
                                 </tr>
                             </thead>
@@ -88,7 +88,7 @@
                                     <strong>{{ currency() }} {{ number_format($selectedPurchase->subtotal, 2) }}</strong>
                                 </div>
                                 <div class="d-flex justify-content-between mb-1 font-size-13">
-                                    <span class="text-muted">VAT Amount:</span>
+                                    <span class="text-muted">{{ tax_name() }} Amount:</span>
                                     <strong>{{ currency() }} {{ number_format($selectedPurchase->vat_amount, 2) }}</strong>
                                 </div>
                                 @if($selectedPurchase->discount_amount > 0)

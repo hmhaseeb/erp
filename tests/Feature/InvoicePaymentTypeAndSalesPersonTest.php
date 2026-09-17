@@ -88,12 +88,12 @@ class InvoicePaymentTypeAndSalesPersonTest extends TestCase
         $this->assertNull($comp->get('account_id'));
         $this->assertEquals('', $comp->get('sales_person'));
 
-        // Attempting to save without selecting payment type triggers validation error
+        // Attempting to save without selecting payment type and sales person triggers validation error
         $comp->set('customer_id', $this->customer->id)
             ->set('items.0.product_id', $this->product->id)
             ->set('items.0.quantity', 2)
             ->call('saveSale')
-            ->assertHasErrors(['payment_type']);
+            ->assertHasErrors(['payment_type', 'sales_person']);
     }
 
     public function test_sales_create_switches_accounts_and_saves_sales_person()
@@ -126,13 +126,13 @@ class InvoicePaymentTypeAndSalesPersonTest extends TestCase
         $this->assertNull($comp->get('account_id'));
         $this->assertEquals('', $comp->get('sales_person'));
 
-        // Attempting to save without selecting payment type triggers validation error
+        // Attempting to save without selecting payment type and sales person triggers validation error
         $comp->set('supplier_id', $this->supplier->id)
             ->set('items.0.product_id', $this->product->id)
             ->set('items.0.quantity', 5)
             ->set('items.0.unit_price', 100)
             ->call('savePurchase')
-            ->assertHasErrors(['payment_type']);
+            ->assertHasErrors(['payment_type', 'sales_person']);
     }
 
     public function test_purchases_create_switches_accounts_and_saves_sales_person()

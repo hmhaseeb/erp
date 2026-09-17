@@ -54,7 +54,7 @@
                                     <th class="text-end text-nowrap" style="min-width: 60px;">Qty</th>
                                     <th class="text-end text-nowrap" style="min-width: 95px;">Selling Price</th>
                                     <th class="text-end text-nowrap" style="min-width: 80px;">Discount</th>
-                                    <th class="text-end text-nowrap" style="min-width: 70px;">VAT</th>
+                                    <th class="text-end text-nowrap" style="min-width: 70px;">{{ tax_name() }}</th>
                                     <th class="text-end text-nowrap" style="min-width: 95px;">Line Total</th>
                                 </tr>
                             </thead>
@@ -92,7 +92,7 @@
                                     <span class="font-monospace fw-semibold">{{ currency() }} {{ number_format($selectedSale->subtotal, 2) }}</span>
                                 </div>
                                 <div class="d-flex justify-content-between mb-1 font-size-13">
-                                    <span class="text-muted">VAT Amount:</span>
+                                    <span class="text-muted">{{ tax_name() }} Amount:</span>
                                     <span class="font-monospace fw-semibold">{{ currency() }} {{ number_format($selectedSale->vat_amount, 2) }}</span>
                                 </div>
                                 @if($selectedSale->discount_amount > 0)

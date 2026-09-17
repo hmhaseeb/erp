@@ -40,8 +40,9 @@
                         @error('customer_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-12 col-sm-6 col-lg-3 col-xl-2">
-                        <label class="form-label font-size-13 fw-semibold">Sales Person Name <span class="text-muted font-size-11 fw-normal">(Optional)</span></label>
-                        <input type="text" wire:model="sales_person" class="form-control" placeholder="e.g. Sales Rep / Agent">
+                        <label class="form-label font-size-13 fw-semibold">Sales Person Name <span class="text-danger">*</span></label>
+                        <input type="text" wire:model="sales_person" class="form-control {{ $errors->has('sales_person') ? 'is-invalid' : '' }}" placeholder="e.g. Sales Rep / Agent">
+                        @error('sales_person') <div class="invalid-feedback d-block">{{ $message }}</div> @enderror
                     </div>
                     <div class="col-12 col-sm-6 col-lg-3 col-xl-3">
                         <label class="form-label font-size-13 fw-semibold">Payment Type <span class="text-danger">*</span></label>
@@ -90,7 +91,7 @@
                                 <th style="width: 38%; min-width: 260px;">Product</th>
                                 <th style="width: 12%; min-width: 90px;" class="text-center">Qty</th>
                                 <th style="width: 16%; min-width: 130px;" class="text-end">Unit Selling Price ({{ currency() }})</th>
-                                <th style="width: 10%; min-width: 90px;" class="text-center">VAT %</th>
+                                <th style="width: 10%; min-width: 90px;" class="text-center">{{ tax_name() }} %</th>
                                 <th style="width: 16%; min-width: 120px;" class="text-end">Line Total</th>
                                 <th style="width: 8%; min-width: 60px;" class="text-center">Action</th>
                             </tr>
@@ -212,7 +213,7 @@
                                 <input type="number" step="0.01" wire:model.live.debounce.300ms="discount_amount" class="form-control form-control-sm text-end font-monospace" style="width: 120px; max-width: 45%;" placeholder="0.00">
                             </div>
                             <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted">VAT Total:</span>
+                                <span class="text-muted">{{ tax_name() }} Total:</span>
                                 <span class="fw-bold font-monospace">{{ currency() }} {{ number_format($vat_amount, 2) }}</span>
                             </div>
                             <hr class="my-2">

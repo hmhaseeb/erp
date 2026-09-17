@@ -69,6 +69,46 @@ class CompanySettings extends Component
         if ($value !== 'CUSTOM' && isset(self::$commonCurrencies[$value])) {
             $this->currency = $value;
             $this->currency_symbol = self::$commonCurrencies[$value]['symbol'];
+
+            if ($value === 'INR') {
+                if (empty($this->country) || $this->country === 'United Arab Emirates') {
+                    $this->country = 'India';
+                }
+                if ((float)$this->default_vat_percent == 5.00 || empty($this->default_vat_percent)) {
+                    $this->default_vat_percent = 18.00;
+                }
+            } elseif ($value === 'AED') {
+                if (empty($this->country) || $this->country === 'India') {
+                    $this->country = 'United Arab Emirates';
+                }
+                if ((float)$this->default_vat_percent == 18.00 || empty($this->default_vat_percent)) {
+                    $this->default_vat_percent = 5.00;
+                }
+            }
+        }
+    }
+
+    public function updatedCountry($value)
+    {
+        $val = strtolower(trim($value));
+        if (str_contains($val, 'india')) {
+            if ($this->currency === 'AED' || empty($this->currency)) {
+                $this->currency = 'INR';
+                $this->currency_symbol = '₹';
+                $this->selected_preset = 'INR';
+            }
+            if ((float)$this->default_vat_percent == 5.00 || empty($this->default_vat_percent)) {
+                $this->default_vat_percent = 18.00;
+            }
+        } elseif (str_contains($val, 'emirates') || str_contains($val, 'uae') || str_contains($val, 'dubai')) {
+            if ($this->currency === 'INR' || empty($this->currency)) {
+                $this->currency = 'AED';
+                $this->currency_symbol = 'AED';
+                $this->selected_preset = 'AED';
+            }
+            if ((float)$this->default_vat_percent == 18.00 || empty($this->default_vat_percent)) {
+                $this->default_vat_percent = 5.00;
+            }
         }
     }
 
@@ -82,9 +122,45 @@ class CompanySettings extends Component
             if (empty($this->currency_symbol)) {
                 $this->currency_symbol = self::$commonCurrencies[$code]['symbol'];
             }
+            if ($code === 'INR' && (empty($this->country) || $this->country === 'United Arab Emirates')) {
+                $this->country = 'India';
+                if ((float)$this->default_vat_percent == 5.00 || empty($this->default_vat_percent)) {
+                    $this->default_vat_percent = 18.00;
+                }
+            }
         } else {
             $this->selected_preset = 'CUSTOM';
         }
+    }
+
+    public function getTaxLabelProperty(): string
+    {
+        $country = strtolower(trim($this->country ?? ''));
+        $curr = strtoupper(trim($this->currency ?? ''));
+        if (str_contains($country, 'india') || $curr === 'INR') {
+            return 'GST';
+        }
+        return 'VAT';
+    }
+
+    public function getTaxNumberLabelProperty(): string
+    {
+        $country = strtolower(trim($this->country ?? ''));
+        $curr = strtoupper(trim($this->currency ?? ''));
+        if (str_contains($country, 'india') || $curr === 'INR') {
+            return 'GSTIN';
+        }
+        return 'TRN';
+    }
+
+    public function getTaxNumberPlaceholderProperty(): string
+    {
+        return $this->taxLabel === 'GST' ? 'e.g. 29AAAAA0000A1Z5' : 'e.g. 100234567890003';
+    }
+
+    public function getDefaultTaxPlaceholderProperty(): string
+    {
+        return $this->taxLabel === 'GST' ? '18.00' : '5.00';
     }
 
     public function saveSettings()
@@ -121,6 +197,7 @@ class CompanySettings extends Component
         \App\Services\SettingsService::clearCache();
 
         session()->flash('success', 'Company settings updated successfully.');
+        $this->dispatch('toast', message: 'Company settings updated successfully.', type: 'success', title: 'Settings Saved');
 
         $this->dispatch('check-and-open-setup-wizard');
     }

@@ -85,7 +85,7 @@
             @error('sales_price') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
         <div class="col-12 col-sm-4 mb-3">
-            <label class="form-label">VAT Tax %</label>
+            <label class="form-label">{{ tax_name() }} Tax %</label>
             <input type="number" step="0.01" wire:model="tax_percent" class="form-control @error('tax_percent') is-invalid @enderror">
             @error('tax_percent') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>

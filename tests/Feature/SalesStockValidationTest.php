@@ -113,6 +113,7 @@ class SalesStockValidationTest extends TestCase
             ->test(SalesCreate::class)
             ->set('customer_id', $customer->id)
             ->set('payment_type', 'Cash')
+            ->set('sales_person', 'Stock Tester')
             ->set('account_id', $account->id)
             ->set('items', [
                 [
@@ -165,6 +166,7 @@ class SalesStockValidationTest extends TestCase
             ->test(SalesCreate::class)
             ->set('customer_id', $customer->id)
             ->set('payment_type', 'Cash')
+            ->set('sales_person', 'Stock Tester')
             ->set('account_id', $account->id)
             ->set('items', [
                 [

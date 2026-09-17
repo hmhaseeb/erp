@@ -779,14 +779,18 @@
                 selectedValue: '',
                 selectedLabel: '',
                 focusedIndex: -1,
+                isSyncing: false,
+                isInitialized: false,
 
                 init() {
                     this.syncFromSelect();
+                    this.isInitialized = true;
                     if (this.$refs.nativeSelect) {
                         const observer = new MutationObserver(() => this.syncFromSelect());
                         observer.observe(this.$refs.nativeSelect, { childList: true, attributes: true, subtree: true });
                     }
                     this.$watch('selectedValue', (val) => {
+                        if (!this.isInitialized || this.isSyncing) return;
                         const select = this.$refs.nativeSelect;
                         if (select && select.value !== val) {
                             select.value = val;
@@ -800,6 +804,7 @@
                     const select = this.$refs.nativeSelect;
                     if (!select) return;
 
+                    this.isSyncing = true;
                     const opts = [];
                     for (let i = 0; i < select.options.length; i++) {
                         const opt = select.options[i];
@@ -819,6 +824,7 @@
                     } else {
                         this.selectedLabel = '';
                     }
+                    this.$nextTick(() => { this.isSyncing = false; });
                 },
 
                 get filteredOptions() {

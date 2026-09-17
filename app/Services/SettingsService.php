@@ -40,6 +40,59 @@ class SettingsService
     }
 
     /**
+     * Retrieve configured company country
+     */
+    public static function country(): string
+    {
+        return self::getCompany()?->country ?: 'United Arab Emirates';
+    }
+
+    /**
+     * Retrieve default tax/VAT percent
+     */
+    public static function defaultVatPercent(): float
+    {
+        $company = self::getCompany();
+        if ($company && $company->default_vat_percent !== null) {
+            return (float) $company->default_vat_percent;
+        }
+        $country = strtolower(trim($company?->country ?? ''));
+        $curr = strtoupper(trim($company?->currency ?? ''));
+        if (str_contains($country, 'india') || $curr === 'INR') {
+            return 18.00;
+        }
+        return 5.00;
+    }
+
+    /**
+     * Retrieve tax label based on company country/currency ('GST' for India, 'VAT' for UAE/others)
+     */
+    public static function taxLabel(): string
+    {
+        $company = self::getCompany();
+        $country = strtolower(trim($company?->country ?? ''));
+        $curr = strtoupper(trim($company?->currency ?? ''));
+        if (str_contains($country, 'india') || $curr === 'INR') {
+            return 'GST';
+        }
+        return 'VAT';
+    }
+
+    /**
+     * Retrieve tax registration number label ('GSTIN' for India, 'TRN' for UAE/others)
+     */
+    public static function taxNumberLabel(): string
+    {
+        $company = self::getCompany();
+        $country = strtolower(trim($company?->country ?? ''));
+        $curr = strtoupper(trim($company?->currency ?? ''));
+        if (str_contains($country, 'india') || $curr === 'INR') {
+            return 'GSTIN';
+        }
+        return 'TRN';
+    }
+
+    /**
      * Retrieve cached General Setting
      */
     public static function getGeneral(): ?GeneralSetting

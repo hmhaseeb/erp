@@ -1,6 +1,6 @@
 <div>
     <!-- Page Header -->
-    <x-page-header title="Sales Statement & Tax Report" subtitle="Detailed sales register, VAT tax collections, customer breakdowns, and invoice statements.">
+    <x-page-header title="Sales Statement & Tax Report" subtitle="Detailed sales register, {{ tax_name() }} tax collections, customer breakdowns, and invoice statements.">
         <button onclick="window.print()" class="btn btn-secondary waves-effect waves-light w-100 w-sm-auto mt-2 mt-sm-0">
             <i class="bx bx-printer me-1"></i> Print Report
         </button>
@@ -19,7 +19,7 @@
         </div>
         <div class="col-12 col-sm-6 col-xl-3">
             <x-kpi-card 
-                title="VAT Output Tax (5%)" 
+                title="{{ tax_name() }} Output Tax" 
                 :amount="$totalVat" 
                 prefix="{{ currency() }} " 
                 color="info" 
@@ -108,8 +108,8 @@
                     <x-th-sort field="sale_date" :sortField="$sortField" :sortDirection="$sortDirection" width="110px">Date</x-th-sort>
                     <th style="min-width: 140px;">Customer</th>
                     <th>Payment Type</th>
-                    <th class="text-end">Subtotal (Excl. VAT)</th>
-                    <th class="text-end text-info">VAT Amount (5%)</th>
+                    <th class="text-end">Subtotal (Excl. {{ tax_name() }})</th>
+                    <th class="text-end text-info">{{ tax_name() }} Amount</th>
                     <x-th-sort field="grand_total" :sortField="$sortField" :sortDirection="$sortDirection" align="right">Grand Total ({{ currency() }})</x-th-sort>
                 </tr>
             </thead>

@@ -100,12 +100,14 @@ class Create extends Component
             return;
         }
 
+        $defaultVat = \App\Services\SettingsService::defaultVatPercent();
+
         $this->items[] = [
             'product_id' => '',
             'quantity' => 1,
             'unit_price' => 0,
             'discount_amount' => 0,
-            'vat_percent' => 5,
+            'vat_percent' => $defaultVat,
             'vat_amount' => 0,
             'line_total' => 0,
         ];
@@ -126,10 +128,12 @@ class Create extends Component
         $field = $parts[1] ?? null;
 
         if ($field === 'product_id') {
+            $defaultVat = \App\Services\SettingsService::defaultVatPercent();
+
             if (empty($value)) {
                 $this->items[$index]['product_id'] = '';
                 $this->items[$index]['unit_price'] = 0;
-                $this->items[$index]['vat_percent'] = 5;
+                $this->items[$index]['vat_percent'] = $defaultVat;
                 $this->calculateTotals();
                 return;
             }
@@ -145,7 +149,7 @@ class Create extends Component
             if ($duplicate) {
                 $this->items[$index]['product_id'] = '';
                 $this->items[$index]['unit_price'] = 0;
-                $this->items[$index]['vat_percent'] = 5;
+                $this->items[$index]['vat_percent'] = $defaultVat;
                 $this->calculateTotals();
 
                 $dupProd = Product::find($value);
@@ -163,14 +167,14 @@ class Create extends Component
                 if (!$allowNegativeStock && $availStock <= 0) {
                     $this->items[$index]['product_id'] = '';
                     $this->items[$index]['unit_price'] = 0;
-                    $this->items[$index]['vat_percent'] = 5;
+                    $this->items[$index]['vat_percent'] = $defaultVat;
                     $this->calculateTotals();
                     $this->dispatch('toast', message: "'{$prod->name}' is out of stock (0 available) and cannot be added to a sales invoice.", type: 'danger', title: 'Out of Stock');
                     return;
                 }
 
                 $this->items[$index]['unit_price'] = (float)$prod->sales_price;
-                $this->items[$index]['vat_percent'] = (float)($prod->tax_percent ?? 5);
+                $this->items[$index]['vat_percent'] = (float)($prod->tax_percent !== null ? $prod->tax_percent : $defaultVat);
 
                 // Auto adjust row quantity if existing quantity exceeds available stock
                 $currentQty = (float)($this->items[$index]['quantity'] ?? 1);
@@ -274,7 +278,7 @@ class Create extends Component
             'invoice_number' => 'required|string',
             'sale_date' => 'required|date',
             'customer_id' => 'required|exists:customers,id',
-            'sales_person' => 'nullable|string|max:191',
+            'sales_person' => 'required|string|max:191',
             'payment_type' => 'required|in:Cash,Bank,Credit',
             'account_id' => 'required_if:payment_type,Cash,Bank|nullable|exists:accounts,id',
             'items' => 'required|array|min:1',
@@ -284,6 +288,7 @@ class Create extends Component
             'discount_amount' => 'numeric|min:0',
         ], [
             'customer_id.required' => 'Please select a customer.',
+            'sales_person.required' => 'Please enter the sales person name.',
             'payment_type.required' => 'Please select a payment type.',
             'payment_type.in' => 'Please select a valid payment type.',
             'account_id.required_if' => 'Please select a deposit account.',

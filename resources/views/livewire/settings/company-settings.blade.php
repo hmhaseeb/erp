@@ -19,61 +19,27 @@
 
                 <div class="row">
                     <div class="col-12 col-md-4 mb-3">
-                        <label class="form-label fw-semibold">TRN / VAT Tax Number</label>
-                        <input type="text" wire:model="trn_number" class="form-control" placeholder="e.g. 100234567890003">
+                        <label class="form-label fw-semibold">{{ $this->taxNumberLabel }} Tax Number</label>
+                        <input type="text" wire:model="trn_number" class="form-control" placeholder="{{ $this->taxNumberPlaceholder }}">
+                        <span class="text-muted font-size-11">Business official tax registration ID ({{ $this->taxNumberLabel }}).</span>
                     </div>
                     <div class="col-12 col-md-4 mb-3">
                         <label class="form-label fw-semibold">Currency Selection</label>
-                        <div x-data="searchableSelect" @click.away="open = false" class="position-relative">
-                            <!-- Native Select -->
-                            <select x-ref="nativeSelect" wire:model.live="selected_preset" class="d-none">
-                                @foreach($commonCurrencies as $code => $c)
-                                    <option value="{{ $code }}">{{ $code }} - {{ $c['name'] }} ({{ $c['symbol'] }})</option>
-                                @endforeach
-                                <option value="CUSTOM">Custom Currency...</option>
-                            </select>
-
-                            <!-- Custom Select Trigger -->
-                            <div @click="toggle()" class="form-select cursor-pointer d-flex justify-content-between align-items-center" :class="{ 'border-primary': open }">
-                                <span x-text="selectedLabel || 'Select Currency...'" class="text-truncate"></span>
-                                <i class="mdi mdi-chevron-down transition-icon" :class="{ 'rotate-180': open }"></i>
-                            </div>
-
-                            <!-- Dropdown Menu -->
-                            <div x-show="open" x-cloak x-transition.opacity
-                                 class="position-absolute w-100 bg-white border rounded shadow-sm mt-1" 
-                                 style="max-height: 250px; overflow-y: auto; z-index: 1050; padding: 8px;">
-                                <div class="mb-2 position-sticky top-0 bg-white" style="z-index: 10;">
-                                    <input type="text" x-ref="searchInput" x-model="searchQuery" 
-                                           @keydown.down.prevent="navigateOptions(1)"
-                                           @keydown.up.prevent="navigateOptions(-1)"
-                                           @keydown.enter.prevent="selectFocusedOption()"
-                                           class="form-control form-control-sm" placeholder="Search..." autocomplete="off">
-                                </div>
-                                <div class="list-group list-group-flush">
-                                    <template x-for="(opt, index) in filteredOptions" :key="opt.value">
-                                        <button type="button" @click="selectOption(opt)" 
-                                                @mouseenter="focusedIndex = index"
-                                                class="list-group-item list-group-item-action border-0 px-2 py-1 rounded"
-                                                :class="{'bg-light text-primary fw-medium': focusedIndex === index || selectedValue === opt.value}"
-                                                :disabled="opt.disabled">
-                                            <span x-text="opt.label" class="font-size-13"></span>
-                                        </button>
-                                    </template>
-                                    <div x-show="filteredOptions.length === 0" class="text-muted text-center py-2 font-size-12">
-                                        No results found.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <x-searchable-select wire:model.live="selected_preset" class="form-select" placeholder="Select Currency...">
+                            @foreach($commonCurrencies as $code => $c)
+                                <option value="{{ $code }}" @selected($selected_preset === $code)>{{ $code }} - {{ $c['name'] }} ({{ $c['symbol'] }})</option>
+                            @endforeach
+                            <option value="CUSTOM" @selected($selected_preset === 'CUSTOM')>Custom Currency...</option>
+                        </x-searchable-select>
                         <span class="text-muted font-size-11">Choose a preset or customize code & symbol below.</span>
                     </div>
                     <div class="col-12 col-md-4 mb-3">
-                        <label class="form-label fw-semibold">Default VAT %</label>
+                        <label class="form-label fw-semibold">Default {{ $this->taxLabel }} %</label>
                         <div class="input-group">
-                            <input type="number" step="0.01" wire:model="default_vat_percent" class="form-control" placeholder="5.00">
+                            <input type="number" step="0.01" wire:model="default_vat_percent" class="form-control" placeholder="{{ $this->defaultTaxPlaceholder }}">
                             <span class="input-group-text">%</span>
                         </div>
+                        <span class="text-muted font-size-11">Default tax applied on new products, sales, and purchases.</span>
                     </div>
                 </div>
 
@@ -136,7 +102,19 @@
                     </div>
                     <div class="col-12 col-sm-6 mb-3">
                         <label class="form-label">Country</label>
-                        <input type="text" wire:model="country" class="form-control">
+                        <input type="text" wire:model.live.debounce.300ms="country" list="country_list" class="form-control" placeholder="e.g. India, United Arab Emirates">
+                        <datalist id="country_list">
+                            <option value="India">
+                            <option value="United Arab Emirates">
+                            <option value="Saudi Arabia">
+                            <option value="Oman">
+                            <option value="Qatar">
+                            <option value="Kuwait">
+                            <option value="Bahrain">
+                            <option value="United States">
+                            <option value="United Kingdom">
+                            <option value="Pakistan">
+                        </datalist>
                     </div>
                 </div>
 

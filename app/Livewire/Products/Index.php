@@ -26,11 +26,17 @@ class Index extends Component
     public $productId;
     public $isEditMode = false;
     public $product_code, $barcode, $name, $category_id, $brand, $unit_id;
-    public $purchase_price = 0, $sales_price = 0, $tax_percent = 5, $min_stock = 5;
+    public $purchase_price = 0, $sales_price = 0, $tax_percent, $min_stock = 5;
     public $opening_stock = 0, $warehouse = 'Main Warehouse', $description;
     public $image;
     public $existingImage;
     public $isModalOpen = false;
+
+    public function mount()
+    {
+        $this->tax_percent = \App\Services\SettingsService::defaultVatPercent();
+        $this->generateCode();
+    }
 
     // View single product modal
     public $viewProduct = null;
@@ -94,11 +100,6 @@ class Index extends Component
         ];
     }
 
-    public function mount()
-    {
-        $this->generateCode();
-    }
-
     public function generateCode()
     {
         $setting = \App\Models\GeneralSetting::first();
@@ -122,7 +123,7 @@ class Index extends Component
     public function openModal()
     {
         $this->reset(['productId', 'isEditMode', 'barcode', 'name', 'category_id', 'brand', 'unit_id', 'purchase_price', 'sales_price', 'description', 'image', 'existingImage']);
-        $this->tax_percent = 5;
+        $this->tax_percent = \App\Services\SettingsService::defaultVatPercent();
         $this->min_stock = 5;
         $this->opening_stock = 0;
         $this->warehouse = 'Main Warehouse';

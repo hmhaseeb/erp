@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Purchase;
 use App\Models\Supplier;
 use App\Services\PurchaseService;
+use App\Services\SettingsService;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -46,6 +47,8 @@ class Create extends Component
         if ($firstSupplier) {
             $this->supplier_id = $firstSupplier->id;
         }
+
+        $this->tax_percent = SettingsService::defaultVatPercent();
 
         // Add 1 default row
         $this->addItem();
@@ -109,7 +112,7 @@ class Create extends Component
             'quantity' => 1,
             'unit_price' => 0,
             'discount_amount' => 0,
-            'vat_percent' => 5,
+            'vat_percent' => SettingsService::defaultVatPercent(),
             'vat_amount' => 0,
             'line_total' => 0,
         ];
@@ -133,7 +136,7 @@ class Create extends Component
             if (empty($value)) {
                 $this->items[$index]['product_id'] = '';
                 $this->items[$index]['unit_price'] = 0;
-                $this->items[$index]['vat_percent'] = 5;
+                $this->items[$index]['vat_percent'] = SettingsService::defaultVatPercent();
                 $this->calculateTotals();
                 return;
             }
@@ -149,7 +152,7 @@ class Create extends Component
             if ($duplicate) {
                 $this->items[$index]['product_id'] = '';
                 $this->items[$index]['unit_price'] = 0;
-                $this->items[$index]['vat_percent'] = 5;
+                $this->items[$index]['vat_percent'] = SettingsService::defaultVatPercent();
                 $this->calculateTotals();
 
                 $dupProd = Product::find($value);
@@ -161,7 +164,7 @@ class Create extends Component
             $prod = Product::find($value);
             if ($prod) {
                 $this->items[$index]['unit_price'] = (float)$prod->purchase_price;
-                $this->items[$index]['vat_percent'] = (float)($prod->tax_percent ?? 5);
+                $this->items[$index]['vat_percent'] = (float)($prod->tax_percent ?? SettingsService::defaultVatPercent());
                 $this->resetErrorBag("items.{$index}.product_id");
             }
         }
@@ -208,7 +211,7 @@ class Create extends Component
             'purchase_date' => 'required|date',
             'supplier_id' => 'required|exists:suppliers,id',
             'reference_number' => 'nullable|string|max:100',
-            'sales_person' => 'nullable|string|max:191',
+            'sales_person' => 'required|string|max:191',
             'payment_type' => 'required|in:Cash,Bank,Credit',
             'account_id' => 'required_if:payment_type,Cash,Bank|nullable|exists:accounts,id',
             'items' => 'required|array|min:1',
@@ -218,6 +221,7 @@ class Create extends Component
             'discount_amount' => 'numeric|min:0',
         ], [
             'supplier_id.required' => 'Please select a supplier.',
+            'sales_person.required' => 'Please enter the sales person name.',
             'payment_type.required' => 'Please select a payment type.',
             'payment_type.in' => 'Please select a valid payment type.',
             'account_id.required_if' => 'Please select a payment account.',
@@ -329,7 +333,7 @@ class Create extends Component
             'barcode', 'name', 'category_id', 'brand', 'unit_id',
             'purchase_price', 'sales_price', 'description', 'image', 'existingImage'
         ]);
-        $this->tax_percent = 5;
+        $this->tax_percent = SettingsService::defaultVatPercent();
         $this->min_stock = 5;
         $this->opening_stock = 0;
         $this->warehouse = 'Main Warehouse';

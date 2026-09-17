@@ -32,7 +32,7 @@
                     <div>{{ $company->address ?? '' }}</div>
                     <div>{{ $company->city ?? '' }}, {{ $company->country ?? '' }}</div>
                     <div>Mobile: {{ $company->mobile ?? '-' }} | Email: {{ $company->email ?? '-' }}</div>
-                    <div><strong>TRN / VAT #:</strong> {{ $company->trn_number ?? '-' }}</div>
+                    <div><strong>{{ tax_number_name() }} #:</strong> {{ $company->trn_number ?? '-' }}</div>
                 </td>
                 <td class="text-end" style="width: 40%;">
                     <div class="header-title">TAX INVOICE</div>
@@ -57,7 +57,7 @@
                     <span style="font-size: 14px;" class="fw-bold">{{ $sale->customer->name ?? 'Walk-in Customer' }}</span><br>
                     @if($sale->customer->company_name) {{ $sale->customer->company_name }}<br> @endif
                     @if($sale->customer->address) {{ $sale->customer->address }}<br> @endif
-                    @if($sale->customer->trn_number) <strong>TRN #:</strong> {{ $sale->customer->trn_number }}<br> @endif
+                    @if($sale->customer->trn_number) <strong>{{ tax_number_name() }} #:</strong> {{ $sale->customer->trn_number }}<br> @endif
                     @if($sale->customer->mobile) Mobile: {{ $sale->customer->mobile }} @endif
                 </td>
             </tr>
@@ -70,7 +70,7 @@
                     <th style="width: 45%;">Item Description</th>
                     <th class="text-end" style="width: 12%;">Qty</th>
                     <th class="text-end" style="width: 15%;">Unit Price</th>
-                    <th class="text-end" style="width: 10%;">VAT %</th>
+                    <th class="text-end" style="width: 10%;">{{ tax_name() }} %</th>
                     <th class="text-end" style="width: 13%;">Total ({{ currency() }})</th>
                 </tr>
             </thead>
@@ -114,7 +114,7 @@
                             </tr>
                         @endif
                         <tr>
-                            <td>VAT Tax Amount:</td>
+                            <td>{{ tax_name() }} Tax Amount:</td>
                             <td class="text-end">{{ currency() }} {{ number_format($sale->vat_amount, 2) }}</td>
                         </tr>
                         <tr style="border-top: 2px solid #0f172a; font-size: 15px;" class="fw-bold">
